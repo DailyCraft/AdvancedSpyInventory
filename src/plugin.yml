@@ -1,7 +1,7 @@
 name: AdvancedSpyInventory
 author: DailyCraft
 description: Open inventory of others players
-version: 1.2
+version: 1.2.1
 main: minecraft.dailycraft.advancedspyinventory.Main
 
 commands:

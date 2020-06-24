@@ -123,7 +123,7 @@ public class InventoryPlayer implements PlayerInventory
                 return setItemWithDisplayName(new Potion(PotionType.INSTANT_HEAL).toItemStack(1), translation.translate("Health", "Vie") + " : " + new DecimalFormat(".#").format(getHolder().getHealth()).replace(',', '.'));
 
             case 47:
-                if (translation.getSender().hasPermission("advancedspyinventory.inventory.view"))
+                if (translation.getSender().hasPermission("advancedspyinventory.inventory.location.view"))
                 {
                     return setItemWithDisplayName(Material.ARROW, "Location",
                             translation.translate("World", "Monde") + " : " + getHolder().getWorld().getName(),
