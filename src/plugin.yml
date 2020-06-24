@@ -1,0 +1,20 @@
+name: AdvancedSpyInventory
+author: DailyCraft
+description: Open inventory of others players
+version: 1.2
+main: minecraft.dailycraft.advancedspyinventory.Main
+
+commands:
+  inventory:
+    description: Open inventory of players
+    usage: /inv <Player>
+    permission: advancedspyinventory.inventory.use
+    aliases: inv
+
+  enderchest:
+    description: Open ender chest of players
+    usage: /enderchest [Player]
+    permission: advancedspyinventory.enderchest.use
+    aliases:
+      - ec
+      - e

@@ -1,0 +1,2 @@
+# Display offline players in the tab completer for the command /inventory and /enderchest
+show_offline_players: false
