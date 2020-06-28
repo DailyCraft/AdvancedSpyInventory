@@ -2,6 +2,7 @@ package minecraft.dailycraft.advancedspyinventory;
 
 import minecraft.dailycraft.advancedspyinventory.command.CommandEnderChest;
 import minecraft.dailycraft.advancedspyinventory.command.CommandInventory;
+import minecraft.dailycraft.advancedspyinventory.command.DefaultTabCompleter;
 import minecraft.dailycraft.advancedspyinventory.listerner.InventoryListeners;
 import minecraft.dailycraft.advancedspyinventory.listerner.PlayerListeners;
 import org.bukkit.command.CommandExecutor;
@@ -17,10 +18,10 @@ public class Main extends JavaPlugin
     {
         saveDefaultConfig();
 
-        addCommand("inventory", new CommandInventory(this), new CommandInventory(this));
-        addCommand("enderchest", new CommandEnderChest(this), new CommandEnderChest(this));
+        addCommand("inventory", new CommandInventory(this));
+        addCommand("enderchest", new CommandEnderChest(this));
 
-        addEvents(new InventoryListeners(), new PlayerListeners());
+        addEvents(new InventoryListeners(), new PlayerListeners(this));
     }
 
     private void addCommand(String name, CommandExecutor executor, TabCompleter completer)
@@ -29,6 +30,11 @@ public class Main extends JavaPlugin
 
         command.setExecutor(executor);
         command.setTabCompleter(completer);
+    }
+
+    private void addCommand(String name, CommandExecutor executor)
+    {
+        addCommand(name, executor, new DefaultTabCompleter(this));
     }
 
     private void addEvents(Listener... listeners)

@@ -29,6 +29,4 @@ public class TranslationUtils
     {
         return sender;
     }
-
-
 }

@@ -1,25 +1,24 @@
 package minecraft.dailycraft.advancedspyinventory.command;
 
-import minecraft.dailycraft.advancedspyinventory.Main;
+import minecraft.dailycraft.advancedspyinventory.ConfigsManager;
 import minecraft.dailycraft.advancedspyinventory.TranslationUtils;
-import minecraft.dailycraft.advancedspyinventory.listerner.PlayerListeners;
 import minecraft.dailycraft.advancedspyinventory.gui.InventoryPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-public class CommandInventory implements CommandExecutor, TabCompleter
+public class CommandInventory implements CommandExecutor
 {
-    private final Main main;
+    private final JavaPlugin plugin;
 
-    public CommandInventory(Main main)
+    public CommandInventory(JavaPlugin plugin)
     {
-        this.main = main;
+        this.plugin = plugin;
     }
 
     @Override
@@ -31,21 +30,20 @@ public class CommandInventory implements CommandExecutor, TabCompleter
             {
                 Player player = (Player) sender;
 
-                try
+                if (Bukkit.getOfflinePlayer(args[0]).isOnline())
                 {
-                    player.openInventory(new InventoryPlayer(player, Bukkit.getPlayer(args[0]).getInventory()));
+                    player.openInventory(new InventoryPlayer(player, Bukkit.getPlayer(args[0]).getUniqueId(), plugin));
                 }
-                catch (NullPointerException exception)
+                else
                 {
-                    if (PlayerListeners.getPlayerMap().keySet().size() != 0)
+                    FileConfiguration playersConfig = new ConfigsManager(plugin).getOfflinePlayersConfig();
+
+                    for (String uuid : playersConfig.getKeys(false))
                     {
-                        for (UUID uuid : PlayerListeners.getPlayerMap().keySet())
+                        if (Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName().equals(args[0]))
                         {
-                            if (Bukkit.getOfflinePlayer(uuid).getName().equals(args[0]))
-                            {
-                                player.openInventory(new InventoryPlayer(player, PlayerListeners.getPlayerMap().get(uuid).getInventory()));
-                                return true;
-                            }
+                            player.openInventory(new InventoryPlayer(player, UUID.fromString(uuid), plugin));
+                            return true;
                         }
                     }
 
@@ -63,26 +61,5 @@ public class CommandInventory implements CommandExecutor, TabCompleter
         }
 
         return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args)
-    {
-        List<String> name = new ArrayList<>();
-
-        for (Player player : sender.getServer().getOnlinePlayers())
-        {
-            name.add(player.getName());
-        }
-
-        if (main.getConfig().getBoolean("show_offline_players"))
-        {
-            for (UUID uuid : PlayerListeners.getPlayerMap().keySet())
-            {
-                name.add(Bukkit.getOfflinePlayer(uuid).getName());
-            }
-        }
-
-        return name;
     }
 }

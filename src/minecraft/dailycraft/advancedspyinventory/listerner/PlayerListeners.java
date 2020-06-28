@@ -1,55 +1,72 @@
 package minecraft.dailycraft.advancedspyinventory.listerner;
 
+import minecraft.dailycraft.advancedspyinventory.ConfigsManager;
+import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 public class PlayerListeners implements Listener
 {
-    public static Map<UUID, Player> playerMap = new HashMap<>();
+    private final ConfigsManager configsManager;
+    private final FileConfiguration offlinePlayersConfig;
+
+    public PlayerListeners(JavaPlugin plugin)
+    {
+        configsManager = new ConfigsManager(plugin);
+        offlinePlayersConfig = configsManager.getOfflinePlayersConfig();
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event)
     {
-        if (!playerMap.containsKey(event.getPlayer().getUniqueId()))
-            return;
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
 
-        event.getPlayer().getInventory().clear();
+        configsManager.reloadConfig();
 
-        PlayerInventory inv = playerMap.get(event.getPlayer().getUniqueId()).getInventory();
-        Inventory ec = playerMap.get(event.getPlayer().getUniqueId()).getEnderChest();
-
-        int i = 0;
-        while (i != inv.getSize())
+        if (offlinePlayersConfig.get(uuid.toString()) != null)
         {
-            event.getPlayer().getInventory().setItem(i, inv.getItem(i));
-            i++;
-        }
+            player.getInventory().clear();
+            player.getEnderChest().clear();
 
-        i = 0;
-        while (i != ec.getSize())
-        {
-            event.getPlayer().getEnderChest().setItem(i, ec.getItem(i));
-            i++;
+            try
+            {
+                player.getInventory().setContents((ItemStack[]) offlinePlayersConfig.get(uuid + ".inventory"));
+                player.getEnderChest().setContents((ItemStack[]) offlinePlayersConfig.get(uuid + ".enderchest"));
+            }
+            catch (ClassCastException exception)
+            {
+                player.getInventory().setContents(((ArrayList<ItemStack>) offlinePlayersConfig.get(uuid + ".inventory")).toArray(new ItemStack[player.getInventory().getContents().length]));
+                player.getEnderChest().setContents(((ArrayList<ItemStack>) offlinePlayersConfig.get(uuid + ".enderchest")).toArray(new ItemStack[player.getEnderChest().getContents().length]));
+            }
         }
-
-        getPlayerMap().remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event)
     {
-        playerMap.put(event.getPlayer().getUniqueId(), event.getPlayer());
-    }
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+        Location location = player.getLocation();
 
-    public static Map<UUID, Player> getPlayerMap()
-    {
-        return playerMap;
+        offlinePlayersConfig.set(uuid + ".location.world", location.getWorld().getName());
+        offlinePlayersConfig.set(uuid + ".location.x", location.getX());
+        offlinePlayersConfig.set(uuid + ".location.y", location.getY());
+        offlinePlayersConfig.set(uuid + ".location.z", location.getZ());
+
+        offlinePlayersConfig.set(uuid + ".health", event.getPlayer().getHealth());
+        offlinePlayersConfig.set(uuid + ".experience", event.getPlayer().getTotalExperience());
+        offlinePlayersConfig.set(uuid + ".food", event.getPlayer().getFoodLevel());
+        offlinePlayersConfig.set(uuid + ".inventory", player.getInventory().getContents());
+        offlinePlayersConfig.set(uuid + ".enderchest", player.getEnderChest().getContents());
+        configsManager.saveConfig();
     }
 }
