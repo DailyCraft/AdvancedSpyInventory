@@ -1,40 +1,72 @@
 package minecraft.dailycraft.advancedspyinventory;
 
-import minecraft.dailycraft.advancedspyinventory.command.CommandEnderChest;
-import minecraft.dailycraft.advancedspyinventory.command.CommandInventory;
-import minecraft.dailycraft.advancedspyinventory.command.DefaultTabCompleter;
-import minecraft.dailycraft.advancedspyinventory.listerner.InventoryListeners;
-import minecraft.dailycraft.advancedspyinventory.listerner.PlayerListeners;
-import org.bukkit.command.CommandExecutor;
+import minecraft.dailycraft.advancedspyinventory.command.*;
+import minecraft.dailycraft.advancedspyinventory.listener.InventoryListeners;
+import minecraft.dailycraft.advancedspyinventory.listener.PlayerListeners;
+import minecraft.dailycraft.advancedspyinventory.utils.Config;
+import minecraft.dailycraft.advancedspyinventory.utils.OfflinePlayer;
+import minecraft.dailycraft.advancedspyinventory.utils.Permissions;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.UUID;
 
 public class Main extends JavaPlugin
 {
     @Override
     public void onEnable()
     {
+        addCommands(new InventoryCommand(), new EnderChestCommand());
+        addEvents(new InventoryListeners(), new PlayerListeners());
+
+        for (Permissions perm : Permissions.values())
+            getServer().getPluginManager().addPermission(perm.get());
+
+        ConfigurationSerialization.registerClass(OfflinePlayer.class);
+        ConfigurationSerialization.registerClass(OfflinePlayer.Location.class);
+
         saveDefaultConfig();
-
-        addCommand("inventory", new CommandInventory(this));
-        addCommand("enderchest", new CommandEnderChest(this));
-
-        addEvents(new InventoryListeners(), new PlayerListeners(this));
+        saveResource("lang/en_us.lang", true);
+        saveResource("lang/fr_fr.lang", true);
     }
 
-    private void addCommand(String name, CommandExecutor executor, TabCompleter completer)
+    @Override
+    public void onDisable()
     {
-        PluginCommand command = getCommand(name);
+        for (Player player : Bukkit.getOnlinePlayers())
+        {
+            UUID uuid = player.getUniqueId();
+            Location location = player.getLocation();
 
-        command.setExecutor(executor);
-        command.setTabCompleter(completer);
+            Config.get().set(uuid.toString(), new OfflinePlayer(
+                    new OfflinePlayer.Location(location.getWorld().getName(), location.getX(), location.getY(), location.getZ()),
+                    player.getHealth(), player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), player.getTotalExperience(), player.getFoodLevel(), player.getInventory().getContents(), player.getEnderChest().getContents()));
+        }
+
+        Config.save();
     }
 
-    private void addCommand(String name, CommandExecutor executor)
+    public static Main getInstance()
     {
-        addCommand(name, executor, new DefaultTabCompleter(this));
+        return getPlugin(Main.class);
+    }
+
+    private void addCommands(TabExecutor... tabExecutors)
+    {
+        for (TabExecutor tabExecutor : tabExecutors)
+        {
+            PluginCommand command = getCommand(tabExecutor.getClass().getSimpleName().replace("Command", "").toLowerCase());
+
+            command.setExecutor(tabExecutor);
+            command.setTabCompleter(tabExecutor);
+        }
     }
 
     private void addEvents(Listener... listeners)

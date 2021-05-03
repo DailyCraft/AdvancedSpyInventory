@@ -1,20 +1,23 @@
 name: AdvancedSpyInventory
 author: DailyCraft
-description: Open inventory and ender chest of other players, online or not !
-version: 1.3
+description: Open and modify the inventory of entities and players, online or not ! But you can also modify the ender chest of the players
+version: 1.4
+website: https://dev.bukkit.org/projects/advancedspyinventory
 main: minecraft.dailycraft.advancedspyinventory.Main
 
 commands:
   inventory:
-    description: Open inventory of players
-    usage: /inv <Player>
-    permission: advancedspyinventory.inventory.use
-    aliases: inv
+    description: Open inventory of players or entities
+    usage: /<command> <Player|Entity>
+    permission: advancedspyinventory.inventory
+    aliases:
+      - inv
+      - i
 
   enderchest:
     description: Open ender chest of players
-    usage: /enderchest [Player]
-    permission: advancedspyinventory.enderchest.use
+    usage: /<command> [Player]
+    permission: advancedspyinventory.enderchest
     aliases:
       - ec
       - e
