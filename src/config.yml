@@ -1,5 +1,0 @@
-# Display offline players in the tab completer for the command /inventory and /enderchest
-show_offline_players: false
-
-# The language used in the console to display plugin messages
-console_language: en_us

@@ -1,0 +1,26 @@
+# This value can be changed if you want to influence whether disconnected
+# players are displayed as command prompts for /inventory and /enderchest.
+# The base value is 'false' so with the feature disabled so that there are
+# not too many players offered if a lot of people have already joined the server.
+# Possible value: 'true' or 'false'
+show_offline_players: false
+
+# The next two entries are part of the translation system or you can find
+# more information on the wiki: https://github.com/DailyCraft/AdvancedSpyInventory/wiki/Translation
+
+# This allows you to set the default language of the server, and therefore
+# choose the language in which messages will be displayed in the console.
+# If the language has not been translated, the one displayed will be English.
+# The default is 'en_us', hence English. Possible values are any in-game locale
+# code you can find here (provided the language is available in the current
+# server version): https://minecraft.fandom.com/wiki/Language#Languages
+default_language: en_us
+
+# Modifying this value will allow to activate or not the fact that the
+# language of the texts of the plugin that the player will see in the chat
+# and in the interfaces is correlated with the language he has chosen on his
+# game. If it is deactivated, the language used to display messages will
+# be the same as stated above.
+# The default value is 'true' so the feature is enabled. Possible values
+# are 'true' and 'false'.
+dynamic_language: true

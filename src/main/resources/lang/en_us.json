@@ -1,0 +1,226 @@
+{
+  "command": {
+    "not_player_uuid": "§cThe UUID is not one of a player",
+    "never_connected": "§cThe player never connected to the server",
+    "not_player": "§cThis command can only be used by players",
+    "inventory.player": "§cYou don't have permission to open the inventory of players",
+    "inventory.entity": "§cYou don't have permission to open the inventory of entities",
+    "enderchest.other": "§cYou don't have permission to open the ender chest of other players"
+  },
+
+  "interface": {
+    "reload": "§cThere was a reload, please reopen the interface manually",
+    "entity": {
+      "title": "§l%s§r's Inventory",
+      "clear": "§cClear Inventory",
+      "close": "Close",
+      "health": {
+        "": "Health: §a%,.2f §7/ §a%,.2f",
+        "modify": "§aLeft Click §7to modify §eplayer health",
+        "modify.max": "§aRight Click §7to modify §eplayer max health"
+      },
+      "location": "Location",
+      "world": "World: §a%s §7(type: §2%s§7)",
+      "world.environment": {
+        "normal": "Overworld",
+        "nether": "Nether",
+        "the_end": "End",
+        "custom": "Custom"
+      },
+      "x": "X: §a%,.2f",
+      "y": "Y: §a%,.2f",
+      "z": "Z: §a%,.2f",
+      "yaw": "Yaw: §e%,.2f",
+      "pitch": "Pitch: §e%,.02f",
+      "teleport": "\u2192 §aClick§7 to §eteleport",
+      "tamed": "Tamer: §a%s",
+      "untamed": "Untamed",
+      "modify": "§cYou don't have permission to modify the inventory",
+      "unknown": "Unknown"
+    },
+    "player": {
+      "slot": {
+        "": "Slot: §a%d",
+        "left": "§c(Left Click -1)",
+        "right": "§a(Right Click +1)",
+        "drop": "§aShift + Left Click§7 to §eforce drop",
+        "drop.all": "§aShift + Right Click§7 to §eforce drop all"
+      },
+      "experience": "Experience: §a%,.2f",
+      "experience.modify": "§aClick §7to modify the §eexperience level",
+      "food": {
+        "level": "Food Level: §a%,d",
+        "saturation": "Food Saturation: §a%,.2f",
+        "level.modify": "§aLeft Click §7to modify the §efood level",
+        "saturation.modify": "§aRight Click §7to modify the §efood saturation"
+      },
+      "enderchest": "Open his §5ender chest",
+      "own": "§cYou cannot modify your own inventory"
+    },
+    "enderchest": {
+      "title": "§l%s§r's Ender Chest",
+      "clear": "§cClear Ender Chest",
+      "inventory": "Open his inventory",
+      "modify": "§cYou don't have permission to modify the ender chest"
+    },
+    "information": {
+      "modify": "\u2192 §aClick§7 to §emodify",
+      "switch": "\u2192 §aClick§7 to §eswitch",
+      "selected": "§cAlready Selected",
+      "select": "§aClick to select",
+      "back": "§cBack"
+    },
+    "villager": {
+      "profession": {
+        "": "Profession: §a%s",
+        "none": "Unemployed",
+        "armorer": "Armorer",
+        "butcher": "Butcher",
+        "cartographer": "Cartographer",
+        "cleric": "Cleric",
+        "farmer": "Farmer",
+        "fisherman": "Fisherman",
+        "fletcher": "Fletcher",
+        "leatherworker": "Leatherworker",
+        "librarian": "Librarian",
+        "mason": "Mason",
+        "nitwit": "Nitwit",
+        "shepherd": "Shepherd",
+        "toolsmith": "Toolsmith",
+        "weaponsmith": "Weaponsmith"
+      },
+      "type": {
+        "": "Type: §a%s",
+        "desert": "Desert",
+        "jungle": "Jungle",
+        "plains": "Plains",
+        "savanna": "Savanna",
+        "snow": "Snow",
+        "swamp": "Swamp",
+        "taiga": "Taiga"
+      },
+      "specifications": {
+        "": "Specifications",
+        "title": "%s's Specifications",
+        "profession": "Modify the villager profession",
+        "type": "Modify the villager type"
+      }
+    },
+    "sheep": {
+      "title": "%s's wool color",
+      "color": {
+        "": "Wool color: %s",
+        "white": "White",
+        "orange": "Orange",
+        "magenta": "Magenta",
+        "light_blue": "Light Blue",
+        "yellow": "Yellow",
+        "lime": "Lime",
+        "pink": "Pink",
+        "gray": "Gray",
+        "light_gray": "Light Gray",
+        "cyan": "Cyan",
+        "purple": "Purple",
+        "blue": "Blue",
+        "brown": "Brown",
+        "green": "Green",
+        "red": "Red",
+        "black": "Black"
+      }
+    },
+    "donkey.no_chest": "The animal doesn't carrying a chest",
+    "llama": {
+      "color": "Llama color",
+      "creamy": "§eCreamy",
+      "white": "§fWhite",
+      "brown": "§6Brown",
+      "gray": "Gray"
+    },
+    "iron_golem.player_creation": "Created by a player",
+    "iron_golem.natural_creation": "Not created by a player, it spawned naturally",
+    "fox": {
+      "type": "Fox Type",
+      "red": "§6Red",
+      "snow": "§fArctic"
+    },
+    "panda.gene": "Gene: §a%s",
+    "panda.hidden_gene": "Hidden Gene: §a%s",
+    "slime.size": "Slime size: §a%,d",
+    "snowman.pumpkin": {
+      "": "Has a pumpkin on his head",
+      "yes": "§aYes",
+      "no": "§cNo"
+    }
+  },
+
+  "sign": {
+    "health": ["§1Enter new", "§1§lhealth value"],
+    "health.max": ["§1Enter new", "§1§lmax health value"],
+    "experience": ["§1Enter new", "§1§lexperience amount"],
+    "food.level": ["§1Enter new", "§1§lfood level"],
+    "food.saturation": ["§1Enter new", "§1§lfood saturation"],
+    "slime": ["§1Enter new", "§1§lslime size"]
+  },
+
+  "item": {
+    "helmet": "Helmet",
+    "chestplate": "Chestplate",
+    "leggings": "Leggings",
+    "boots": "Boots",
+    "main_hand": "Main Hand",
+    "off_hand": "Secondary Hand",
+    "saddle": "Saddle",
+    "horse_armor": "Horse Armor",
+    "llama_decor": "Llama decor",
+    "enderman_carried": "Carried Block",
+    "cursor": "Cursor",
+    "description": "If you see this it means that there is no item in this slot",
+    "warning": "§cEven if the texture is not displayed in game, it is still saved and modifies strength, resistance, etc... as if it had",
+    "unavailable": "§cUnavailable"
+  },
+
+  "permission": {
+    "inventory": {
+      "": "Allows you to access to the /inventory command",
+      "player": {
+        "view": "Allows you to inspect the players inventory",
+        "modify": "Allows you to modify player inventory",
+        "slot": "Allows you to modify the player selected slot",
+        "drop": "Allows you to force the player to drop held item",
+        "health": "Allows you to see the player health",
+        "health.modify": "Allows you to modify the player health",
+        "health.modify.max": "Allows you to modify the player maximum health limit",
+        "location": "Allows you to see the player's location",
+        "teleport": "Allows you to teleport to player's location",
+        "xp": "Allows you to see the player experience",
+        "xp.modify": "Allows you to modify the player experience",
+        "food": "Allows you to see the player's food level",
+        "food.modify": "Allows you to modify the player food level"
+      },
+      "entity": {
+        "view": "Allows you to inspect the entities inventory",
+        "modify": "Allows you to modify the entities inventory",
+        "health": "Allows you to see the entity health",
+        "health.modify": "Allows you to modify the entity health",
+        "health.modify.max": "Allows you to modify the entity maximum health limit",
+        "location": "Allows you to see the entity's location",
+        "teleport": "Allows you to teleport the entity location",
+        "tamed": "Allows you to see if the entity is tamed",
+        "information.specific": "Allows you to see more information about '%s' entities",
+        "information.specific.modify": "Allows you to modify the information that can be seen with 'advancedspyinventory.inventory.entity.information.%s'",
+        "information": "Allows you to see more information about any entity",
+        "information.modify": "Allows you to modify the information that can be seen with 'advancedspyinventory.inventory.entity.information'"
+      }
+    },
+    "enderchest": {
+      "": "Allows you to execute the /enderchest command and inspect his own inventory",
+      "modify": "Allows you to modify your own ender chest",
+      "others": "Allows you to inspect the ender chest of other players",
+      "others.modify": "Allows you to modify the ender chest of other players"
+    },
+    "config": {
+      "": "Allows you to access to /asi command and see config values",
+      "modify": "Allows you to modify values in config and to reload it"
+    }
+  }
+}

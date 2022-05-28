@@ -1,0 +1,226 @@
+{
+  "command": {
+    "not_player_uuid": "§cLe UUID n'est pas celui d'un joueur",
+    "never_connected": "§cLe joueur ne s'est jamais connecté au serveur",
+    "not_player": "§cCette commande ne peut être utilisée que par des joueurs",
+    "inventory.player": "§cVous n'avez pas la permission d'ouvrir l'inventaire des joueurs",
+    "inventory.entity": "§cVous n'avez pas la permission d'ouvrir l'inventaire des entités",
+    "enderchest.other": "§cVous n'avez pas la permission d'ouvrir le coffre de l'ender des autres joueurs"
+  },
+
+  "interface": {
+    "reload": "§cIl y a eu un rechargement, veuillez rouvrir l'interface manuellement",
+    "entity": {
+      "title": "Inventaire de §l%s",
+      "clear": "§cVider l'inventaire",
+      "close": "Fermer",
+      "health": {
+        "": "Vie : §a%,.2f §7/ §a%,.2f",
+        "modify": "§aClic gauche §7pour modifier §ela vie du joueur",
+        "modify.max": "§aClic droit §7pour modifier §ela vie maximale du joueur"
+      },
+      "location": "Localisation",
+      "world": "Monde : §a%s §7(type : §2%s§7)",
+      "world.environment": {
+        "normal": "Overworld",
+        "nether": "Nether",
+        "the_end": "Ender",
+        "custom": "Customisé"
+      },
+      "x": "X : §a%,.2f",
+      "y": "Y : §a%,.2f",
+      "z": "Z : §a%,.2f",
+      "yaw": "Yaw : §e%,.2f",
+      "pitch": "Pitch : §e%,.02f",
+      "teleport": "\u2192 §aCliquer§7 pour §ese téléporter",
+      "tamed": "Dompteur : §a%s",
+      "untamed": "Indompté",
+      "modify": "§cVous n'avez pas la permission de modifier l'inventaire",
+      "unknown": "Inconnu"
+    },
+    "player": {
+      "slot": {
+        "": "Slot : §a%d",
+        "left": "§c(Clic gauche -1)",
+        "right": "§a(Clic droit +1)",
+        "drop": "§aShift + Clic gauche§7 pour §eforcer le drop",
+        "drop.all": "§aShift + Clic droit§7 pour §eforcer le drop de tout"
+      },
+      "experience": "Expérience : §a%,.2f",
+      "experience.modify": "§aCliquer §7pour modifier le §eniveau d'expérience",
+      "food": {
+        "level": "Niveau de nourriture : §a%,d",
+        "saturation": "Saturation alimentaire : §a%,.2f",
+        "level.modify": "§aClic gauche §7pour modifier le §eniveau de nourriture",
+        "saturation.modify": "§aClic droit §7pour modifier la §esaturation alimentaire"
+      },
+      "enderchest": "Ouvrir son §5coffre de l'ender",
+      "own": "§cVous ne pouvez pas modifier votre propre inventaire"
+    },
+    "enderchest": {
+      "title": "Coffre de l'ender de §l%s",
+      "clear": "§cVider le coffre de l'ender",
+      "inventory": "Ouvrir son inventaire",
+      "modify": "§cVous n'avez pas la permission de modifier le coffre de l'ender"
+    },
+    "information": {
+      "modify": "\u2129 §aCliquer§7 pour §emodifier",
+      "switch": "\u2129 §aCliquer§7 pour §eéchanger",
+      "selected": "§cDéjà sélectionné",
+      "select": "§aCliquer pour sélectionner",
+      "back": "§cRetour"
+    },
+    "villager": {
+      "profession": {
+        "": "Profession : §a%s",
+        "none": "Sans emploi",
+        "armorer": "Armurier",
+        "butcher": "Boucher",
+        "cartographer": "Cartographe",
+        "cleric": "Prêtre",
+        "farmer": "Fermier",
+        "fisherman": "Pêcheur",
+        "fletcher": "Fléchier",
+        "leatherworker": "Tanneur",
+        "librarian": "Bibliothécaire",
+        "mason": "Maçon",
+        "nitwit": "Idiot",
+        "shepherd": "Berger",
+        "toolsmith": "Forgeron d'outils",
+        "weaponsmith": "Forgeron d'armes"
+      },
+      "type": {
+        "": "Type : §a%s",
+        "desert": "Désert",
+        "jungle": "Jungle",
+        "plains": "Plaine",
+        "savanna": "Savane",
+        "snow": "Neige",
+        "swamp": "Marécage",
+        "taiga": "Taïga"
+      },
+      "specifications": {
+        "": "Spécifications",
+        "title": "Spécifications de %s",
+        "profession": "Modifier la profession du villageois",
+        "type": "Modifier le type du villageois"
+      }
+    },
+    "sheep": {
+      "title": "Couleur de la laine de %s",
+      "color": {
+        "": "Couleur de la laine : %s",
+        "white": "Blanc",
+        "orange": "Orange",
+        "magenta": "Magenta",
+        "light_blue": "Bleu clair",
+        "yellow": "Jaune",
+        "lime": "Vert clair",
+        "pink": "Rose",
+        "gray": "Gris",
+        "light_gray": "Gris clair",
+        "cyan": "Cyan",
+        "purple": "Violet",
+        "blue": "Bleu",
+        "brown": "Marron",
+        "green": "Vert",
+        "red": "Rouge",
+        "black": "Noir"
+      }
+    },
+    "donkey.no_chest": "L'animal ne porte pas de coffre",
+    "llama": {
+      "color": "Couleur du llama",
+      "creamy": "§eCrémeux",
+      "white": "§fBlanc",
+      "brown": "§6Marron",
+      "gray": "Gris"
+    },
+    "iron_golem.player_creation": "Créé par un joueur",
+    "iron_golem.natural_creation": "Non créé par un joueur, il est apparu naturellement",
+    "fox": {
+      "type": "Type de renard",
+      "red": "§6Roux",
+      "snow": "§fPolaire"
+    },
+    "panda.gene": "Gène : §a%s",
+    "panda.hidden_gene": "Gène caché : §a%s",
+    "slime.size": "Taille du slime : §a%,d",
+    "snowman.pumpkin": {
+      "": "A une citrouille sur sa tête",
+      "yes": "§aOui",
+      "no": "§cNon"
+    }
+  },
+
+  "sign": {
+    "health": ["§1Saisir une nouvelle", "§1§lvaleur de vie"],
+    "health.max": ["§1Saisir une nouvelle", "§1§lvaleur de vie maximal"],
+    "experience": ["§1Saisir un nouveau", "§1§lnombre d'experience"],
+    "food.level": ["§1Saisir un nouveau", "§1§lniveau de nourriture"],
+    "food.saturation": ["§1Saisir une nouvelle", "§1§lsaturation alimentaire"],
+    "slime": ["§1Entrer une nouvelle", "§1§ltaille pour le slime"]
+  },
+
+  "item": {
+    "helmet": "Casque",
+    "chestplate": "Plastron",
+    "leggings": "Jambières",
+    "boots": "Bottes",
+    "main_hand": "Main Principale",
+    "off_hand": "Main Secondaire",
+    "saddle": "Selle",
+    "horse_armor": "Armure du Cheval",
+    "llama_decor": "Décoration du Lama",
+    "enderman_carried": "Bloc Porté",
+    "cursor": "Curseur",
+    "description": "Si vous voyez cela, c'est qu'il n'y a aucun item dans ce slot",
+    "warning": "§cMême si la texture de s'affiche pas en jeu, elle est quand même enregistrer et modifie la force, la resistance, etc... comme si elle l'avait",
+    "unavailable": "§cIndisponible"
+  },
+
+  "permission": {
+    "inventory": {
+      "": "Permet d'accéder à la commande /inventory",
+      "player": {
+        "view": "Permet d'inspecter l'inventaire des joueurs",
+        "modify": "Permet de modifier l'inventaire des joueurs",
+        "slot": "Permet de modifier l'emplacement sélectionné des joueurs",
+        "drop": "Permet de forcer le joueur à lancer l'item tenu",
+        "health": "Permet de voir la vie des joueurs",
+        "health.modify": "Permet de modifier la vie des joueurs",
+        "health.modify.max": "Permet de modifier la limite de vie maximale des joueurs",
+        "location": "Permet de voir la localisation des joueurs",
+        "teleport": "Permet de se téléporter aux joueurs",
+        "xp": "Permet de voir l'expérience des joueurs",
+        "xp.modify": "Permet de modifier l'expérience des joueurs",
+        "food": "Permet de voir le niveau de nourriture des joueurs",
+        "food.modify": "Permet de modifier le niveau de nourriture des joueurs"
+      },
+      "entity": {
+        "view": "Permet d'inspecter l'inventaire des entités",
+        "modify": "Permet de modifier l'inventaire des entités",
+        "health": "Permet de voir la vie des joueurs",
+        "health.modify": "Permet de modifier la vie des joueurs",
+        "health.modify.max": "Permet de modifier la limite de vie maximale des entités",
+        "location": "Permet de voir la position des entités",
+        "teleport": "Permet de se téléporter aux entités",
+        "tamed": "Permet de voir si l'animal est apprivoisé",
+        "information.specific": "Permet de voir plus d'informations à propos des entités '%s'",
+        "information.specific.modify": "Permet de modifier l'information que l'on peut voir avec 'advancedspyinventory.inventory.entity.information.%s'",
+        "information": "Permet de voir plus d'informations sur n'importe quelle entité",
+        "information.modify": "Permet de modifier les informations que l'on peut voir avec 'advancedspyinventory.inventory.entity.information'"
+      }
+    },
+    "enderchest": {
+      "": "Permet d'exécuter la commande /enderchest et d'inspecter son propre coffre de l'ender",
+      "modify": "Permet de modifier son propre coffre de l'ender",
+      "others": "Permet d'inspecter le coffre de l'ender des autres joueurs",
+      "others.modify": "Permet de modifier le coffre de l'ender des autres joueurs"
+    },
+    "config": {
+      "": "Permet d'accéder à la commande /asi et des voir les valeurs de la configuration",
+      "modify": "Permet de modifier les valeurs dans la configuration et de la recharger"
+    }
+  }
+}

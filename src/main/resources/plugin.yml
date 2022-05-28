@@ -1,0 +1,20 @@
+name: ${name}
+author: DailyCraft
+description: ${description}
+version: ${version}
+api-version: 1.16
+website: ${url}
+main: ${groupId}.${artifactId}.Main
+
+commands:
+  inventory:
+    description: Open inventory of players or entities
+    usage: /<command> <Player|Entity>
+    permission: ${artifactId}.inventory
+    aliases: inv
+
+  enderchest:
+    description: Open ender chest of players
+    usage: /<command> [Player]
+    permission: ${artifactId}.enderchest
+    aliases: ec
