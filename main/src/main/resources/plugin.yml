@@ -1,0 +1,20 @@
+name: ${parent.name}
+author: DailyCraft
+description: ${description}
+version: ${version}
+api-version: 1.17
+website: ${parent.url}
+main: ${groupId}.advancedspyinventory.Main
+
+commands:
+  inventory:
+    description: Open inventory of players or entities
+    usage: /<command> <Player|Entity>
+    permission: ${artifactId}.inventory
+    aliases: inv
+
+  enderchest:
+    description: Open ender chest of players
+    usage: /<command> [Player]
+    permission: ${artifactId}.enderchest
+    aliases: ec

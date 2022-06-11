@@ -5,86 +5,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>mc.dailycraft</groupId>
-    <artifactId>advancedspyinventory</artifactId>
-    <version>2.0</version>
+    <artifactId>advancedspyinventory-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>2.1</version>
 
     <name>AdvancedSpyInventory</name>
     <url>https://dev.bukkit.org/projects/advancedspyinventory</url>
     <description>Open and modify the inventory of entities and players, online or not ! But you can also modify the ender chest of the players</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>23.0.0</version>
-            <optional>true</optional>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <finalName>${project.name}-${project.version}</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>org.bstats:bstats-bukkit</include>
-                                    <include>org.bstats:bstats-base</include>
-                                </includes>
-                            </artifactSet>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>mc.dailycraft.bstats</shadedPattern>
-                                </relocation>
-                            </relocations>
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+        <module>main</module>
+        <module>v1_18_R2</module>
+        <module>dist</module>
+    </modules>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <minecraftVersion>unknown</minecraftVersion>
     </properties>
-
 </project>
