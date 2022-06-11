@@ -111,7 +111,7 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                     }
                 }
             }
-        } else if (index == getSize() - 2)
+        } else if (index == getSize() - 2) {
             if (entity instanceof Tameable && Permissions.ENTITY_TAMED.has(viewer)) {
                 if (((Tameable) entity).isTamed()) {
                     if (((Tameable) entity).getOwner() != null)
@@ -121,6 +121,7 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                 } else
                     return new ItemStackBuilder(LocalDateTime.now().getMonth() == Month.OCTOBER && LocalDateTime.now().getDayOfMonth() == 31 ? "MHF_Herobrine" : "MHF_Steve", translation.format("interface.entity.untamed")).get();
             }
+        }
 
         return VOID_ITEM;
     }

@@ -35,7 +35,7 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder(String headOwner, String displayName) {
         this(Material.PLAYER_HEAD, displayName);
-        modifyMeta((Consumer<SkullMeta>) meta -> meta.setOwner(headOwner));
+        this.<SkullMeta>modifyMeta(meta -> meta.setOwner(headOwner));
     }
 
     public ItemStackBuilder(PotionType potionType, String displayName) {

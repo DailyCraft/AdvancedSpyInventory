@@ -20,7 +20,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>advancedspyinventory-v1_18_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>advancedspyinventory-v1_18_R2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>advancedspyinventory-v1_19_R1</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
