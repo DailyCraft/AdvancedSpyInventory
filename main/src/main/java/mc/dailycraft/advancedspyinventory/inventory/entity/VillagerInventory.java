@@ -48,9 +48,9 @@ public class VillagerInventory extends EntityInventory<Villager> {
     @Override
     public void setItem(int index, ItemStack stack) {
         if (index >= 2 && index <= 6)
-            entity.getInventory().setItem(index - 2, getContents()[index + 4] = stack);
+            entity.getInventory().setItem(index - 2, stack);
         else if (index >= 12 && index <= 14)
-            entity.getInventory().setItem(index - 7, getContents()[index - 1] = stack);
+            entity.getInventory().setItem(index - 7, stack);
         else
             super.setItem(index, stack);
     }

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class PlayerTabExecutor implements TabExecutor {
     @Override
@@ -21,6 +22,6 @@ public abstract class PlayerTabExecutor implements TabExecutor {
                 .filter(player -> Main.getInstance().getConfig().getBoolean("show_offline_players") || player.isOnline())
                 .map(OfflinePlayer::getName)
                 .filter(name -> name.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
-                .toList();
+                .collect(Collectors.toList());
     }
 }

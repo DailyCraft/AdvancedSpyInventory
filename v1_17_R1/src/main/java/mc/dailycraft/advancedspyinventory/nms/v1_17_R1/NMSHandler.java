@@ -1,4 +1,4 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_19_R1;
+package mc.dailycraft.advancedspyinventory.nms.v1_17_R1;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,9 +7,7 @@ import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
@@ -20,22 +18,26 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 
+import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHandler {
+    private static Field matchingStatesField = null;
+
     @Override
     public String worldId(World world) {
         return ((CraftWorld) world).getHandle().dimension().location().toString();
@@ -59,10 +61,10 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
 
         SignBlockEntity teSign = new SignBlockEntity(position, ((CraftBlockData) Material.OAK_SIGN.createBlockData()).getState());
 
-        teSign.setMessage(0, Component.literal(defaultValue.toString()));
-        teSign.setMessage(1, Component.literal("^".repeat(15)));
-        teSign.setMessage(2, Component.literal(translation.format("sign." + formatKey + ".0")));
-        teSign.setMessage(3, Component.literal(translation.format("sign." + formatKey + ".1")));
+        teSign.setMessage(0, new TextComponent(defaultValue.toString()));
+        teSign.setMessage(1, new TextComponent("^".repeat(15)));
+        teSign.setMessage(2, new TextComponent(translation.format("sign." + formatKey + ".0")));
+        teSign.setMessage(3, new TextComponent(translation.format("sign." + formatKey + ".1")));
 
         view.getPlayer().closeInventory();
 
@@ -113,20 +115,27 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
 
     @Override
     public Material getVillagerProfessionMaterial(Villager.Profession profession) {
+        if (matchingStatesField == null) {
+            try {
+                matchingStatesField = PoiType.class.getDeclaredField("E");
+                matchingStatesField.setAccessible(true);
+            } catch (NoSuchFieldException exception) {
+                exception.printStackTrace();
+            }
+        }
+
         return switch (profession) {
             case NONE ->
                     Material.BELL;
             case NITWIT ->
                     Material.OAK_DOOR;
             default -> {
-                for (Holder.Reference<PoiType> holder : Registry.POINT_OF_INTEREST_TYPE.holders().toList()) {
-                    if (CraftVillager.bukkitToNmsProfession(profession).acquirableJobSite().test(holder)) {
-                        Iterator<BlockState> iterator = holder.value().matchingStates().iterator();
-                        yield iterator.hasNext() ? CraftMagicNumbers.getMaterial(iterator.next().getBlock().asItem()) : Material.RED_BED;
-                    }
+                try {
+                    Iterator<BlockState> matchingStates = ((Set<BlockState>) matchingStatesField.get(CraftVillager.bukkitToNmsProfession(profession).getJobPoiType())).iterator();
+                    yield matchingStates.hasNext() ? CraftMagicNumbers.getMaterial(matchingStates.next().getBlock()) : Material.RED_BED;
+                } catch (IllegalAccessException exception) {
+                    throw new RuntimeException(exception);
                 }
-
-                yield Material.RED_BED;
             }
         };
     }

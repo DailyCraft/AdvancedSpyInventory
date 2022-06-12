@@ -13,7 +13,6 @@ import org.bukkit.entity.*;
 import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +20,8 @@ import java.util.UUID;
 public class InventoryCommand extends PlayerTabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if (sender instanceof Player player) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
             Translation translation = Translation.of(player);
 
             if (args.length == 1) {
@@ -71,7 +71,7 @@ public class InventoryCommand extends PlayerTabExecutor {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         if (sender instanceof Player && args.length == 1) {
-            List<String> list = new ArrayList<>(super.onTabComplete(sender, command, alias, args));
+            List<String> list = super.onTabComplete(sender, command, alias, args);
 
             if (Permissions.ENTITY_VIEW.has(sender)) {
                 Player player = (Player) sender;

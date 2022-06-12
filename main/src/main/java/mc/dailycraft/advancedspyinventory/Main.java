@@ -22,7 +22,7 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         try {
-            NMS = (NMSHandler) Class.forName("mc.dailycraft.advancedspyinventory.nms." + Bukkit.getServer().getClass().getPackageName().replaceFirst(".+\\.", "") + ".NMSHandler").getConstructor().newInstance();
+            NMS = (NMSHandler) Class.forName("mc.dailycraft.advancedspyinventory.nms." + Bukkit.getServer().getClass().getPackage().getName().replaceFirst(".+\\.", "") + ".NMSHandler").getConstructor().newInstance();
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException | ClassNotFoundException exception) {
             getLogger().severe("The current server version isn't supported by the plugin.");
             getServer().getPluginManager().disablePlugin(this);

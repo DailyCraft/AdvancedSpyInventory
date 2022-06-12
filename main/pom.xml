@@ -12,14 +12,14 @@
     <artifactId>advancedspyinventory-main</artifactId>
 
     <properties>
-        <minecraftVersion>1.18.2</minecraftVersion>
+        <minecraftVersion>1.19</minecraftVersion>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.18.2-R0.1-SNAPSHOT</version>
+            <version>${minecraftVersion}-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
@@ -35,7 +35,6 @@
     </dependencies>
 
     <build>
-        <finalName>${project.name}-${project.version}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -59,7 +58,6 @@
                                 <includes>
                                     <include>org.bstats:bstats-bukkit</include>
                                     <include>org.bstats:bstats-base</include>
-                                    <include>mc.dailycraft:nms-handler_*</include>
                                 </includes>
                             </artifactSet>
                             <relocations>

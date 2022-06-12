@@ -60,21 +60,22 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
             return new ItemStackBuilder(Material.BARRIER, Permissions.ENTITY_MODIFY.has(viewer) ? translation.format("interface.entity.clear") : translation.format("interface.entity.close")).get();
         else if (index == getSize() - 3) {
             switch (entity.getType()) {
-                case SHEEP -> {
+                case SHEEP:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.SHEEP))) {
                         Sheep sheep = (Sheep) entity;
 
                         return new ItemStackBuilder(Material.getMaterial(sheep.getColor().name() + "_WOOL"), translation.format("interface.sheep.color", SheepColorInventory.dyeToChatColor(sheep.getColor()) + translation.format("interface.sheep.color." + sheep.getColor().name().toLowerCase()))).modifyLore(viewer, sheep.getType()).get();
                     }
-                }
 
-                case IRON_GOLEM -> {
+                    break;
+
+                case IRON_GOLEM:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.IRON_GOLEM)))
                         return new ItemStackBuilder("MHF_Golem", translation.format("interface.iron_golem." + (((IronGolem) entity).isPlayerCreated() ? "player_creation" : "natural_creation"))).get();
 
-                }
+                    break;
 
-                case FOX -> {
+                case FOX:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.FOX))) {
                         Fox fox = (Fox) entity;
 
@@ -83,24 +84,28 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                                 .lore((fox.getFoxType() == Fox.Type.SNOW ? "\u25ba " : "  ") + translation.format("interface.fox.snow"))
                                 .switchLore(viewer, fox.getType()).get();
                     }
-                }
 
-                case PANDA -> {
+                    break;
+
+                case PANDA:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.PANDA))) {
                         Panda panda = (Panda) entity;
                         return new ItemStackBuilder(Material.BAMBOO, translation.format("interface.panda.gene", panda.getMainGene()))
                                 .lore(translation.format("interface.panda.hidden_gene", panda.getHiddenGene())).get();
                     }
-                }
 
-                case SLIME, MAGMA_CUBE -> {
+                    break;
+
+                case SLIME:
+                case MAGMA_CUBE:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.SLIME))) {
                         return new ItemStackBuilder(Material.SLIME_BLOCK, translation.format("interface.slime.size", ((Slime) entity).getSize()))
                                 .modifyLore(viewer, EntityType.SLIME).get();
                     }
-                }
 
-                case SNOWMAN -> {
+                    break;
+
+                case SNOWMAN:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.SNOWMAN))) {
                         Snowman snowman = (Snowman) entity;
 
@@ -109,7 +114,8 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                                 .lore((snowman.isDerp() ? "\u25ba " : "  ") + translation.format("interface.snowman.pumpkin.no"))
                                 .switchLore(viewer, entity.getType()).get();
                     }
-                }
+
+                    break;
             }
         } else if (index == getSize() - 2) {
             if (entity instanceof Tameable && Permissions.ENTITY_TAMED.has(viewer)) {
@@ -130,10 +136,10 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
     public void setItem(int index, ItemStack stack) {
         if (index >= getSize() - 17 && index <= getSize() - 14) {
             if (!stack.equals(InformationItems.values()[-index + getSize() - 12].warning(translation)))
-                entity.getEquipment().setItem(EquipmentSlot.values()[-index + getSize() - 12], getContents()[-index + getSize() - 12] = stack);
-        } else if (index >= getSize() - 12 && index <= getSize() - 11) {
+                entity.getEquipment().getItem(EquipmentSlot.values()[-index + getSize() - 12]);
+        } else if (index == getSize() - 12 || index == getSize() - 11) {
             if (!stack.equals(InformationItems.values()[index - getSize() + 12].warning(translation)))
-                entity.getEquipment().setItem(EquipmentSlot.values()[index - getSize() + 12], getContents()[index - getSize() + 12] = stack);
+                entity.getEquipment().getItem(EquipmentSlot.values()[index - getSize() + 12]);
         }
     }
 

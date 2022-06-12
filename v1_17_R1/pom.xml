@@ -9,12 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>advancedspyinventory-v1_18_R2</artifactId>
+    <artifactId>advancedspyinventory-v1_17_R1</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <minecraftVersion>1.18.2</minecraftVersion>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
+        <minecraftVersion>1.17.1</minecraftVersion>
     </properties>
 
     <dependencies>

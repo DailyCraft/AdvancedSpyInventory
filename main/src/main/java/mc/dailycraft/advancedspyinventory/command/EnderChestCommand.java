@@ -18,7 +18,8 @@ import java.util.UUID;
 public class EnderChestCommand extends PlayerTabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if (sender instanceof Player player) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
             Translation translation = Translation.of(player);
 
             if (args.length == 0)

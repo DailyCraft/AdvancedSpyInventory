@@ -41,62 +41,61 @@ public class PlayerInventory extends NMSContainer {
             return getNonNull(getContents()[-index + 76], InformationItems.values()[-index + 42].get(translation));
 
         switch (index) {
-            case 42 -> {
+            case 42:
                 return new ItemStackBuilder(getNonNull(getContents()[target.getSelectedSlot()] != null ? getContents()[target.getSelectedSlot()].clone() : null, InformationItems.MAIN_HAND.get(translation)))
                         .lore("")
                         .lore(translation.format("interface.player.slot", target.getSelectedSlot() + 1) + (Permissions.PLAYER_SLOT.has(viewer) ? " " + translation.format("interface.player.slot.left") + " " + translation.format("interface.player.slot.right") : ""))
                         .lore(target.isOnline() && Permissions.PLAYER_DROP.has(viewer), translation.format("interface.player.slot.drop"), translation.format("interface.player.slot.drop.all"))
                         .get();
-            }
 
-            case 43 -> {
+            case 43:
                 return getNonNull(getContents()[40], InformationItems.OFF_HAND.get(translation));
-            }
 
-            case 44 -> {
+            case 44:
                 if (target.isOnline() && target.getPlayer().getGameMode() != GameMode.CREATIVE)
                     return getNonNull(target.getPlayer().getItemOnCursor(), InformationItems.CURSOR.get(translation));
                 else
                     return InformationItems.CURSOR.unavailable(translation);
-            }
 
-            case 46 -> {
+            case 46:
                 if (Permissions.PLAYER_HEALTH.has(viewer)) {
                     return new ItemStackBuilder(PotionType.INSTANT_HEAL, translation.format("interface.entity.health", target.getHealth(), target.getMaxHealth()))
                             .lore(Permissions.PLAYER_HEALTH_MODIFY.has(viewer), translation.format("interface.entity.health.modify"))
                             .lore(Permissions.PLAYER_HEALTH_MODIFY_MAX.has(viewer), translation.format("interface.entity.health.modify.max")).get();
                 }
-            }
 
-            case 47 -> {
+                break;
+
+            case 47:
                 if (Permissions.PLAYER_LOCATION.has(viewer))
                     return getLocationItemStack(target.getLocation(), true);
-            }
 
-            case 49 -> {
+                break;
+
+            case 49:
                 return new ItemStackBuilder(Material.BARRIER, Permissions.PLAYER_MODIFY.has(viewer) ? translation.format("interface.entity.clear") : translation.format("interface.entity.close")).get();
-            }
 
-            case 51 -> {
+            case 51:
                 if (Permissions.PLAYER_XP.has(viewer)) {
                     return new ItemStackBuilder(Material.EXPERIENCE_BOTTLE, translation.format("interface.player.experience", target.getExperience()))
                             .lore(translation.format("interface.player.experience.modify"), Permissions.PLAYER_XP_MODIFY.has(viewer)).get();
                 }
-            }
 
-            case 52 -> {
+                break;
+
+            case 52:
                 if (Permissions.PLAYER_FOOD.has(viewer)) {
                     return new ItemStackBuilder(Material.COOKED_BEEF, translation.format("interface.player.food.level", target.getFoodLevel()))
                             .lore(translation.format("interface.player.food.saturation", target.getFoodSaturation()))
                             .lore(Permissions.PLAYER_FOOD_MODIFY.has(viewer), "", translation.format("interface.player.food.level.modify"), translation.format("interface.player.food.saturation.modify"))
                             .get();
                 }
-            }
 
-            case 53 -> {
+                break;
+
+            case 53:
                 if (Permissions.ENDER.has(viewer))
                     return new ItemStackBuilder(Material.ENDER_CHEST, translation.format("interface.player.enderchest")).get();
-            }
         }
 
         return VOID_ITEM;
@@ -163,9 +162,9 @@ public class PlayerInventory extends NMSContainer {
 
             if (target.isOnline() && Permissions.PLAYER_DROP.has(viewer)) {
                 if (event.getClick() == ClickType.SHIFT_LEFT)
-                    target.getPlayer().dropItem(false);
+                    Main.NMS.dropItem(target.getPlayer(), false);
                 else if (event.getClick() == ClickType.SHIFT_RIGHT)
-                    target.getPlayer().dropItem(true);
+                    Main.NMS.dropItem(target.getPlayer(), true);
             }
         } else if (rawSlot == 43) {
             if (!target.equals(viewer)) {

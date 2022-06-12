@@ -46,22 +46,24 @@ public class VillagerSpecificationsInventory extends InformationInventory<Villag
     }
 
     public static Material getMaterialOfType(Villager.Type villagerType) {
-        return switch (villagerType) {
-            case DESERT ->
-                    Material.SANDSTONE;
-            case JUNGLE ->
-                    Material.JUNGLE_LEAVES;
-            case PLAINS ->
-                    Material.GRASS_BLOCK;
-            case SAVANNA ->
-                    Material.ACACIA_SAPLING;
-            case SNOW ->
-                    Material.SNOW_BLOCK;
-            case SWAMP ->
-                    Material.LILY_PAD;
-            case TAIGA ->
-                    Material.DARK_OAK_LOG;
-        };
+        switch (villagerType) {
+            case DESERT:
+                return Material.SANDSTONE;
+            case JUNGLE:
+                return Material.JUNGLE_LEAVES;
+            case PLAINS:
+                return Material.GRASS_BLOCK;
+            case SAVANNA:
+                return Material.ACACIA_SAPLING;
+            case SNOW:
+                return Material.SNOW_BLOCK;
+            case SWAMP:
+                return Material.LILY_PAD;
+            case TAIGA:
+                return Material.DARK_OAK_LOG;
+        }
+
+        return null;
     }
 
     @Override
