@@ -150,7 +150,17 @@
       "": "Has a pumpkin on his head",
       "yes": "§aYes",
       "no": "§cNo"
-    }
+    },
+    "goat": {
+      "screaming": "Is screaming: %s",
+      "horn": {
+        "": "Has horn ?",
+        "left": "Left: %s",
+        "right": "Right: %s"
+      }
+    },
+    "allay.owner": "Owner: §a%s",
+    "allay.unowned": "Unowned"
   },
 
   "sign": {

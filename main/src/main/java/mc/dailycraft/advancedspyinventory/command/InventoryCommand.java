@@ -1,5 +1,6 @@
 package mc.dailycraft.advancedspyinventory.command;
 
+import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.*;
 import mc.dailycraft.advancedspyinventory.inventory.entity.*;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
@@ -55,6 +56,8 @@ public class InventoryCommand extends PlayerTabExecutor {
                             new DonkeyInventory(player, (ChestedHorse) targetEntity).getView().open();
                         else if (targetEntity.getType() == EntityType.LLAMA || targetEntity.getType() == EntityType.TRADER_LLAMA)
                             new LlamaInventory(player, (Llama) targetEntity).getView().open();
+                        else if (Main.VERSION >= 19 && targetEntity.getType() == EntityType.ALLAY)
+                            new AllayInventory(player, (Allay) targetEntity).getView().open();
                         else
                             new EntityInventory<>(player, (LivingEntity) targetEntity).getView().open();
                     } else

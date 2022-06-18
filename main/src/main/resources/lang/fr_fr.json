@@ -150,7 +150,17 @@
       "": "A une citrouille sur sa tête",
       "yes": "§aOui",
       "no": "§cNon"
-    }
+    },
+    "goat": {
+      "screaming": "Est criante : %s",
+      "horn": {
+        "": "A des cornes ?",
+        "left": "Gauche : %s",
+        "right": "Droite : %s"
+      }
+    },
+    "allay.owner": "Propriétaire : §a%s",
+    "allay.unowned": "Sans propriétaire"
   },
 
   "sign": {

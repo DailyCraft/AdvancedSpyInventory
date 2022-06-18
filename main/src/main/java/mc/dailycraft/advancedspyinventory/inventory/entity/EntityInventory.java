@@ -116,6 +116,13 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                     }
 
                     break;
+
+                case GOAT:
+                    if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.GOAT))) {
+                        return new ItemStackBuilder(Material.SCULK_SENSOR, translation.format("interface.goat.screaming", translation.format("interface.snowman.pumpkin." + (((Goat) entity).isScreaming() ? "yes" : "no")))).get();
+                    }
+
+                    break;
             }
         } else if (index == getSize() - 2) {
             if (entity instanceof Tameable && Permissions.ENTITY_TAMED.has(viewer)) {
@@ -125,7 +132,13 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                     else
                         return new ItemStackBuilder("MHF_Question", translation.format("interface.entity.tamed", translation.format("interface.entity.unknown"))).get();
                 } else
-                    return new ItemStackBuilder(LocalDateTime.now().getMonth() == Month.OCTOBER && LocalDateTime.now().getDayOfMonth() == 31 ? "MHF_Herobrine" : "MHF_Steve", translation.format("interface.entity.untamed")).get();
+                    return new ItemStackBuilder(LocalDateTime.now().getMonth() == Month.OCTOBER && LocalDateTime.now().getDayOfMonth() == 31 ? "MHF_Herobrine" : "MHF_Question", translation.format("interface.entity.untamed")).get();
+            } else if (Main.VERSION >= 19 && entity.getType() == EntityType.GOAT) {
+                if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.GOAT))) {
+                    return new ItemStackBuilder(Material.GOAT_HORN, translation.format("interface.goat.horn"))
+                            .lore(translation.format("interface.goat.horn.left", translation.format("interface.snowman.pumpkin." + (((Goat) entity).hasLeftHorn() ? "yes" : "no"))))
+                            .lore(translation.format("interface.goat.horn.right", translation.format("interface.snowman.pumpkin." + (((Goat) entity).hasRightHorn() ? "yes" : "no")))).get();
+                }
             }
         }
 
@@ -136,10 +149,10 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
     public void setItem(int index, ItemStack stack) {
         if (index >= getSize() - 17 && index <= getSize() - 14) {
             if (!stack.equals(InformationItems.values()[-index + getSize() - 12].warning(translation)))
-                entity.getEquipment().getItem(EquipmentSlot.values()[-index + getSize() - 12]);
+                entity.getEquipment().setItem(EquipmentSlot.values()[-index + getSize() - 12], stack);
         } else if (index == getSize() - 12 || index == getSize() - 11) {
             if (!stack.equals(InformationItems.values()[index - getSize() + 12].warning(translation)))
-                entity.getEquipment().getItem(EquipmentSlot.values()[index - getSize() + 12]);
+                entity.getEquipment().setItem(EquipmentSlot.values()[index - getSize() + 12], stack);
         }
     }
 
@@ -178,6 +191,17 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                         ((Slime) entity).setSize(result));
             else if (entity.getType() == EntityType.SNOWMAN && viewer.hasPermission(Permissions.ENTITY_INFORMATION_MODIFY.get(EntityType.SNOWMAN)))
                 ((Snowman) entity).setDerp(!((Snowman) entity).isDerp());
+            else if (Main.VERSION >= 17 && entity.getType() == EntityType.GOAT && viewer.hasPermission(Permissions.ENTITY_INFORMATION_MODIFY.get(EntityType.GOAT)))
+                ((Goat) entity).setScreaming(!((Goat) entity).isScreaming());
+        } else if (rawSlot == getSize() - 2) {
+            if (Main.VERSION >= 19 && entity.getType() == EntityType.GOAT && viewer.hasPermission(Permissions.ENTITY_INFORMATION_MODIFY.get(EntityType.GOAT))) {
+                Goat goat = (Goat) entity;
+
+                if (event.getClick() == ClickType.LEFT)
+                    goat.setLeftHorn(!goat.hasLeftHorn());
+                else if (event.getClick() == ClickType.RIGHT)
+                    goat.setRightHorn(!goat.hasRightHorn());
+            }
         } else if (rawSlot >= getSize()) {
             if (Permissions.ENTITY_MODIFY.has(viewer)) {
                 event.setCancelled(false);

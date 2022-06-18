@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class Main extends JavaPlugin implements Listener {
     public static NMSHandler NMS;
+    public static int VERSION = Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[1].replaceFirst("-.+", ""));
 
     @Override
     public void onEnable() {

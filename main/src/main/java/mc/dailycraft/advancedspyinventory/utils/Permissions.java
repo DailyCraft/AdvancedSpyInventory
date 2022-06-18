@@ -7,9 +7,7 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public enum Permissions {
@@ -68,17 +66,32 @@ public enum Permissions {
 
         String start = Main.getInstance().getName().toLowerCase() + ".inventory.entity.information";
 
-        Arrays.asList(EntityType.SHEEP, EntityType.IRON_GOLEM, EntityType.FOX, EntityType.PANDA, EntityType.SLIME, EntityType.SNOWMAN, EntityType.VILLAGER, EntityType.LLAMA).forEach(entity -> {
-            String key = start + "." + entity.getKey().getKey();
-            Permission perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific", entity.getKey()), PermissionDefault.OP, valToMap(ENTITY_VIEW.get()));
+        List<EntityType> types = new ArrayList<>();
+
+        types.add(EntityType.SHEEP);
+        types.add(EntityType.IRON_GOLEM);
+        types.add(EntityType.FOX);
+        types.add(EntityType.PANDA);
+        types.add(EntityType.SLIME);
+        types.add(EntityType.SNOWMAN);
+        types.add(EntityType.VILLAGER);
+        types.add(EntityType.LLAMA);
+        if (Main.VERSION >= 17)
+            types.add(EntityType.GOAT);
+        if (Main.VERSION >= 19)
+            types.add(EntityType.ALLAY);
+
+        for (EntityType type : types) {
+            String key = start + "." + type.getKey().getKey();
+            Permission perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific", type.getKey()), PermissionDefault.OP, valToMap(ENTITY_VIEW.get()));
             Bukkit.getPluginManager().addPermission(perm);
-            ENTITY_INFORMATION.put(entity, perm);
+            ENTITY_INFORMATION.put(type, perm);
 
             key += ".modify";
-            Permission permModify = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific.modify", entity.getKey().getKey()), PermissionDefault.OP, valToMap(perm));
+            Permission permModify = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific.modify", type.getKey().getKey()), PermissionDefault.OP, valToMap(perm));
             Bukkit.getPluginManager().addPermission(permModify);
-            ENTITY_INFORMATION_MODIFY.put(entity, permModify);
-        });
+            ENTITY_INFORMATION_MODIFY.put(type, permModify);
+        }
 
         Bukkit.getPluginManager().addPermission(new Permission(start, Translation.of().format("permission.inventory.entity.information"), PermissionDefault.OP, ENTITY_INFORMATION.values().stream().collect(Collectors.toMap(Permission::getName, perm -> true))));
         Bukkit.getPluginManager().addPermission(new Permission(start + ".modify", Translation.of().format("permission.inventory.entity.information.modify"), PermissionDefault.OP, ENTITY_INFORMATION_MODIFY.values().stream().collect(Collectors.toMap(Permission::getName, perm -> true))));
