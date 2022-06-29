@@ -23,9 +23,7 @@ public class Translation {
     private final Locale javaLocale;
 
     private Translation(String locale) {
-        this.locale = locale;
-
-        String[] s = locale.split("_");
+        String[] s = (this.locale = locale).split("_");
         javaLocale = s.length == 2 ? new Locale(s[0], s[1]) : new Locale(s[0]);
     }
 
@@ -54,7 +52,7 @@ public class Translation {
         try {
             return String.format(javaLocale, s, parameters);
         } catch (IllegalFormatException exception) {
-            System.err.println("The translation of " + key + " as an incorrect format: '" + s + "'! Error: " + exception.getMessage());
+            Main.getInstance().getLogger().severe("The translation of " + key + " as an incorrect format: '" + s + "'! Error: " + exception.getMessage());
             return key;
         }
     }

@@ -19,17 +19,9 @@ public class AllayInventory extends EntityInventory<Allay> {
     }
 
     @Override
-    public ItemStack[] getContents() {
-        ItemStack[] result = new ItemStack[7];
-        System.arraycopy(super.getContents(), 0, result, 0, 6);
-        result[6] = entity.getInventory().getItem(0);
-        return result;
-    }
-
-    @Override
     public ItemStack getItem(int index) {
         if (index == 4)
-            return getContents()[6];
+            return entity.getInventory().getItem(0);
         else if (index == getSize() - 3) {
             if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.ALLAY))) {
                 UUID memory = entity.getMemory(MemoryKey.LIKED_PLAYER);

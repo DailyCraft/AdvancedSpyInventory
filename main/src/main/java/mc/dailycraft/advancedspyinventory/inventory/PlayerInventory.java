@@ -1,7 +1,6 @@
 package mc.dailycraft.advancedspyinventory.inventory;
 
 import mc.dailycraft.advancedspyinventory.Main;
-import mc.dailycraft.advancedspyinventory.nms.NMSContainer;
 import mc.dailycraft.advancedspyinventory.utils.PlayerData;
 import mc.dailycraft.advancedspyinventory.utils.*;
 import org.bukkit.GameMode;
@@ -9,12 +8,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionType;
 
 import java.util.UUID;
 
-public class PlayerInventory extends NMSContainer {
+public class PlayerInventory extends BaseInventory {
     private final PlayerData target;
 
     public PlayerInventory(Player viewer, PlayerData target) {
@@ -27,29 +27,26 @@ public class PlayerInventory extends NMSContainer {
     }
 
     @Override
-    public ItemStack[] getContents() {
-        return target.getInventory();
-    }
-
-    @Override
     public ItemStack getItem(int index) {
+        ItemStack[] inventory = target.getInventory();
+
         if (index <= 26)
-            return getContents()[index + 9];
+            return inventory[index + 9];
         else if (index <= 35)
-            return getContents()[index - 27];
+            return inventory[index - 27];
         else if (index >= 37 && index <= 40)
-            return getNonNull(getContents()[-index + 76], InformationItems.values()[-index + 42].get(translation));
+            return getNonNull(inventory[-index + 76], InformationItems.values()[-index + 42].get(translation));
 
         switch (index) {
             case 42:
-                return new ItemStackBuilder(getNonNull(getContents()[target.getSelectedSlot()] != null ? getContents()[target.getSelectedSlot()].clone() : null, InformationItems.MAIN_HAND.get(translation)))
+                return new ItemStackBuilder(getNonNull(inventory[target.getSelectedSlot()] != null ? inventory[target.getSelectedSlot()].clone() : null, InformationItems.MAIN_HAND.get(translation)))
                         .lore("")
                         .lore(translation.format("interface.player.slot", target.getSelectedSlot() + 1) + (Permissions.PLAYER_SLOT.has(viewer) ? " " + translation.format("interface.player.slot.left") + " " + translation.format("interface.player.slot.right") : ""))
                         .lore(target.isOnline() && Permissions.PLAYER_DROP.has(viewer), translation.format("interface.player.slot.drop"), translation.format("interface.player.slot.drop.all"))
                         .get();
 
             case 43:
-                return getNonNull(getContents()[40], InformationItems.OFF_HAND.get(translation));
+                return getNonNull(inventory[40], InformationItems.OFF_HAND.get(translation));
 
             case 44:
                 if (target.isOnline() && target.getPlayer().getGameMode() != GameMode.CREATIVE)
@@ -104,20 +101,15 @@ public class PlayerInventory extends NMSContainer {
     @Override
     public void setItem(int index, ItemStack stack) {
         if (index <= 26)
-            target.addInInventory(index + 9, getContents()[index + 9] = stack);
+            target.addInInventory(index + 9, stack);
         else if (index <= 35)
-            target.addInInventory(index - 27, getContents()[index - 27] = stack);
+            target.addInInventory(index - 27, stack);
         else if (index >= 37 && index <= 40 && !stack.equals(InformationItems.values()[-index + 42].get(translation)))
-            target.addInInventory(-index + 76, getContents()[-index + 76] = stack);
+            target.addInInventory(-index + 76, stack);
         else if (index == 43 && !stack.equals(InformationItems.OFF_HAND.get(translation)))
-            target.addInInventory(40, getContents()[40] = stack);
-
-        else if (index == 44 && !stack.equals(InformationItems.CURSOR.get(translation)) && target.isOnline() && target.getPlayer().getGameMode() != GameMode.CREATIVE) {
+            target.addInInventory(40, stack);
+        else if (index == 44 && !stack.equals(InformationItems.CURSOR.get(translation)) && target.isOnline() && target.getPlayer().getGameMode() != GameMode.CREATIVE)
             target.getPlayer().setItemOnCursor(stack);
-        }
-
-        // maybe
-        //viewer.updateInventory();
     }
 
     @Override
@@ -162,9 +154,11 @@ public class PlayerInventory extends NMSContainer {
 
             if (target.isOnline() && Permissions.PLAYER_DROP.has(viewer)) {
                 if (event.getClick() == ClickType.SHIFT_LEFT)
-                    Main.NMS.dropItem(target.getPlayer(), false);
+                    target.getPlayer().dropItem(false);
                 else if (event.getClick() == ClickType.SHIFT_RIGHT)
-                    Main.NMS.dropItem(target.getPlayer(), true);
+                    target.getPlayer().dropItem(true);
+
+                target.getPlayer().updateInventory();
             }
         } else if (rawSlot == 43) {
             if (!target.equals(viewer)) {
@@ -219,10 +213,10 @@ public class PlayerInventory extends NMSContainer {
                 if (Permissions.PLAYER_MODIFY.has(viewer)) {
                     event.setCancelled(false);
 
-                    shift(event, 37, InformationItems.HELMET.get(translation), current -> current.getType().getKey().getKey().endsWith("_helmet"));
-                    shift(event, 38, InformationItems.CHESTPLATE.get(translation), current -> current.getType().getKey().getKey().endsWith("_chestplate"));
-                    shift(event, 39, InformationItems.LEGGINGS.get(translation), current -> current.getType().getKey().getKey().endsWith("_leggings"));
-                    shift(event, 40, InformationItems.BOOTS.get(translation), current -> current.getType().getKey().getKey().endsWith("_boots"));
+                    shift(event, 37, InformationItems.HELMET.get(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.HEAD);
+                    shift(event, 38, InformationItems.CHESTPLATE.get(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.CHEST);
+                    shift(event, 39, InformationItems.LEGGINGS.get(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.LEGS);
+                    shift(event, 40, InformationItems.BOOTS.get(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.FEET);
                 }
             }
         }

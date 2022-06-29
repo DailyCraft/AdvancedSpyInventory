@@ -29,6 +29,7 @@ public enum Permissions {
 
     ENTITY_VIEW("inventory.entity.view", INVENTORY),
     ENTITY_MODIFY("inventory.entity.modify", ENTITY_VIEW),
+    ENTITY_DROP_CHANCE("inventory.entity.drop_chance", ENTITY_VIEW),
     ENTITY_HEALTH("inventory.entity.health", ENTITY_VIEW),
     ENTITY_HEALTH_MODIFY("inventory.entity.health.modify", ENTITY_HEALTH),
     ENTITY_HEALTH_MODIFY_MAX("inventory.entity.health.modify.max", ENTITY_HEALTH_MODIFY),

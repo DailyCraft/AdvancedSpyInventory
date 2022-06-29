@@ -19,22 +19,14 @@ public class VillagerInventory extends EntityInventory<Villager> {
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack[] getContents() {
-        ItemStack[] array = new ItemStack[14];
-        System.arraycopy(super.getContents(), 0, array, 0, 6);
-        System.arraycopy(entity.getInventory().getContents(), 0, array, 6, 8);
-        return array;
-    }
-
-    @Override
     public ItemStack getItem(int index) {
         if (tick >= 80)
             tick = 0;
 
         if (index >= 2 && index <= 6)
-            return getContents()[index + 4];
+            return entity.getInventory().getItem(index - 2);
         else if (index >= 12 && index <= 14)
-            return getContents()[index - 1];
+            return entity.getInventory().getItem(index - 7);
         else if (index == getSize() - 3) {
             if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.VILLAGER)))
                 return new ItemStackBuilder(++tick < 40 ? Main.NMS.getVillagerProfessionMaterial(entity.getProfession()) : VillagerSpecificationsInventory.getMaterialOfType(entity.getVillagerType()), translation.format("interface.villager.specifications"))

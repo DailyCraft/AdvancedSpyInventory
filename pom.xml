@@ -15,9 +15,6 @@
 
     <modules>
         <module>main</module>
-        <module>v1_16_R1</module>
-        <module>v1_16_R2</module>
-        <module>v1_16_R3</module>
         <module>v1_17_R1</module>
         <module>v1_18_R1</module>
         <module>v1_18_R2</module>

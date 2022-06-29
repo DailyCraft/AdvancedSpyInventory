@@ -2,7 +2,7 @@ package mc.dailycraft.advancedspyinventory.inventory.entity;
 
 import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.entity.information.SheepColorInventory;
-import mc.dailycraft.advancedspyinventory.nms.NMSContainer;
+import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import mc.dailycraft.advancedspyinventory.utils.InformationItems;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionType;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-public class EntityInventory<T extends LivingEntity> extends NMSContainer {
+public class EntityInventory<T extends LivingEntity> extends BaseInventory {
     protected final T entity;
 
     public EntityInventory(Player viewer, T entity, int rows) {
@@ -32,21 +32,9 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
     }
 
     @Override
-    public ItemStack[] getContents() {
-        ItemStack[] array = new ItemStack[6];
-
-        for (int i = 0; i < 6; i++)
-            array[i] = entity.getEquipment().getItem(EquipmentSlot.values()[i]);
-
-        return array;
-    }
-
-    @Override
     public ItemStack getItem(int index) {
-        if (index >= getSize() - 17 && index <= getSize() - 14)
-            return getNonNull(getContents()[-index + getSize() - 12], InformationItems.values()[-index + getSize() - 12].warning(translation));
-        else if (index == getSize() - 12 || index == getSize() - 11)
-            return getNonNull(getContents()[index - getSize() + 12], InformationItems.values()[index - getSize() + 12].warning(translation));
+        if (index >= getSize() - 17 && index <= getSize() - 14 || index == getSize() - 12 || index == getSize() - 11)
+            return getNonNull(entity.getEquipment().getItem(EquipmentSlot.values()[Math.abs(index - getSize() + 12)]), InformationItems.values()[Math.abs(index - getSize() + 12)].warning(translation));
         else if (index == getSize() - 8) {
             if (Permissions.ENTITY_HEALTH.has(viewer)) {
                 return new ItemStackBuilder(PotionType.INSTANT_HEAL, translation.format("interface.entity.health", entity.getHealth(), entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()))
@@ -63,7 +51,6 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                 case SHEEP:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.SHEEP))) {
                         Sheep sheep = (Sheep) entity;
-
                         return new ItemStackBuilder(Material.getMaterial(sheep.getColor().name() + "_WOOL"), translation.format("interface.sheep.color", SheepColorInventory.dyeToChatColor(sheep.getColor()) + translation.format("interface.sheep.color." + sheep.getColor().name().toLowerCase()))).modifyLore(viewer, sheep.getType()).get();
                     }
 
@@ -78,7 +65,6 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                 case FOX:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.FOX))) {
                         Fox fox = (Fox) entity;
-
                         return new ItemStackBuilder(fox.getFoxType() == Fox.Type.RED ? Material.SPRUCE_SAPLING : Material.SNOW_BLOCK, translation.format("interface.fox.type", translation.format("interface.fox.type." + fox.getFoxType().name().toLowerCase())))
                                 .lore((fox.getFoxType() == Fox.Type.RED ? "\u25ba " : "  ") + translation.format("interface.fox.red"))
                                 .lore((fox.getFoxType() == Fox.Type.SNOW ? "\u25ba " : "  ") + translation.format("interface.fox.snow"))
@@ -108,7 +94,6 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                 case SNOWMAN:
                     if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.SNOWMAN))) {
                         Snowman snowman = (Snowman) entity;
-
                         return new ItemStackBuilder(Material.CARVED_PUMPKIN, translation.format("interface.snowman.pumpkin"))
                                 .lore((!snowman.isDerp() ? "\u25ba " : "  ") + translation.format("interface.snowman.pumpkin.yes"))
                                 .lore((snowman.isDerp() ? "\u25ba " : "  ") + translation.format("interface.snowman.pumpkin.no"))
@@ -118,9 +103,8 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
                     break;
 
                 case GOAT:
-                    if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.GOAT))) {
+                    if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.GOAT)))
                         return new ItemStackBuilder(Material.SCULK_SENSOR, translation.format("interface.goat.screaming", translation.format("interface.snowman.pumpkin." + (((Goat) entity).isScreaming() ? "yes" : "no")))).get();
-                    }
 
                     break;
             }
@@ -147,13 +131,9 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
 
     @Override
     public void setItem(int index, ItemStack stack) {
-        if (index >= getSize() - 17 && index <= getSize() - 14) {
-            if (!stack.equals(InformationItems.values()[-index + getSize() - 12].warning(translation)))
-                entity.getEquipment().setItem(EquipmentSlot.values()[-index + getSize() - 12], stack);
-        } else if (index == getSize() - 12 || index == getSize() - 11) {
-            if (!stack.equals(InformationItems.values()[index - getSize() + 12].warning(translation)))
-                entity.getEquipment().setItem(EquipmentSlot.values()[index - getSize() + 12], stack);
-        }
+        if (index >= getSize() - 17 && index <= getSize() - 14 || index == getSize() - 12 || index == getSize() - 11)
+            if (!stack.equals(InformationItems.values()[Math.abs(index - getSize() + 12)].warning(translation)))
+                entity.getEquipment().setItem(EquipmentSlot.values()[Math.abs(index - getSize() + 12)], stack);
     }
 
     @Override
@@ -206,10 +186,10 @@ public class EntityInventory<T extends LivingEntity> extends NMSContainer {
             if (Permissions.ENTITY_MODIFY.has(viewer)) {
                 event.setCancelled(false);
 
-                shift(event, getSize() - 17, InformationItems.HELMET.warning(translation), current -> current.getType().getKey().getKey().endsWith("_helmet"));
-                shift(event, getSize() - 16, InformationItems.CHESTPLATE.warning(translation), current -> current.getType().getKey().getKey().endsWith("_chestplate"));
-                shift(event, getSize() - 15, InformationItems.LEGGINGS.warning(translation), current -> current.getType().getKey().getKey().endsWith("_leggings"));
-                shift(event, getSize() - 14, InformationItems.BOOTS.warning(translation), current -> current.getType().getKey().getKey().endsWith("_boots"));
+                shift(event, getSize() - 17, InformationItems.HELMET.warning(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.HEAD);
+                shift(event, getSize() - 16, InformationItems.CHESTPLATE.warning(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.CHEST);
+                shift(event, getSize() - 15, InformationItems.LEGGINGS.warning(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.LEGS);
+                shift(event, getSize() - 14, InformationItems.BOOTS.warning(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.FEET);
             }
         }
     }

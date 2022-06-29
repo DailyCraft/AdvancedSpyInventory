@@ -4,6 +4,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import mc.dailycraft.advancedspyinventory.Main;
+import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
 import net.minecraft.core.BlockPos;
@@ -49,7 +50,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     }
 
     @Override
-    public Inventory containerToInventory(mc.dailycraft.advancedspyinventory.nms.NMSContainer container) {
+    public Inventory createInventory(BaseInventory container) {
         return new CraftInventory(new NMSContainer(container));
     }
 

@@ -17,7 +17,7 @@ public class DonkeyInventory extends HorseInventory<ChestedHorse> {
     public ItemStack getItem(int index) {
         if (index > 1 && index <= 6 || index > 10 && index <= 15 || index > 19 && index <= 24) {
             if (entity.isCarryingChest())
-                return getContents()[6 + index - (index <= 6 ? 0 : index <= 15 ? 4 : 8)];
+                return entity.getInventory().getItem(index - (index <= 6 ? 0 : index <= 15 ? 4 : 8));
             else
                 return new ItemStackBuilder(Material.BLACK_STAINED_GLASS_PANE, translation.format("interface.donkey.no_chest")).get();
         }
@@ -27,10 +27,8 @@ public class DonkeyInventory extends HorseInventory<ChestedHorse> {
 
     @Override
     public void setItem(int index, ItemStack stack) {
-        if (entity.isCarryingChest() && (index > 1 && index <= 6 || index > 10 && index <= 15 || index > 19 && index <= 24)) {
-            int i = 8 + index - (index <= 6 ? 2 : index <= 15 ? 6 : 10);
-            entity.getInventory().setItem(i - 6, getContents()[i] = stack);
-        }
+        if (entity.isCarryingChest() && (index > 1 && index <= 6 || index > 10 && index <= 15 || index > 19 && index <= 24))
+            entity.getInventory().setItem(index - (index <= 6 ? 0 : index <= 15 ? 4 : 8), stack);
 
         super.setItem(index, stack);
     }

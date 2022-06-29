@@ -8,13 +8,12 @@ import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class Main extends JavaPlugin implements Listener {
     public static NMSHandler NMS;
@@ -23,11 +22,14 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         try {
-            NMS = (NMSHandler) Class.forName("mc.dailycraft.advancedspyinventory.nms." + Bukkit.getServer().getClass().getPackage().getName().replaceFirst(".+\\.", "") + ".NMSHandler").getConstructor().newInstance();
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException | ClassNotFoundException exception) {
+            NMS = (NMSHandler) Class.forName(Bukkit.getServer().getClass().getPackage().getName().replaceFirst(".+\\.", "mc.dailycraft.advancedspyinventory.nms.") + ".NMSHandler").getConstructor().newInstance();
+        } catch (ClassNotFoundException exception) {
             getLogger().severe("The current server version isn't supported by the plugin.");
+            getLogger().severe("You can go to the website " + getDescription().getWebsite() + " to check if a version of the plugin support your server version.");
             getServer().getPluginManager().disablePlugin(this);
             return;
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
 
         getCommand("inventory").setExecutor(new InventoryCommand());

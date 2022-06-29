@@ -1,12 +1,11 @@
 package mc.dailycraft.advancedspyinventory.nms.v1_18_R2;
 
+import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
@@ -16,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NMSContainer implements Container {
-    private final mc.dailycraft.advancedspyinventory.nms.NMSContainer container;
+    private final BaseInventory container;
     private final List<HumanEntity> viewers = new ArrayList<>();
 
-    public NMSContainer(mc.dailycraft.advancedspyinventory.nms.NMSContainer container) {
+    public NMSContainer(BaseInventory container) {
         this.container = container;
     }
 
@@ -35,16 +34,7 @@ public class NMSContainer implements Container {
 
     @Override
     public ItemStack getItem(int index) {
-        ItemStack stack = CraftItemStack.asNMSCopy(container.getItem(index));
-        CompoundTag tag = stack.getTagElement("SkullOwner");
-
-        if (tag != null) {
-            String name = tag.getString("Name");
-            stack.removeTagKey("SkullOwner");
-            stack.getTag().putString("SkullOwner", name);
-        }
-
-        return stack;
+        return CraftItemStack.asNMSCopy(container.getItem(index));
     }
 
     @Override
@@ -102,14 +92,7 @@ public class NMSContainer implements Container {
 
     @Override
     public List<ItemStack> getContents() {
-        org.bukkit.inventory.ItemStack[] contents = container.getContents();
-        List<ItemStack> result = NonNullList.withSize(contents.length, ItemStack.EMPTY);
-
-        for (int i = 0; i < contents.length; ++i)
-            if (contents[i] != null && contents[i].getType() != Material.AIR)
-                result.set(i, CraftItemStack.asNMSCopy(contents[i]));
-
-        return result;
+        return NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
     }
 
     @Override

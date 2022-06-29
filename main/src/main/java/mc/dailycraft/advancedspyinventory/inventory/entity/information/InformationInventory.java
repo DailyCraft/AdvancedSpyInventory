@@ -1,6 +1,6 @@
 package mc.dailycraft.advancedspyinventory.inventory.entity.information;
 
-import mc.dailycraft.advancedspyinventory.nms.NMSContainer;
+import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import org.bukkit.Material;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class InformationInventory<T extends LivingEntity> extends NMSContainer {
+public abstract class InformationInventory<T extends LivingEntity> extends BaseInventory {
     protected final T entity;
     protected final CustomInventoryView oldView;
     protected final ItemStack[] contents = new ItemStack[getSize()];
@@ -29,22 +29,18 @@ public abstract class InformationInventory<T extends LivingEntity> extends NMSCo
     }
 
     @Override
-    public ItemStack[] getContents() {
-        return contents;
+    public ItemStack getItem(int index) {
+        return contents[index];
     }
 
     @Override
-    public ItemStack getItem(int index) {
-        return contents[index];
+    public void setItem(int index, ItemStack stack) {
+        contents[index] = stack;
     }
 
     @Override
     public void onClick(InventoryClickEvent event, int rawSlot) {
         if (rawSlot == getSize() - 9)
             oldView.open();
-    }
-
-    @Override
-    public void setItem(int index, ItemStack stack) {
     }
 }

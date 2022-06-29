@@ -18,20 +18,11 @@ public class HorseInventory<T extends AbstractHorse> extends EntityInventory<T> 
     }
 
     @Override
-    public ItemStack[] getContents() {
-        ItemStack[] inv = entity.getInventory().getContents();
-        ItemStack[] array = new ItemStack[6 + inv.length];
-        System.arraycopy(super.getContents(), 0, array, 0, 6);
-        System.arraycopy(inv, 0, array, 6, inv.length);
-        return array;
-    }
-
-    @Override
     public org.bukkit.inventory.ItemStack getItem(int index) {
         if (index == getSize() - 24)
-            return getNonNull(getContents()[6], InformationItems.SADDLE.get(translation));
+            return getNonNull(entity.getInventory().getSaddle(), InformationItems.SADDLE.get(translation));
         else if (index == getSize() - 22)
-            return getNonNull(getContents()[7], InformationItems.HORSE_ARMOR.get(translation));
+            return getNonNull(entity.getInventory().getItem(1), InformationItems.HORSE_ARMOR.get(translation));
         else if (index == getSize() - 16)
             return InformationItems.CHESTPLATE.unavailable(translation);
 
@@ -42,10 +33,10 @@ public class HorseInventory<T extends AbstractHorse> extends EntityInventory<T> 
     public void setItem(int index, ItemStack stack) {
         if (index == getSize() - 24) {
             if (!stack.equals(InformationItems.SADDLE.get(translation)))
-                entity.getInventory().setItem(0, getContents()[6] = stack);
+                entity.getInventory().setItem(0, stack);
         } else if (index == getSize() - 22) {
             if (!stack.equals(InformationItems.HORSE_ARMOR.get(translation)))
-                entity.getInventory().setItem(1, getContents()[7] = stack);
+                entity.getInventory().setItem(1, stack);
         } else
             super.setItem(index, stack);
     }
@@ -53,8 +44,8 @@ public class HorseInventory<T extends AbstractHorse> extends EntityInventory<T> 
     @Override
     public void onClick(InventoryClickEvent event, int rawSlot) {
         if (rawSlot >= getSize() && Permissions.ENTITY_MODIFY.has(viewer)) {
-            shift(event, getSize() - 24, InformationItems.SADDLE.get(translation), current -> current.getType() == Material.SADDLE);
-            shift(event, getSize() - 22, InformationItems.HORSE_ARMOR.get(translation), current -> current.getType().getKey().getKey().endsWith("_horse_armor"));
+            shift(event, getSize() - 24, InformationItems.SADDLE.get(translation), current -> current == Material.SADDLE);
+            shift(event, getSize() - 22, InformationItems.HORSE_ARMOR.get(translation), current -> current.getKey().getKey().endsWith("_horse_armor"));
         }
 
         if (rawSlot == getSize() - 24) {

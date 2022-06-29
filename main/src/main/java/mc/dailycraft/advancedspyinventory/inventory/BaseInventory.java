@@ -1,4 +1,4 @@
-package mc.dailycraft.advancedspyinventory.nms;
+package mc.dailycraft.advancedspyinventory.inventory;
 
 import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
@@ -15,14 +15,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Predicate;
 
-public abstract class NMSContainer {
+public abstract class BaseInventory {
     protected static final ItemStack VOID_ITEM = new ItemStackBuilder(Material.GRAY_STAINED_GLASS_PANE, "").get();
 
     protected final Player viewer;
     protected final Translation translation;
     private final int size;
 
-    public NMSContainer(Player viewer, int rows) {
+    public BaseInventory(Player viewer, int rows) {
         this.viewer = viewer;
         translation = Translation.of(viewer);
         size = rows * 9;
@@ -33,8 +33,6 @@ public abstract class NMSContainer {
     public int getSize() {
         return size;
     }
-
-    public abstract ItemStack[] getContents();
 
     public abstract ItemStack getItem(int index);
 
@@ -56,8 +54,8 @@ public abstract class NMSContainer {
         return privileged != null && privileged.getType() != Material.AIR ? privileged : replacer;
     }
 
-    protected void shift(InventoryClickEvent event, int slot, ItemStack informationItem, Predicate<ItemStack> condition) {
-        if ((event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) && event.getCurrentItem() != null && condition.test(event.getCurrentItem()) && event.getInventory().getItem(slot) != null && event.getInventory().getItem(slot).equals(informationItem)) {
+    protected void shift(InventoryClickEvent event, int slot, ItemStack informationItem, Predicate<Material> condition) {
+        if ((event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) && event.getCurrentItem() != null && condition.test(event.getCurrentItem().getType()) && event.getInventory().getItem(slot) != null && event.getInventory().getItem(slot).equals(informationItem)) {
             event.setCancelled(true);
             event.getInventory().setItem(slot, event.getCurrentItem());
             event.setCurrentItem(null);
@@ -70,7 +68,7 @@ public abstract class NMSContainer {
         String entityKey = "interface.entity.";
 
         return new ItemStackBuilder(Material.ARROW, translation.format(entityKey + "location"))
-                .lore(translation.format(entityKey + "world", location.getWorld().getName(), translation.format(entityKey + "world.environment." + location.getWorld().getEnvironment().name().toLowerCase())))
+                .lore(translation.format(entityKey + "world", Main.NMS.worldId(location.getWorld()), translation.format(entityKey + "world.environment." + location.getWorld().getEnvironment().name().toLowerCase())))
                 .lore(translation.format(entityKey + "x", location.getX()))
                 .lore(translation.format(entityKey + "y", location.getY()))
                 .lore(translation.format(entityKey + "z", location.getZ()))
@@ -79,7 +77,7 @@ public abstract class NMSContainer {
                 .lore(isPlayer ? Permissions.PLAYER_TELEPORT.has(viewer) : Permissions.ENTITY_TELEPORT.has(viewer), "", translation.format(entityKey + "teleport")).get();
     }
 
-    protected void replaceItem(InventoryClickEvent event, org.bukkit.inventory.ItemStack informationItem) {
+    protected void replaceItem(InventoryClickEvent event, ItemStack informationItem) {
         if (event.getCurrentItem() != null && event.getCurrentItem().equals(informationItem) && (event.getCursor() == null || event.getCursor().getType() == Material.AIR)) {
             event.setCancelled(true);
             return;

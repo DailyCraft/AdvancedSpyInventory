@@ -1,5 +1,11 @@
 package mc.dailycraft.advancedspyinventory.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.util.UUIDTypeAdapter;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -13,11 +19,16 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ItemStackBuilder {
+    private static final Map<String, GameProfile> headProfiles = new HashMap<>();
+    private static Field headField;
     private final ItemStack stack;
 
     public ItemStackBuilder(ItemStack stack) {
@@ -35,12 +46,47 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder(String headOwner, String displayName) {
         this(Material.PLAYER_HEAD, displayName);
-        this.<SkullMeta>modifyMeta(meta -> meta.setOwner(headOwner));
+
+        this.<SkullMeta>modifyMeta(meta -> {
+            try {
+                GameProfile profile = headProfiles.get(headOwner);
+
+                if (profile == null) {
+                    UUID uuid;
+
+                    if (Bukkit.getOnlineMode()) {
+                        uuid = Bukkit.getOfflinePlayer(headOwner).getUniqueId();
+                    } else {
+                        try (Reader reader = new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + headOwner).openStream())) {
+                            uuid = UUIDTypeAdapter.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString());
+                        }
+                    }
+
+                    try (Reader sessionReader = new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDTypeAdapter.fromUUID(uuid)).openStream())) {
+                        JsonObject textureProperty = new Gson().fromJson(sessionReader, JsonObject.class).get("properties").getAsJsonArray().get(0).getAsJsonObject();
+                        String value = textureProperty.get("value").getAsString();
+
+                        GameProfile gameProfile = new GameProfile(uuid, headOwner);
+                        gameProfile.getProperties().put("textures", new Property("textures", value));
+                        headProfiles.put(headOwner, profile = gameProfile);
+                    }
+                }
+
+                if (headField == null) {
+                    headField = meta.getClass().getDeclaredField("profile");
+                    headField.setAccessible(true);
+                }
+
+                headField.set(meta, profile);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
     }
 
     public ItemStackBuilder(PotionType potionType, String displayName) {
         this(Material.POTION, displayName);
-        modifyMeta((Consumer<PotionMeta>) meta -> {
+        this.<PotionMeta>modifyMeta(meta -> {
             meta.setBasePotionData(new PotionData(potionType));
             meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
         });
@@ -107,9 +153,12 @@ public class ItemStackBuilder {
     }
 
     public <T extends ItemMeta> ItemStackBuilder modifyMeta(Consumer<T> consumer) {
-        T meta = (T) stack.getItemMeta();
-        consumer.accept(meta);
-        stack.setItemMeta(meta);
+        if (stack.getItemMeta() != null) {
+            T meta = (T) stack.getItemMeta();
+            consumer.accept(meta);
+            stack.setItemMeta(meta);
+        }
+
         return this;
     }
 

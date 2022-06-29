@@ -19,8 +19,7 @@ public class PlayerData implements AnimalTamer {
     private final NMSData nms;
 
     public PlayerData(UUID playerUuid) {
-        this.playerUuid = playerUuid;
-        nms = Main.NMS.getData(playerUuid);
+        nms = Main.NMS.getData(this.playerUuid = playerUuid);
     }
 
     @NotNull

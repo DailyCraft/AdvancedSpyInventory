@@ -1,6 +1,5 @@
 package mc.dailycraft.advancedspyinventory.inventory;
 
-import mc.dailycraft.advancedspyinventory.nms.NMSContainer;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.PlayerData;
@@ -12,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public class EnderChestInventory extends NMSContainer {
+public class EnderChestInventory extends BaseInventory {
     private final PlayerData target;
 
     public EnderChestInventory(Player viewer, PlayerData target) {
@@ -25,14 +24,9 @@ public class EnderChestInventory extends NMSContainer {
     }
 
     @Override
-    public ItemStack[] getContents() {
-        return target.getEnderChest();
-    }
-
-    @Override
     public ItemStack getItem(int index) {
         if (index < getSize() - 9)
-            return getContents()[index];
+            return target.getEnderChest()[index];
         else if (index == getSize() - 9) {
             if (Permissions.INVENTORY.has(viewer))
                 return new ItemStackBuilder(Material.CHEST, translation.format("interface.enderchest.inventory")).get();
@@ -45,7 +39,7 @@ public class EnderChestInventory extends NMSContainer {
     @Override
     public void setItem(int index, ItemStack stack) {
         if (index < getSize() - 9)
-            target.addInEnderChest(index, getContents()[index] = stack);
+            target.addInEnderChest(index, stack);
     }
 
     @Override

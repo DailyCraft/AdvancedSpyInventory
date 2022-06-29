@@ -79,7 +79,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
         ListTag list = data.getList(id, CraftMagicNumbers.NBT.TAG_COMPOUND);
 
         for (int i = 0; i < list.size(); i++) {
-            if (((CompoundTag) list.get(i)).getByte("Slot") == slot) {
+            if (list.getCompound(i).getByte("Slot") == slot) {
                 list.remove(i);
                 break;
             }
@@ -132,9 +132,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
             try {
                 File file = File.createTempFile(playerUuid + "-", ".dat", playerDir);
                 NbtIo.writeCompressed(data, file);
-                File file1 = new File(playerDir, playerUuid + ".dat");
-                File file2 = new File(playerDir, playerUuid + ".dat_old");
-                Util.safeReplaceFile(file1, file, file2);
+                Util.safeReplaceFile(new File(playerDir, playerUuid + ".dat"), file, new File(playerDir, playerUuid + ".dat_old"));
             } catch (Exception exception) {
                 Main.getInstance().getLogger().severe("Failed to save player data for " + playerUuid);
                 exception.printStackTrace();
