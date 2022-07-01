@@ -23,7 +23,7 @@ public class AllayInventory extends EntityInventory<Allay> {
         if (index == 4)
             return entity.getInventory().getItem(0);
         else if (index == getSize() - 3) {
-            if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.ALLAY))) {
+            if (Permissions.hasPermission(EntityType.ALLAY, viewer)) {
                 UUID memory = entity.getMemory(MemoryKey.LIKED_PLAYER);
 
                 if (memory != null) {

@@ -2,6 +2,7 @@ package mc.dailycraft.advancedspyinventory.utils;
 
 import mc.dailycraft.advancedspyinventory.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
@@ -29,7 +30,6 @@ public enum Permissions {
 
     ENTITY_VIEW("inventory.entity.view", INVENTORY),
     ENTITY_MODIFY("inventory.entity.modify", ENTITY_VIEW),
-    ENTITY_DROP_CHANCE("inventory.entity.drop_chance", ENTITY_VIEW),
     ENTITY_HEALTH("inventory.entity.health", ENTITY_VIEW),
     ENTITY_HEALTH_MODIFY("inventory.entity.health.modify", ENTITY_HEALTH),
     ENTITY_HEALTH_MODIFY_MAX("inventory.entity.health.modify.max", ENTITY_HEALTH_MODIFY),
@@ -43,7 +43,9 @@ public enum Permissions {
     ENDER_OTHERS_MODIFY("enderchest.others.modify", ENDER_OTHERS, ENDER_MODIFY),
     ;
 
-    public static final Map<EntityType, Permission> ENTITY_INFORMATION = new HashMap<>(), ENTITY_INFORMATION_MODIFY = new HashMap<>();
+    private static final Map<EntityType, Permission>
+            ENTITY_INFORMATION = new HashMap<>(),
+            ENTITY_INFORMATION_MODIFY = new HashMap<>();
 
     private final Permission permission;
 
@@ -77,8 +79,17 @@ public enum Permissions {
         types.add(EntityType.SNOWMAN);
         types.add(EntityType.VILLAGER);
         types.add(EntityType.LLAMA);
-        if (Main.VERSION >= 17)
+        types.add(EntityType.WOLF);
+        types.add(EntityType.OCELOT);
+        types.add(EntityType.CAT);
+        types.add(EntityType.PHANTOM);
+        types.add(EntityType.BAT);
+        types.add(EntityType.MUSHROOM_COW);
+        types.add(EntityType.RABBIT);
+        if (Main.VERSION >= 17) {
             types.add(EntityType.GOAT);
+            types.add(EntityType.AXOLOTL);
+        }
         if (Main.VERSION >= 19)
             types.add(EntityType.ALLAY);
 
@@ -102,5 +113,17 @@ public enum Permissions {
         Map<String, Boolean> map = new HashMap<>();
         map.put(perm.getName(), true);
         return map;
+    }
+
+    public static boolean hasPermission(EntityType type, Permissible permissible) {
+        return permissible.hasPermission(ENTITY_INFORMATION.get(type));
+    }
+
+    public static boolean hasPermissionModify(EntityType type, Permissible permissible) {
+        return permissible.hasPermission(ENTITY_INFORMATION_MODIFY.get(type));
+    }
+
+    public static boolean hasPermissionModify(EntityType type, Permissible permissible, Entity entity) {
+        return entity.getType() == type && hasPermissionModify(type, permissible);
     }
 }

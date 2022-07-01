@@ -136,11 +136,11 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder modifyLore(Player viewer, EntityType entityType) {
-        return lore(viewer.hasPermission(Permissions.ENTITY_INFORMATION_MODIFY.get(entityType)), "", Translation.of(viewer).format("interface.information.modify"));
+        return lore(Permissions.hasPermissionModify(entityType, viewer), "", Translation.of(viewer).format("interface.information.modify"));
     }
 
     public ItemStackBuilder switchLore(Player viewer, EntityType entityType) {
-        return lore(viewer.hasPermission(Permissions.ENTITY_INFORMATION_MODIFY.get(entityType)), "", Translation.of(viewer).format("interface.information.switch"));
+        return lore(Permissions.hasPermissionModify(entityType, viewer), "", Translation.of(viewer).format("interface.information.switch"));
     }
 
     public ItemStackBuilder enchant(boolean condition) {

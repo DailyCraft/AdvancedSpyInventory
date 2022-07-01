@@ -10,6 +10,7 @@
 
   "interface": {
     "reload": "§cThere was a reload, please reopen the interface manually",
+    "dead": "§cThe entity you are spying on is dead.",
     "entity": {
       "title": "§l%s§r's Inventory",
       "clear": "§cClear Inventory",
@@ -151,6 +152,37 @@
       "yes": "§aYes",
       "no": "§cNo"
     },
+    "wolf.angry": "Is angry: %s",
+    "wolf.angry.modify": "§aClick§7 to toggle §eangry",
+    "wolf.collar": "Collar color: %s",
+    "ocelot.trusting": "Trusting players: %s",
+    "cat.type": {
+      "": "Cat Type",
+      "tabby": "Tabby",
+      "black": "Tuxedo",
+      "red": "Red",
+      "siamese": "Siamese",
+      "british_shorthair": "British Shorthair",
+      "calico": "Calico",
+      "persian": "Persian",
+      "ragdoll": "Ragdoll",
+      "white": "White",
+      "jellie": "Jellie",
+      "all_black": "Black"
+    },
+    "phantom.size": "Phantom size: §a%d",
+    "bat.awake": "Is awake: %s",
+    "mooshroom.variant": "Mooshroom Variant: %s",
+    "rabbit.type": {
+      "": "Rabbit Type",
+      "brown": "Brown",
+      "white": "White",
+      "black": "Black",
+      "black_and_white": "Black and White",
+      "gold": "Gold",
+      "salt_and_pepper": "Salt and pepper",
+      "the_killer_bunny": "The killer Bunny"
+    },
     "goat": {
       "screaming": "Is screaming: %s",
       "horn": {
@@ -160,7 +192,16 @@
       }
     },
     "allay.owner": "Owner: §a%s",
-    "allay.unowned": "Unowned"
+    "allay.unowned": "Unowned",
+    "axolotl.variant": {
+      "": "Axolotl Variant",
+      "lucy": "Leucistic",
+      "wild": "Wild",
+      "gold": "Gold",
+      "cyan": "Cyan",
+      "blue": "Blue"
+    },
+    "axolotl.dead": "Playing dead: %s"
   },
 
   "sign": {
@@ -169,7 +210,8 @@
     "experience": ["§1Enter new", "§1§lexperience amount"],
     "food.level": ["§1Enter new", "§1§lfood level"],
     "food.saturation": ["§1Enter new", "§1§lfood saturation"],
-    "slime": ["§1Enter new", "§1§lslime size"]
+    "slime": ["§1Enter new", "§1§lslime size"],
+    "phantom": ["§1Enter new", "§1§lphantom size"]
   },
 
   "item": {

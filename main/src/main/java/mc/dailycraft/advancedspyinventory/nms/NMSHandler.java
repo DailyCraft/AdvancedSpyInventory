@@ -10,6 +10,7 @@ import org.bukkit.inventory.Inventory;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public interface NMSHandler {
     String worldId(World world);
@@ -18,7 +19,14 @@ public interface NMSHandler {
 
     Inventory createInventory(BaseInventory container);
 
-    <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Consumer<T> runAfter);
+    <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter);
+
+    default <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Consumer<T> runAfter) {
+        signInterface(view, formatKey, defaultValue, minimumValue, maximumValue, stringToT, t -> {
+            runAfter.accept(t);
+            return true;
+        });
+    }
 
     Material getVillagerProfessionMaterial(Villager.Profession profession);
 }

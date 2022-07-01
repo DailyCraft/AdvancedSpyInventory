@@ -182,7 +182,7 @@ public class PlayerInventory extends BaseInventory {
             if (Permissions.PLAYER_HEALTH_MODIFY.has(viewer) && event.getClick() == ClickType.LEFT)
                 Main.NMS.signInterface((CustomInventoryView) event.getView(), "health", target.getHealth(), 0f, target.getMaxHealth(), Float::parseFloat, target::setHealth);
             else if (Permissions.PLAYER_HEALTH_MODIFY_MAX.has(viewer) && event.getClick() == ClickType.RIGHT)
-                Main.NMS.signInterface((CustomInventoryView) event.getView(), "health.max", target.getMaxHealth(), 0f, Float.MAX_VALUE, Float::parseFloat, target::setMaxHealth);
+                Main.NMS.signInterface((CustomInventoryView) event.getView(), "health.max", target.getMaxHealth(), 0.1f, Float.MAX_VALUE, Float::parseFloat, target::setMaxHealth);
         } else if (rawSlot == getSize() - 7) {
             if (Permissions.PLAYER_TELEPORT.has(viewer)) {
                 viewer.teleport(target.getLocation());

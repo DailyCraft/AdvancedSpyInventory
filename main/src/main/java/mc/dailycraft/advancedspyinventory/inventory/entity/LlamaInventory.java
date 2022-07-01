@@ -31,7 +31,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
         else if (index == 32)
             return getNonNull(entity.getInventory().getItem(1), InformationItems.LLAMA_DECOR.get(translation));
         else if (index == getSize() - 3) {
-            if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.LLAMA))) {
+            if (Permissions.hasPermission(EntityType.LLAMA, viewer)) {
                 return new ItemStackBuilder(entity.getColor() == Llama.Color.CREAMY ? Material.MILK_BUCKET : entity.getColor() == Llama.Color.GRAY ? Material.DIORITE : Material.valueOf(entity.getColor().name() + "_WOOL"), translation.format("interface.llama.color"))
                         .lore((entity.getColor() == Llama.Color.CREAMY ? "\u25ba " : "  ") + translation.format("interface.llama.creamy"))
                         .lore((entity.getColor() == Llama.Color.WHITE ? "\u25ba " : "  ") + translation.format("interface.llama.white"))
@@ -78,7 +78,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
             if (Permissions.ENTITY_MODIFY.has(viewer))
                 replaceItem(event, InformationItems.LLAMA_DECOR.get(translation));
         } else if (rawSlot == getSize() - 3) {
-            if (viewer.hasPermission(Permissions.ENTITY_INFORMATION_MODIFY.get(EntityType.LLAMA)))
+            if (Permissions.hasPermissionModify(EntityType.LLAMA, viewer))
                 entity.setColor(Llama.Color.values()[entity.getColor().ordinal() + 1 == Llama.Color.values().length ? 0 : entity.getColor().ordinal() + 1]);
         } else
             super.onClick(event, rawSlot);

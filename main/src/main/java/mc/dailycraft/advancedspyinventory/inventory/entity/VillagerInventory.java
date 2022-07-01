@@ -28,7 +28,7 @@ public class VillagerInventory extends EntityInventory<Villager> {
         else if (index >= 12 && index <= 14)
             return entity.getInventory().getItem(index - 7);
         else if (index == getSize() - 3) {
-            if (viewer.hasPermission(Permissions.ENTITY_INFORMATION.get(EntityType.VILLAGER)))
+            if (Permissions.hasPermission(EntityType.VILLAGER, viewer))
                 return new ItemStackBuilder(++tick < 40 ? Main.NMS.getVillagerProfessionMaterial(entity.getProfession()) : VillagerSpecificationsInventory.getMaterialOfType(entity.getVillagerType()), translation.format("interface.villager.specifications"))
                         .lore(translation.format("interface.villager.profession", (tick < 40 ? "§l" : "") + translation.format("interface.villager.profession." + entity.getProfession().name().toLowerCase())))
                         .lore(translation.format("interface.villager.type", (tick >= 40 ? "§l" : "") + translation.format("interface.villager.type." + entity.getVillagerType().name().toLowerCase()))).get();
@@ -53,7 +53,7 @@ public class VillagerInventory extends EntityInventory<Villager> {
             if (Permissions.ENTITY_MODIFY.has(viewer))
                 event.setCancelled(false);
         } else if (rawSlot == getSize() - 3) {
-            if (viewer.hasPermission(Permissions.ENTITY_INFORMATION_MODIFY.get(EntityType.VILLAGER)))
+            if (Permissions.hasPermissionModify(EntityType.VILLAGER, viewer))
                 new VillagerSpecificationsInventory(viewer, entity, (CustomInventoryView) event.getView()).getView().open();
         } else
             super.onClick(event, rawSlot);

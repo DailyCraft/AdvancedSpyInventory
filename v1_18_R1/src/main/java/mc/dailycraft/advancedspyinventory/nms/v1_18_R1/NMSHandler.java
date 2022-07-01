@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHandler {
     private static Field matchingStatesField = null;
@@ -55,7 +56,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     }
 
     @Override
-    public <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Consumer<T> runAfter) {
+    public <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter) {
         ServerPlayer nmsViewer = ((CraftPlayer) view.getPlayer()).getHandle();
         Translation translation = Translation.of(view.getPlayer());
         BlockPos position = new BlockPos(nmsViewer.position().add(0, -nmsViewer.position().y, 0));
@@ -102,8 +103,8 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
 
                     final T finalResult = result;
                     Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
-                        runAfter.accept(finalResult);
-                        view.open();
+                        if (runAfter.test(finalResult))
+                            view.open();
                     });
 
                     return;

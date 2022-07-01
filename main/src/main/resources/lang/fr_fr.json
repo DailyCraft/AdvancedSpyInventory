@@ -10,6 +10,7 @@
 
   "interface": {
     "reload": "§cIl y a eu un rechargement, veuillez rouvrir l'interface manuellement",
+    "dead": "§cL'entité que vous espionnez est morte.",
     "entity": {
       "title": "Inventaire de §l%s",
       "clear": "§cVider l'inventaire",
@@ -64,8 +65,8 @@
       "modify": "§cVous n'avez pas la permission de modifier le coffre de l'ender"
     },
     "information": {
-      "modify": "\u2129 §aCliquer§7 pour §emodifier",
-      "switch": "\u2129 §aCliquer§7 pour §eéchanger",
+      "modify": "\u2192 §aCliquer§7 pour §emodifier",
+      "switch": "\u2192 §aCliquer§7 pour §eéchanger",
       "selected": "§cDéjà sélectionné",
       "select": "§aCliquer pour sélectionner",
       "back": "§cRetour"
@@ -151,6 +152,37 @@
       "yes": "§aOui",
       "no": "§cNon"
     },
+    "wolf.angry": "Est en colère : %s",
+    "wolf.angry.modify": "§aCliquer§7 pour basculer §eson état de colère",
+    "wolf.collar": "Collar color: %s",
+    "ocelot.trusting": "Fait confiance aux joueurs : %s",
+    "cat.type": {
+      "": "Type de chat",
+      "tabby": "Tigré brun",
+      "black": "Bicolore",
+      "red": "Tigré roux",
+      "siamese": "Siamois",
+      "british_shorthair": "British Shorthair",
+      "calico": "Calico",
+      "persian": "Persan",
+      "ragdoll": "Ragdoll",
+      "white": "Angora",
+      "jellie": "Jellie",
+      "all_black": "Panthère"
+    },
+    "phantom.size": "Taille du Phantom : §a%d",
+    "bat.awake": "Est éveillée : %s",
+    "mooshroom.variant": "Variante de Champimeuh : %s",
+    "rabbit.type": {
+      "": "Type de lapin",
+      "brown": "Marron",
+      "white": "Blanc",
+      "black": "Noir",
+      "black_and_white": "Noir et blanc",
+      "gold": "Or",
+      "salt_and_pepper": "Sel et poivre",
+      "the_killer_bunny": "Le lapin tueur"
+    },
     "goat": {
       "screaming": "Est criante : %s",
       "horn": {
@@ -160,7 +192,16 @@
       }
     },
     "allay.owner": "Propriétaire : §a%s",
-    "allay.unowned": "Sans propriétaire"
+    "allay.unowned": "Sans propriétaire",
+    "axolotl.variant": {
+      "": "Variente d'Axolotl",
+      "lucy": "Leucistique",
+      "wild": "Sauvage",
+      "gold": "Or",
+      "cyan": "Cyan",
+      "blue": "Bleu"
+    },
+    "axolotl.dead": "Fait le mort : %s"
   },
 
   "sign": {
@@ -169,7 +210,8 @@
     "experience": ["§1Saisir un nouveau", "§1§lnombre d'experience"],
     "food.level": ["§1Saisir un nouveau", "§1§lniveau de nourriture"],
     "food.saturation": ["§1Saisir une nouvelle", "§1§lsaturation alimentaire"],
-    "slime": ["§1Entrer une nouvelle", "§1§ltaille pour le slime"]
+    "slime": ["§1Entrer une nouvelle", "§1§ltaille pour le slime"],
+    "phantom": ["§1Entrer une nouvelle", "§1§ltaille pour le phantom"]
   },
 
   "item": {
