@@ -10,11 +10,11 @@ commands:
   inventory:
     description: Open inventory of players or entities
     usage: /<command> <Player|Entity>
-    permission: ${artifactId}.inventory
+    permission: advancedspyinventory.inventory
     aliases: inv
 
   enderchest:
     description: Open ender chest of players
     usage: /<command> [Player]
-    permission: ${artifactId}.enderchest
+    permission: advancedspyinventory.enderchest
     aliases: ec

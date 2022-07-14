@@ -12,35 +12,35 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public enum Permissions {
-    INVENTORY("inventory"),
+    INVENTORY,
 
-    PLAYER_VIEW("inventory.player.view", INVENTORY),
-    PLAYER_MODIFY("inventory.player.modify", PLAYER_VIEW),
-    PLAYER_SLOT("inventory.player.slot", PLAYER_VIEW),
-    PLAYER_DROP("inventory.player.drop", PLAYER_MODIFY),
-    PLAYER_HEALTH("inventory.player.health", PLAYER_VIEW),
-    PLAYER_HEALTH_MODIFY("inventory.player.health.modify", PLAYER_HEALTH),
-    PLAYER_HEALTH_MODIFY_MAX("inventory.player.health.modify.max", PLAYER_HEALTH_MODIFY),
-    PLAYER_LOCATION("inventory.player.location", PLAYER_VIEW),
-    PLAYER_TELEPORT("inventory.player.teleport", PLAYER_LOCATION),
-    PLAYER_XP("inventory.player.xp", PLAYER_VIEW),
-    PLAYER_XP_MODIFY("inventory.player.xp.modify", PLAYER_XP),
-    PLAYER_FOOD("inventory.player.food", PLAYER_VIEW),
-    PLAYER_FOOD_MODIFY("inventory.player.food.modify", PLAYER_FOOD),
+    PLAYER_VIEW(INVENTORY),
+    PLAYER_MODIFY(PLAYER_VIEW),
+    PLAYER_SLOT(PLAYER_VIEW),
+    PLAYER_DROP(PLAYER_MODIFY),
+    PLAYER_HEALTH(PLAYER_VIEW),
+    PLAYER_HEALTH_MODIFY(PLAYER_HEALTH),
+    PLAYER_HEALTH_MODIFY_MAX(PLAYER_HEALTH_MODIFY),
+    PLAYER_LOCATION(PLAYER_VIEW),
+    PLAYER_TELEPORT(PLAYER_LOCATION),
+    PLAYER_XP(PLAYER_VIEW),
+    PLAYER_XP_MODIFY(PLAYER_XP),
+    PLAYER_FOOD(PLAYER_VIEW),
+    PLAYER_FOOD_MODIFY(PLAYER_FOOD),
 
-    ENTITY_VIEW("inventory.entity.view", INVENTORY),
-    ENTITY_MODIFY("inventory.entity.modify", ENTITY_VIEW),
-    ENTITY_HEALTH("inventory.entity.health", ENTITY_VIEW),
-    ENTITY_HEALTH_MODIFY("inventory.entity.health.modify", ENTITY_HEALTH),
-    ENTITY_HEALTH_MODIFY_MAX("inventory.entity.health.modify.max", ENTITY_HEALTH_MODIFY),
-    ENTITY_LOCATION("inventory.entity.location", ENTITY_VIEW),
-    ENTITY_TELEPORT("inventory.entity.teleport", ENTITY_LOCATION),
-    ENTITY_TAMED("inventory.entity.tamed", ENTITY_VIEW),
+    ENTITY_VIEW(INVENTORY),
+    ENTITY_MODIFY(ENTITY_VIEW),
+    ENTITY_HEALTH(ENTITY_VIEW),
+    ENTITY_HEALTH_MODIFY(ENTITY_HEALTH),
+    ENTITY_HEALTH_MODIFY_MAX(ENTITY_HEALTH_MODIFY),
+    ENTITY_LOCATION(ENTITY_VIEW),
+    ENTITY_TELEPORT(ENTITY_LOCATION),
+    ENTITY_TAMED(ENTITY_VIEW),
 
-    ENDER("enderchest"),
-    ENDER_MODIFY("enderchest.modify", ENDER),
-    ENDER_OTHERS("enderchest.others", ENDER),
-    ENDER_OTHERS_MODIFY("enderchest.others.modify", ENDER_OTHERS, ENDER_MODIFY),
+    ENDER,
+    ENDER_MODIFY(ENDER),
+    ENDER_OTHERS(ENDER),
+    ENDER_OTHERS_MODIFY(ENDER_OTHERS, ENDER_MODIFY),
     ;
 
     private static final Map<EntityType, Permission>
@@ -49,7 +49,28 @@ public enum Permissions {
 
     private final Permission permission;
 
-    Permissions(String key, Permissions... children) {
+    Permissions(Permissions... children) {
+        String key = "inventory.";
+        int i = -1;
+
+        if (name().equals("INVENTORY"))
+            key = "inventory";
+        else if (name().startsWith("PLAYER")) {
+            key += "player.";
+            i = 7;
+        } else if (name().startsWith("ENTITY")) {
+            key += "entity.";
+            i = 7;
+        } else if (name().equals("ENDER"))
+            key = "enderchest";
+        else if (name().startsWith("ENDER")) {
+            key = "enderchest.";
+            i = 6;
+        }
+
+        if (i != -1)
+            key += name().toLowerCase().substring(i).replace('_', '.');
+
         permission = new Permission(Main.getInstance().getName().toLowerCase() + "." + key,
                 Translation.of().format("permission." + key), PermissionDefault.OP,
                 Arrays.stream(children).collect(Collectors.toMap(permission -> permission.get().getName(), permission -> true)));

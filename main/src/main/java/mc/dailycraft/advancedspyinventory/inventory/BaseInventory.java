@@ -6,6 +6,7 @@ import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -100,5 +101,14 @@ public abstract class BaseInventory {
 
             viewer.updateInventory();
         });
+    }
+
+    public static String dyeToChatColor(DyeColor color) {
+        StringBuilder sb = new StringBuilder("§x");
+
+        for (char c : Integer.toHexString(color.getColor().asRGB()).toCharArray())
+            sb.append('§').append(c);
+
+        return sb.toString();
     }
 }

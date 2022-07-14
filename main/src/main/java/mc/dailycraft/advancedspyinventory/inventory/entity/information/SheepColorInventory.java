@@ -34,13 +34,4 @@ public class SheepColorInventory extends InformationInventory<Sheep> {
         } else
             super.onClick(event, rawSlot);
     }
-
-    public static String dyeToChatColor(DyeColor color) {
-        StringBuilder sb = new StringBuilder("§x");
-
-        for (char c : Integer.toHexString(color.getColor().asRGB()).toCharArray())
-            sb.append('§').append(c);
-
-        return sb.toString();
-    }
 }
