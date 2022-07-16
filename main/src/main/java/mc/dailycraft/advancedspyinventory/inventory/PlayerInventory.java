@@ -154,9 +154,9 @@ public class PlayerInventory extends BaseInventory {
 
             if (target.isOnline() && Permissions.PLAYER_DROP.has(viewer)) {
                 if (event.getClick() == ClickType.SHIFT_LEFT)
-                    target.getPlayer().dropItem(false);
+                    Main.NMS.dropItem(target.getPlayer(), false);
                 else if (event.getClick() == ClickType.SHIFT_RIGHT)
-                    target.getPlayer().dropItem(true);
+                    Main.NMS.dropItem(target.getPlayer(), true);
 
                 target.getPlayer().updateInventory();
             }
@@ -213,10 +213,10 @@ public class PlayerInventory extends BaseInventory {
                 if (Permissions.PLAYER_MODIFY.has(viewer)) {
                     event.setCancelled(false);
 
-                    shift(event, 37, InformationItems.HELMET.get(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.HEAD);
-                    shift(event, 38, InformationItems.CHESTPLATE.get(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.CHEST);
-                    shift(event, 39, InformationItems.LEGGINGS.get(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.LEGS);
-                    shift(event, 40, InformationItems.BOOTS.get(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.FEET);
+                    shift(event, 37, InformationItems.HELMET.get(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.HEAD : current.getKey().getKey().endsWith("_helmet"));
+                    shift(event, 38, InformationItems.CHESTPLATE.get(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.CHEST : current.getKey().getKey().endsWith("_chestplate"));
+                    shift(event, 39, InformationItems.LEGGINGS.get(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.LEGS : current.getKey().getKey().endsWith("_leggings"));
+                    shift(event, 40, InformationItems.BOOTS.get(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.FEET : current.getKey().getKey().endsWith("_boots"));
                 }
             }
         }

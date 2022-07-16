@@ -48,8 +48,8 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     }
 
     @Override
-    public Inventory createInventory(BaseInventory container) {
-        return new CraftInventory(new NMSContainer(container));
+    public Inventory createInventory(BaseInventory inventory) {
+        return new CraftInventory(new NMSContainer(inventory));
     }
 
     @Override

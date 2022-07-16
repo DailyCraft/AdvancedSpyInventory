@@ -72,9 +72,9 @@ public class InventoryCommand extends PlayerTabExecutor {
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (sender instanceof Player && args.length == 1) {
-            List<String> list = super.onTabComplete(sender, command, alias, args);
+            List<String> list = super.onTabComplete(sender, command, label, args);
 
             if (Permissions.ENTITY_VIEW.has(sender)) {
                 Player player = (Player) sender;

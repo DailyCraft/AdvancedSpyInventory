@@ -24,8 +24,7 @@ public abstract class BaseInventory {
     private final int size;
 
     public BaseInventory(Player viewer, int rows) {
-        this.viewer = viewer;
-        translation = Translation.of(viewer);
+        translation = Translation.of(this.viewer = viewer);
         size = rows * 9;
     }
 
@@ -75,7 +74,7 @@ public abstract class BaseInventory {
                 .lore(translation.format(entityKey + "z", location.getZ()))
                 .lore(translation.format(entityKey + "yaw", location.getYaw()))
                 .lore(translation.format(entityKey + "pitch", location.getPitch()))
-                .lore(isPlayer ? Permissions.PLAYER_TELEPORT.has(viewer) : Permissions.ENTITY_TELEPORT.has(viewer), "", translation.format(entityKey + "teleport")).get();
+                .lore((isPlayer ? Permissions.PLAYER_TELEPORT : Permissions.ENTITY_TELEPORT).has(viewer), "", translation.format(entityKey + "teleport")).get();
     }
 
     protected void replaceItem(InventoryClickEvent event, ItemStack informationItem) {

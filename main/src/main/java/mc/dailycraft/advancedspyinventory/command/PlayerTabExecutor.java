@@ -14,10 +14,7 @@ import java.util.stream.Collectors;
 
 public abstract class PlayerTabExecutor implements TabExecutor {
     @Override
-    public abstract boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args);
-
-    @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         return Arrays.stream(Bukkit.getServer().getOfflinePlayers())
                 .filter(player -> Main.getInstance().getConfig().getBoolean("show_offline_players") || player.isOnline())
                 .map(OfflinePlayer::getName)

@@ -54,9 +54,9 @@ public class EnderChestCommand extends PlayerTabExecutor {
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length == 1 && Permissions.ENDER_OTHERS.has(sender))
-            return super.onTabComplete(sender, command, alias, args);
+            return super.onTabComplete(sender, command, label, args);
 
         return Collections.emptyList();
     }

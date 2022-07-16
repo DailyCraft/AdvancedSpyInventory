@@ -159,10 +159,10 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             if (Permissions.ENTITY_MODIFY.has(viewer)) {
                 event.setCancelled(false);
 
-                shift(event, getSize() - 17, InformationItems.HELMET.warning(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.HEAD);
-                shift(event, getSize() - 16, InformationItems.CHESTPLATE.warning(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.CHEST);
-                shift(event, getSize() - 15, InformationItems.LEGGINGS.warning(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.LEGS);
-                shift(event, getSize() - 14, InformationItems.BOOTS.warning(translation), current -> current.isItem() && current.getEquipmentSlot() == EquipmentSlot.FEET);
+                shift(event, getSize() - 17, InformationItems.HELMET.warning(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.HEAD : current.getKey().getKey().endsWith("_helmet"));
+                shift(event, getSize() - 16, InformationItems.CHESTPLATE.warning(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.CHEST : current.getKey().getKey().endsWith("_chestplate"));
+                shift(event, getSize() - 15, InformationItems.LEGGINGS.warning(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.LEGS : current.getKey().getKey().endsWith("_leggings"));
+                shift(event, getSize() - 14, InformationItems.BOOTS.warning(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.FEET : current.getKey().getKey().endsWith("_boots"));
             }
         }
     }
@@ -224,10 +224,11 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         entity.setAngry(!entity.isAngry())));
 
         DATA_ITEMS.put(EntityType.OCELOT, new DataItem<Ocelot>((inv, entity) ->
-                new ItemStackBuilder(Material.TROPICAL_FISH, inv.translation.format("interface.ocelot.trusting", inv.translation.format("interface.snowman.pumpkin." + (entity.isTrusting() ? "yes" : "no"))))
+                new ItemStackBuilder(Material.TROPICAL_FISH, inv.translation.format("interface.ocelot.trusting", inv.translation.format("interface.snowman.pumpkin." + (Main.NMS.isOcelotTrusting(entity) ? "yes" : "no"))))
                         .switchLore(inv.viewer, EntityType.OCELOT).get(),
                 (inv, event, entity) ->
-                        entity.setTrusting(!entity.isTrusting())));
+                        Main.NMS.setOcelotTrusting(entity, !Main.NMS.isOcelotTrusting(entity))
+        ));
 
         DATA_ITEMS.put(EntityType.CAT, new DataItem<Cat>((inv, entity) -> {
             ItemStackBuilder builder = new ItemStackBuilder(Material.TROPICAL_FISH, inv.translation.format("interface.cat.type"));

@@ -92,24 +92,24 @@ public enum Permissions {
 
         List<EntityType> types = new ArrayList<>();
 
-        types.add(EntityType.SHEEP);
-        types.add(EntityType.IRON_GOLEM);
+        types.add(EntityType.BAT);
+        types.add(EntityType.CAT);
         types.add(EntityType.FOX);
+        types.add(EntityType.IRON_GOLEM);
+        types.add(EntityType.LLAMA);
+        types.add(EntityType.MUSHROOM_COW);
+        types.add(EntityType.OCELOT);
         types.add(EntityType.PANDA);
+        types.add(EntityType.PHANTOM);
+        types.add(EntityType.RABBIT);
+        types.add(EntityType.SHEEP);
         types.add(EntityType.SLIME);
         types.add(EntityType.SNOWMAN);
         types.add(EntityType.VILLAGER);
-        types.add(EntityType.LLAMA);
         types.add(EntityType.WOLF);
-        types.add(EntityType.OCELOT);
-        types.add(EntityType.CAT);
-        types.add(EntityType.PHANTOM);
-        types.add(EntityType.BAT);
-        types.add(EntityType.MUSHROOM_COW);
-        types.add(EntityType.RABBIT);
         if (Main.VERSION >= 17) {
-            types.add(EntityType.GOAT);
             types.add(EntityType.AXOLOTL);
+            types.add(EntityType.GOAT);
         }
         if (Main.VERSION >= 19)
             types.add(EntityType.ALLAY);
