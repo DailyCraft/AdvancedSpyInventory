@@ -1,16 +1,17 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_16_R2;
+package mc.dailycraft.advancedspyinventory.nms.v1_15_R1;
 
 import mc.dailycraft.advancedspyinventory.Main;
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_16_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_16_R2.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -72,7 +73,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
         Arrays.fill(array, new ItemStack(Material.AIR));
 
         getData().getList(id, CraftMagicNumbers.NBT.TAG_COMPOUND).stream().map(tag -> (NBTTagCompound) tag)
-                .forEach(tag -> array[slotConversion.apply((int) tag.getByte("Slot"))] = CraftItemStack.asBukkitCopy(net.minecraft.server.v1_16_R2.ItemStack.a(tag)));
+                .forEach(tag -> array[slotConversion.apply((int) tag.getByte("Slot"))] = CraftItemStack.asBukkitCopy(net.minecraft.server.v1_15_R1.ItemStack.a(tag)));
 
         return array;
     }
@@ -125,19 +126,24 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     private NBTTagCompound getData() {
-        return ((CraftServer) Bukkit.getServer()).getHandle().playerFileData.getPlayerData(playerUuid.toString());
+        return ((WorldNBTStorage) ((CraftServer) Bukkit.getServer()).getHandle().playerFileData).getPlayerData(playerUuid.toString());
     }
 
     private void saveData(NBTTagCompound data) {
         if (getOfflinePlayer().isOnline())
             ((CraftPlayer) getOfflinePlayer().getPlayer()).getHandle().save(data);
         else {
-            File playerDir = ((CraftServer) Bukkit.getServer()).getHandle().playerFileData.getPlayerDir();
+            File playerDir = ((WorldNBTStorage) ((CraftServer) Bukkit.getServer()).getHandle().playerFileData).getPlayerDir();
 
             try {
-                File file = File.createTempFile(playerUuid + "-", ".dat", playerDir);
-                NBTCompressedStreamTools.a(data, file);
-                SystemUtils.a(new File(playerDir, playerUuid + ".dat"), file, new File(playerDir, playerUuid + ".dat_old"));
+                File file = new File(playerDir, playerUuid + ".dat.tmp");
+                File file1 = new File(playerDir, playerUuid + ".dat");
+                NBTCompressedStreamTools.a(data, new FileOutputStream(file));
+
+                if (file1.exists())
+                    file1.delete();
+
+                file.renameTo(file1);
             } catch (Exception exception) {
                 Main.getInstance().getLogger().severe("Failed to save player data for " + playerUuid);
                 exception.printStackTrace();

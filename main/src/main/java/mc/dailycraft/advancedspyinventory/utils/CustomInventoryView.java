@@ -53,6 +53,6 @@ public class CustomInventoryView extends InventoryView {
     }
 
     public void open() {
-        viewer.openInventory(this);
+        Main.NMS.openInventory(viewer, this);
     }
 }

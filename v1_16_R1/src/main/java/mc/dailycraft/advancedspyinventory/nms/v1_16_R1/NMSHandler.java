@@ -117,12 +117,12 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Material getVillagerProfessionMaterial(Villager.Profession profession) {
         if (matchingStatesField == null) {
             try {
-                matchingStatesField = VillagePlaceType.class.getDeclaredField("C");
-                matchingStatesField.setAccessible(true);
+                (matchingStatesField = VillagePlaceType.class.getDeclaredField("C")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
                 exception.printStackTrace();
             }

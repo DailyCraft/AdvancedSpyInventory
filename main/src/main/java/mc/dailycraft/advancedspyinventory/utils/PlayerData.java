@@ -5,6 +5,7 @@ import mc.dailycraft.advancedspyinventory.nms.NMSData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -58,14 +59,14 @@ public class PlayerData implements AnimalTamer {
 
     public float getMaxHealth() {
         if (isOnline())
-            return (float) getPlayer().getMaxHealth();
+            return (float) getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 
         return nms.getMaxHealth();
     }
 
     public void setMaxHealth(float maxHealth) {
         if (isOnline())
-            getPlayer().setMaxHealth(maxHealth);
+            getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         else
             nms.setMaxHealth(maxHealth);
     }
@@ -78,7 +79,7 @@ public class PlayerData implements AnimalTamer {
         List<Float> rotation = nms.getFloatList("Rotation");
 
         return new Location(
-                Bukkit.getWorlds().stream().filter(world -> Main.NMS.worldId(world).equals(nms.getString("Dimension"))).findFirst().orElseGet(() -> Bukkit.getWorlds().get(0)),
+                Bukkit.getWorlds().stream().filter(world -> world.getUID().getMostSignificantBits() == nms.getLong("WorldUUIDMost")).findFirst().orElseGet(() -> Bukkit.getWorlds().get(0)),
                 position.get(0), position.get(1), position.get(2), rotation.get(0), rotation.get(1));
     }
 

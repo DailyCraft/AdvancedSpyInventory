@@ -24,7 +24,7 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         try {
-            NMS = (NMSHandler) Class.forName(Bukkit.getServer().getClass().getPackage().getName().replaceFirst(".+\\.", "mc.dailycraft.advancedspyinventory.nms.") + ".NMSHandler").getConstructor().newInstance();
+            NMS = (NMSHandler) Class.forName(getServer().getClass().getPackage().getName().replaceFirst(".+\\.", "mc.dailycraft.advancedspyinventory.nms.") + ".NMSHandler").getConstructor().newInstance();
         } catch (ClassNotFoundException exception) {
             getLogger().severe("The current server version isn't supported by the plugin.");
             getLogger().severe("You can go to the website " + getDescription().getWebsite() + " to check if a version of the plugin support your server version.");

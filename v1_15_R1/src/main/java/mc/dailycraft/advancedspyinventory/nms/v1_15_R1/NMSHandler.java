@@ -1,4 +1,4 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_16_R3;
+package mc.dailycraft.advancedspyinventory.nms.v1_15_R1;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,20 +7,24 @@ import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftOcelot;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftOcelot;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_15_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Ocelot;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,11 +41,6 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     private static Method isTrustingMethod = null, setTrustingMethod = null;
 
     @Override
-    public String worldId(World world) {
-        return ((CraftWorld) world).getHandle().getDimensionKey().a().toString();
-    }
-
-    @Override
     public NMSData getData(UUID playerUuid) {
         return new NMSData(playerUuid);
     }
@@ -49,6 +48,66 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     @Override
     public Inventory createInventory(BaseInventory inventory) {
         return new CraftInventory(new NMSContainer(inventory));
+    }
+
+    @Override
+    public void openInventory(Player player, InventoryView view) {
+        EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+
+        if (nmsPlayer.playerConnection != null) {
+            if (nmsPlayer.activeContainer != nmsPlayer.defaultContainer)
+                nmsPlayer.playerConnection.a(new PacketPlayInCloseWindow(nmsPlayer.activeContainer.windowId));
+
+            Container container = new CraftContainer(view, nmsPlayer, nmsPlayer.nextContainerCounter());
+            container = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, container);
+            if (container != null) {
+                Containers<?> windowType = null;
+
+                try {
+                    // 1.18.2
+                    Method method = CraftContainer.class.getMethod("getNotchInventoryType", Inventory.class);
+                    windowType = (Containers<?>) method.invoke(null, view.getTopInventory());
+                } catch (NoSuchMethodException exception) {
+                    // 1.18 / 1.18.1
+                    try {
+                        if (view.getType() != InventoryType.CHEST) {
+                            Method method = CraftContainer.class.getMethod("getNotchInventoryType", InventoryType.class);
+                            windowType = (Containers<?>) method.invoke(null, view.getType());
+                        } else {
+                            switch (view.getTopInventory().getSize()) {
+                                case 9:
+                                    windowType = Containers.GENERIC_9X1;
+                                    break;
+                                case 9 * 2:
+                                    windowType = Containers.GENERIC_9X2;
+                                    break;
+                                case 9 * 3:
+                                    windowType = Containers.GENERIC_9X3;
+                                    break;
+                                case 9 * 4:
+                                    windowType = Containers.GENERIC_9X4;
+                                    break;
+                                case 9 * 5:
+                                    windowType = Containers.GENERIC_9X5;
+                                    break;
+                                case 9 * 6:
+                                    windowType = Containers.GENERIC_9X6;
+                                    break;
+                            }
+                        }
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException exception1) {
+                        exception1.printStackTrace();
+                    }
+                } catch (InvocationTargetException | IllegalAccessException exception) {
+                    exception.printStackTrace();
+                }
+
+                String title = view.getTitle();
+                nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(container.windowId, windowType, CraftChatMessage.fromString(title)[0]));
+                nmsPlayer.activeContainer = container;
+                nmsPlayer.activeContainer.addSlotListener(nmsPlayer);
+            }
+        }
     }
 
     @Override
@@ -67,7 +126,9 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
 
         view.getPlayer().closeInventory();
 
-        nmsViewer.playerConnection.sendPacket(new PacketPlayOutBlockChange(position, ((CraftBlockData) Material.OAK_SIGN.createBlockData()).getState()));
+        PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange(nmsViewer.world, position);
+        packet.block = ((CraftBlockData) Material.OAK_SIGN.createBlockData()).getState();
+        nmsViewer.playerConnection.sendPacket(packet);
         nmsViewer.playerConnection.sendPacket(teSign.getUpdatePacket());
         nmsViewer.playerConnection.sendPacket(new PacketPlayOutOpenSignEditor(position));
 
@@ -95,7 +156,9 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
                         result = defaultValue;
                     }
 
-                    nmsViewer.playerConnection.sendPacket(new PacketPlayOutBlockChange(position, ((CraftBlockData) view.getPlayer().getLocation().getBlock().getBlockData()).getState()));
+                    PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange(nmsViewer.world, position);
+                    packet.block = ((CraftBlockData) view.getPlayer().getLocation().getBlock().getBlockData()).getState();
+                    nmsViewer.playerConnection.sendPacket(packet);
                     pipeline.channel().eventLoop().submit(() -> pipeline.remove(handlerId));
 
                     final T finalResult = result;
@@ -117,7 +180,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     public Material getVillagerProfessionMaterial(Villager.Profession profession) {
         if (matchingStatesField == null) {
             try {
-                (matchingStatesField = VillagePlaceType.class.getDeclaredField("C")).setAccessible(true);
+                (matchingStatesField = VillagePlaceType.class.getDeclaredField("z")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
                 exception.printStackTrace();
             }
@@ -172,5 +235,10 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
         } catch (IllegalAccessException | InvocationTargetException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    @Override
+    public void dropItem(Player player, boolean dropAll) {
+        ((CraftPlayer) player).getHandle().n(dropAll);
     }
 }

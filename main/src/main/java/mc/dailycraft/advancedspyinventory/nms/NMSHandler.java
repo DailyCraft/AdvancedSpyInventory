@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -13,11 +14,17 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface NMSHandler {
-    String worldId(World world);
+    default String worldId(World world) {
+        return world.getName();
+    }
 
     NMSData getData(UUID playerUuid);
 
     Inventory createInventory(BaseInventory inventory);
+
+    default void openInventory(Player player, InventoryView view) {
+        player.openInventory(view);
+    }
 
     <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter);
 

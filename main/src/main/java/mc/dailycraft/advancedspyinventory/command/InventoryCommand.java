@@ -1,6 +1,5 @@
 package mc.dailycraft.advancedspyinventory.command;
 
-import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.*;
 import mc.dailycraft.advancedspyinventory.inventory.entity.*;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
@@ -14,6 +13,7 @@ import org.bukkit.entity.*;
 import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -46,9 +46,7 @@ public class InventoryCommand extends PlayerTabExecutor {
                         player.sendMessage(translation.format("command.inventory.player"));
                 } else if (targetEntity instanceof LivingEntity) {
                     if (Permissions.ENTITY_VIEW.has(player)) {
-                        if (targetEntity.getType() == EntityType.VILLAGER)
-                            new VillagerInventory(player, (Villager) targetEntity).getView().open();
-                        else if (targetEntity.getType() == EntityType.ENDERMAN)
+                        if (targetEntity.getType() == EntityType.ENDERMAN)
                             new EndermanInventory(player, (Enderman) targetEntity).getView().open();
                         else if (targetEntity.getType() == EntityType.HORSE || targetEntity.getType() == EntityType.ZOMBIE_HORSE || targetEntity.getType() == EntityType.SKELETON_HORSE)
                             new HorseInventory<>(player, (AbstractHorse) targetEntity).getView().open();
@@ -56,8 +54,6 @@ public class InventoryCommand extends PlayerTabExecutor {
                             new DonkeyInventory(player, (ChestedHorse) targetEntity).getView().open();
                         else if (targetEntity.getType() == EntityType.LLAMA || targetEntity.getType() == EntityType.TRADER_LLAMA)
                             new LlamaInventory(player, (Llama) targetEntity).getView().open();
-                        else if (Main.VERSION >= 19 && targetEntity.getType() == EntityType.ALLAY)
-                            new AllayInventory(player, (Allay) targetEntity).getView().open();
                         else
                             new EntityInventory<>(player, (LivingEntity) targetEntity).getView().open();
                     } else
@@ -75,6 +71,8 @@ public class InventoryCommand extends PlayerTabExecutor {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (sender instanceof Player && args.length == 1) {
             List<String> list = super.onTabComplete(sender, command, label, args);
+            if (list == null)
+                list = new ArrayList<>();
 
             if (Permissions.ENTITY_VIEW.has(sender)) {
                 Player player = (Player) sender;

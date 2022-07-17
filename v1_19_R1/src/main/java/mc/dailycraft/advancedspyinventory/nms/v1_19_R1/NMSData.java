@@ -35,6 +35,11 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
+    public long getLong(String id) {
+        return getData().getLong(id);
+    }
+
+    @Override
     public float getFloat(String id) {
         return getData().getFloat(id);
     }

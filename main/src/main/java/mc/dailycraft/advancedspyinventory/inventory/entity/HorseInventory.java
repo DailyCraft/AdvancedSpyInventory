@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 public class HorseInventory<T extends AbstractHorse> extends EntityInventory<T> {
     public HorseInventory(Player viewer, T entity, int rows) {
         super(viewer, entity, rows);
+        inventorySize = null;
     }
 
     public HorseInventory(Player viewer, T entity) {

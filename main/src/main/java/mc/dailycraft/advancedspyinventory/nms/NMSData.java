@@ -23,6 +23,8 @@ public abstract class NMSData {
 
     public abstract void putInt(String id, int value);
 
+    public abstract long getLong(String id);
+
     public abstract float getFloat(String id);
 
     public abstract void putFloat(String id, float value);
