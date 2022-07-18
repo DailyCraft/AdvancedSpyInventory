@@ -12,8 +12,6 @@
     <artifactId>advancedspyinventory-v1_16_R1</artifactId>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
         <minecraftVersion>1.16.1</minecraftVersion>
     </properties>
 

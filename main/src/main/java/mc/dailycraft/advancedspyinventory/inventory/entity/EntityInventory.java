@@ -5,6 +5,7 @@ import mc.dailycraft.advancedspyinventory.inventory.entity.information.SheepColo
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.inventory.entity.information.VillagerSpecificationsInventory;
 import mc.dailycraft.advancedspyinventory.utils.*;
+import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -200,52 +201,15 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 (inv, event, entity) ->
                         entity.setAwake(!entity.isAwake())));
 
-        DATA_ITEMS.put(EntityType.CAT, new DataItem<Cat>((inv, entity) -> {
-            ItemStackBuilder builder = new ItemStackBuilder(Material.TROPICAL_FISH, inv.translation.format("interface.cat.type"));
-
-            for (Cat.Type type : Cat.Type.values())
-                builder.lore((entity.getCatType() == type ? "\u25ba " : "  ") + inv.translation.format("interface.cat.type." + type.name().toLowerCase()));
-
-            return builder
-                    .switchLore(inv.viewer, EntityType.CAT)
-                    .lore("")
-                    .lore(inv.translation.format("interface.wolf.collar", dyeToChatColor(entity.getCollarColor()) + inv.translation.format("interface.sheep.color." + entity.getCollarColor().name().toLowerCase())))
-                    .get();
-        }, (inv, event, entity) -> {
-            int i = entity.getCatType().ordinal() + 1;
-            entity.setCatType(Cat.Type.values()[i >= Cat.Type.values().length ? 0 : i]);
-        }));
-
-        DATA_ITEMS.put(EntityType.FOX, new DataItem<Fox>((inv, entity) ->
-                new ItemStackBuilder(entity.getFoxType() == Fox.Type.RED ? Material.SPRUCE_SAPLING : Material.SNOW_BLOCK, inv.translation.format("interface.fox.type", inv.translation.format("interface.fox.type." + entity.getFoxType().name().toLowerCase())))
-                        .lore((entity.getFoxType() == Fox.Type.RED ? "\u25ba " : "  ") + inv.translation.format("interface.fox.red"))
-                        .lore((entity.getFoxType() == Fox.Type.SNOW ? "\u25ba " : "  ") + inv.translation.format("interface.fox.snow"))
-                        .switchLore(inv.viewer, entity.getType()).get(),
-                (inv, event, entity) ->
-                        entity.setFoxType(entity.getFoxType() == Fox.Type.RED ? Fox.Type.SNOW : Fox.Type.RED)));
-
         DATA_ITEMS.put(EntityType.IRON_GOLEM, new DataItem<IronGolem>((inv, entity) ->
                 new ItemStackBuilder("MHF_Golem", inv.translation.format("interface.iron_golem." + (entity.isPlayerCreated() ? "player_creation" : "natural_creation"))).get(),
                 null));
-
-        DATA_ITEMS.put(EntityType.MUSHROOM_COW, new DataItem<MushroomCow>((inv, entity) -> {
-            boolean isRed = entity.getVariant() == MushroomCow.Variant.RED;
-            return new ItemStackBuilder(isRed ? Material.RED_MUSHROOM_BLOCK : Material.BROWN_MUSHROOM_BLOCK, inv.translation.format("interface.mooshroom.variant", dyeToChatColor(isRed ? DyeColor.RED : DyeColor.BROWN) + inv.translation.format("interface.sheep.color." + (isRed ? DyeColor.RED : DyeColor.BROWN).name().toLowerCase())))
-                    .switchLore(inv.viewer, EntityType.MUSHROOM_COW)
-                    .get();
-        }, (inv, event, entity) ->
-                entity.setVariant(entity.getVariant() == MushroomCow.Variant.RED ? MushroomCow.Variant.BROWN : MushroomCow.Variant.RED)));
 
         DATA_ITEMS.put(EntityType.OCELOT, new DataItem<Ocelot>((inv, entity) ->
                 new ItemStackBuilder(Material.TROPICAL_FISH, inv.translation.format("interface.ocelot.trusting", inv.translation.format("interface.snowman.pumpkin." + (Main.NMS.isOcelotTrusting(entity) ? "yes" : "no"))))
                         .switchLore(inv.viewer, EntityType.OCELOT).get(),
                 (inv, event, entity) ->
                         Main.NMS.setOcelotTrusting(entity, !Main.NMS.isOcelotTrusting(entity))));
-
-        DATA_ITEMS.put(EntityType.PANDA, new DataItem<Panda>((inv, entity) ->
-                new ItemStackBuilder(Material.BAMBOO, inv.translation.format("interface.panda.gene", entity.getMainGene()))
-                        .lore(inv.translation.format("interface.panda.hidden_gene", entity.getHiddenGene())).get(),
-                null));
 
         DATA_ITEMS.put(EntityType.PHANTOM, new DataItem<Phantom>((inv, entity) ->
                 new ItemStackBuilder(Material.PHANTOM_MEMBRANE, inv.translation.format("interface.phantom.size", entity.getSize()))
@@ -304,14 +268,36 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         entity.setDerp(!entity.isDerp())));
 
         DATA_ITEMS.put(EntityType.VILLAGER, new DataItem<Villager>((inv, entity) -> {
-            if (inv.villagerTick >= 80)
-                inv.villagerTick = 0;
+            if (Main.VERSION < 14) {
+                ItemStackBuilder builder = new ItemStackBuilder("MHF_Villager", inv.translation.format("interface.villager.profession", inv.translation.format("interface.villager.profession." + Main.NMS.getVillagerProfession(entity).toLowerCase().replace("_", ""))));
 
-            return new ItemStackBuilder(++inv.villagerTick < 40 ? Main.NMS.getVillagerProfessionMaterial(entity.getProfession()) : VillagerSpecificationsInventory.getMaterialOfType(entity.getVillagerType()), inv.translation.format("interface.villager.specifications"))
-                    .lore(inv.translation.format("interface.villager.profession", (inv.villagerTick < 40 ? "§l" : "") + inv.translation.format("interface.villager.profession." + entity.getProfession().name().toLowerCase())))
-                    .lore(inv.translation.format("interface.villager.type", (inv.villagerTick >= 40 ? "§l" : "") + inv.translation.format("interface.villager.type." + entity.getVillagerType().name().toLowerCase()))).get();
-        }, (inv, event, entity) ->
-                new VillagerSpecificationsInventory(inv.viewer, entity, (CustomInventoryView) event.getView()).getView().open()));
+                for (String profession : Main.NMS.getVillagerProfessions())
+                    builder.lore((Main.NMS.getVillagerProfession(entity).equals(profession) ? "\u25ba " : "  ") + inv.translation.format("interface.villager.profession." + profession.toLowerCase().replace("_", "")));
+
+                return builder.switchLore(inv.viewer, EntityType.VILLAGER).get();
+            } else {
+                if (inv.villagerTick >= 80)
+                    inv.villagerTick = 0;
+
+                return new ItemStackBuilder(++inv.villagerTick < 40 ? Main.NMS.getVillagerProfessionMaterial(entity.getProfession()) : VillagerSpecificationsInventory.getMaterialOfType(entity.getVillagerType()), inv.translation.format("interface.villager.specifications"))
+                        .lore(inv.translation.format("interface.villager.profession", (inv.villagerTick < 40 ? "§l" : "") + inv.translation.format("interface.villager.profession." + entity.getProfession().name().toLowerCase())))
+                        .lore(inv.translation.format("interface.villager.type", (inv.villagerTick >= 40 ? "§l" : "") + inv.translation.format("interface.villager.type." + entity.getVillagerType().name().toLowerCase()))).get();
+            }
+        }, (inv, event, entity) -> {
+            if (Main.VERSION < 14) {
+                String[] professions = Main.NMS.getVillagerProfessions();
+                String profession = Main.NMS.getVillagerProfession(entity);
+
+                for (int i = 0; i < professions.length; ++i) {
+                    if (profession.equals(professions[i])) {
+                        String profession1 = professions[i + 1 >= professions.length ? 0 : i + 1];
+                        Main.NMS.setVillagerProfession(entity, profession1);
+                        break;
+                    }
+                }
+            } else
+                new VillagerSpecificationsInventory(inv.viewer, entity, (CustomInventoryView) event.getView()).getView().open();
+        }));
 
         DATA_ITEMS.put(EntityType.WOLF, new DataItem<Wolf>((inv, entity) ->
                 new ItemStackBuilder(Material.BONE, inv.translation.format("interface.wolf.angry", inv.translation.format("interface.snowman.pumpkin." + (entity.isAngry() ? "yes" : "no"))))
@@ -322,6 +308,48 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 (inv, event, entity) ->
                         entity.setAngry(!entity.isAngry())));
         //</editor-fold>
+
+        if (Main.VERSION >= 14) {
+            //<editor-fold desc="Data Items - 1.14+ versions" defaultstate="collapsed">
+            DATA_ITEMS.put(EntityType.CAT, new DataItem<Cat>((inv, entity) -> {
+                ItemStackBuilder builder = new ItemStackBuilder(Material.TROPICAL_FISH, inv.translation.format("interface.cat.type"));
+
+                for (Cat.Type type : Cat.Type.values())
+                    builder.lore((entity.getCatType() == type ? "\u25ba " : "  ") + inv.translation.format("interface.cat.type." + type.name().toLowerCase()));
+
+                return builder
+                        .switchLore(inv.viewer, EntityType.CAT)
+                        .lore("")
+                        .lore(inv.translation.format("interface.wolf.collar", dyeToChatColor(entity.getCollarColor()) + inv.translation.format("interface.sheep.color." + entity.getCollarColor().name().toLowerCase())))
+                        .get();
+            }, (inv, event, entity) -> {
+                int i = entity.getCatType().ordinal() + 1;
+                entity.setCatType(Cat.Type.values()[i >= Cat.Type.values().length ? 0 : i]);
+            }));
+
+            DATA_ITEMS.put(EntityType.FOX, new DataItem<Fox>((inv, entity) ->
+                    new ItemStackBuilder(entity.getFoxType() == Fox.Type.RED ? Material.SPRUCE_SAPLING : Material.SNOW_BLOCK, inv.translation.format("interface.fox.type", inv.translation.format("interface.fox.type." + entity.getFoxType().name().toLowerCase())))
+                            .lore((entity.getFoxType() == Fox.Type.RED ? "\u25ba " : "  ") + inv.translation.format("interface.fox.red"))
+                            .lore((entity.getFoxType() == Fox.Type.SNOW ? "\u25ba " : "  ") + inv.translation.format("interface.fox.snow"))
+                            .switchLore(inv.viewer, entity.getType()).get(),
+                    (inv, event, entity) ->
+                            entity.setFoxType(entity.getFoxType() == Fox.Type.RED ? Fox.Type.SNOW : Fox.Type.RED)));
+
+            DATA_ITEMS.put(EntityType.MUSHROOM_COW, new DataItem<MushroomCow>((inv, entity) -> {
+                boolean isRed = entity.getVariant() == MushroomCow.Variant.RED;
+                return new ItemStackBuilder(isRed ? Material.RED_MUSHROOM_BLOCK : Material.BROWN_MUSHROOM_BLOCK, inv.translation.format("interface.mooshroom.variant", dyeToChatColor(isRed ? DyeColor.RED : DyeColor.BROWN) + inv.translation.format("interface.sheep.color." + (isRed ? DyeColor.RED : DyeColor.BROWN).name().toLowerCase())))
+                        .switchLore(inv.viewer, EntityType.MUSHROOM_COW)
+                        .get();
+            }, (inv, event, entity) ->
+                    entity.setVariant(entity.getVariant() == MushroomCow.Variant.RED ? MushroomCow.Variant.BROWN : MushroomCow.Variant.RED)));
+
+
+            DATA_ITEMS.put(EntityType.PANDA, new DataItem<Panda>((inv, entity) ->
+                    new ItemStackBuilder(Material.BAMBOO, inv.translation.format("interface.panda.gene", entity.getMainGene()))
+                            .lore(inv.translation.format("interface.panda.hidden_gene", entity.getHiddenGene())).get(),
+                    null));
+            //</editor-fold>
+        }
 
         if (Main.VERSION >= 17) {
             //<editor-fold desc="Data Items - 1.17+ versions" defaultstate="collapsed">

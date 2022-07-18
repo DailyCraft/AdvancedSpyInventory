@@ -20,8 +20,6 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftVillager;
@@ -37,11 +35,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHandler {
-    @Override
-    public String worldId(World world) {
-        return ((CraftWorld) world).getHandle().dimension().location().toString();
-    }
-
     @Override
     public NMSData getData(UUID playerUuid) {
         return new NMSData(playerUuid);

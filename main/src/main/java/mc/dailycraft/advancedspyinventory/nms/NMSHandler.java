@@ -1,5 +1,6 @@
 package mc.dailycraft.advancedspyinventory.nms;
 
+import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import org.bukkit.Material;
@@ -15,7 +16,10 @@ import java.util.function.Predicate;
 
 public interface NMSHandler {
     default String worldId(World world) {
-        return world.getName();
+        if (Main.VERSION >= 19)
+            return world.getKey().getKey();
+        else
+            return world.getName();
     }
 
     NMSData getData(UUID playerUuid);
@@ -35,7 +39,20 @@ public interface NMSHandler {
         });
     }
 
-    Material getVillagerProfessionMaterial(Villager.Profession profession);
+    default String[] getVillagerProfessions() {
+        return null;
+    }
+
+    default String getVillagerProfession(Villager villager) {
+        return null;
+    }
+
+    default void setVillagerProfession(Villager villager, String profession) {
+    }
+
+    default Material getVillagerProfessionMaterial(Villager.Profession profession) {
+        return null;
+    }
 
     default boolean isOcelotTrusting(Ocelot ocelot) {
         return ocelot.isTrusting();

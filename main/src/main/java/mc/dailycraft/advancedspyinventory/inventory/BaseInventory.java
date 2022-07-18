@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.Predicate;
 
 public abstract class BaseInventory {
@@ -44,7 +45,12 @@ public abstract class BaseInventory {
     public abstract void onClick(InventoryClickEvent event, int rawSlot);
 
     public CustomInventoryView getView() {
-        return new CustomInventoryView(viewer, this);
+        try {
+            return (CustomInventoryView) Class.forName("mc.dailycraft.advancedspyinventory.utils.CustomInventoryView" + (Main.VERSION <= 13 ? "Old" : "New"))
+                    .getConstructor(Player.class, BaseInventory.class).newInstance(viewer, this);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     public static ItemStack getNonNull(ItemStack privileged, ItemStack replacer) {

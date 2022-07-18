@@ -2,7 +2,7 @@ name: ${parent.name}
 author: DailyCraft
 description: ${description}
 version: ${version}
-api-version: 1.15
+api-version: 1.13
 website: ${parent.url}
 main: ${groupId}.advancedspyinventory.Main
 

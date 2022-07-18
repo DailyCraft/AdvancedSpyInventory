@@ -1,4 +1,4 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_15_R1;
+package mc.dailycraft.advancedspyinventory.nms.v1_14_R1;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,18 +7,18 @@ import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftOcelot;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_15_R1.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftContainer;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftChatMessage;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftOcelot;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_14_R1.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_14_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -64,42 +64,33 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
                 Containers<?> windowType = null;
 
                 try {
-                    // 1.15.2
-                    Method method = CraftContainer.class.getMethod("getNotchInventoryType", Inventory.class);
-                    windowType = (Containers<?>) method.invoke(null, view.getTopInventory());
-                } catch (NoSuchMethodException exception) {
-                    // 1.15 / 1.15.1
-                    try {
-                        if (view.getType() != InventoryType.CHEST) {
-                            Method method = CraftContainer.class.getMethod("getNotchInventoryType", InventoryType.class);
-                            windowType = (Containers<?>) method.invoke(null, view.getType());
-                        } else {
-                            switch (view.getTopInventory().getSize()) {
-                                case 9:
-                                    windowType = Containers.GENERIC_9X1;
-                                    break;
-                                case 9 * 2:
-                                    windowType = Containers.GENERIC_9X2;
-                                    break;
-                                case 9 * 3:
-                                    windowType = Containers.GENERIC_9X3;
-                                    break;
-                                case 9 * 4:
-                                    windowType = Containers.GENERIC_9X4;
-                                    break;
-                                case 9 * 5:
-                                    windowType = Containers.GENERIC_9X5;
-                                    break;
-                                case 9 * 6:
-                                    windowType = Containers.GENERIC_9X6;
-                                    break;
-                            }
+                    if (view.getType() != InventoryType.CHEST) {
+                        Method method = CraftContainer.class.getMethod("getNotchInventoryType", InventoryType.class);
+                        windowType = (Containers<?>) method.invoke(null, view.getType());
+                    } else {
+                        switch (view.getTopInventory().getSize()) {
+                            case 9:
+                                windowType = Containers.GENERIC_9X1;
+                                break;
+                            case 9 * 2:
+                                windowType = Containers.GENERIC_9X2;
+                                break;
+                            case 9 * 3:
+                                windowType = Containers.GENERIC_9X3;
+                                break;
+                            case 9 * 4:
+                                windowType = Containers.GENERIC_9X4;
+                                break;
+                            case 9 * 5:
+                                windowType = Containers.GENERIC_9X5;
+                                break;
+                            case 9 * 6:
+                                windowType = Containers.GENERIC_9X6;
+                                break;
                         }
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException exception1) {
-                        exception1.printStackTrace();
                     }
-                } catch (InvocationTargetException | IllegalAccessException exception) {
-                    exception.printStackTrace();
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException exception1) {
+                    exception1.printStackTrace();
                 }
 
                 String title = view.getTitle();
@@ -114,7 +105,35 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     public <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter) {
         EntityPlayer nmsViewer = ((CraftPlayer) view.getPlayer()).getHandle();
         Translation translation = Translation.of(view.getPlayer());
-        BlockPosition position = new BlockPosition(nmsViewer.getPositionVector().add(0, -nmsViewer.getPositionVector().y, 0));
+
+        Method method = null;
+
+        try {
+            // 1.14.4
+            method = EntityPlayer.class.getMethod("getPositionVector");
+        } catch (NoSuchMethodException e) {
+            try {
+                // 1.14.3
+                method = EntityPlayer.class.getMethod("ci");
+            } catch (NoSuchMethodException ex) {
+                try {
+                    // 1.14.2 / 1.14.1 / 1.14
+                    method = EntityPlayer.class.getMethod("bO");
+                } catch (NoSuchMethodException exc) {
+                    exc.printStackTrace();
+                }
+            }
+        }
+
+        Vec3D viewerPos = null;
+
+        try {
+            viewerPos = (Vec3D) method.invoke(nmsViewer);
+        } catch (IllegalAccessException | InvocationTargetException exception) {
+            exception.printStackTrace();
+        }
+
+        BlockPosition position = new BlockPosition(viewerPos.add(0, -viewerPos.y, 0));
 
         TileEntitySign teSign = new TileEntitySign();
         teSign.setPosition(position);
@@ -180,7 +199,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     public Material getVillagerProfessionMaterial(Villager.Profession profession) {
         if (matchingStatesField == null) {
             try {
-                (matchingStatesField = VillagePlaceType.class.getDeclaredField("z")).setAccessible(true);
+                (matchingStatesField = VillagePlaceType.class.getDeclaredField("w")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
                 exception.printStackTrace();
             }
@@ -193,7 +212,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
                 return Material.OAK_DOOR;
             default:
                 try {
-                    Iterator<IBlockData> matchingStates = ((Set<IBlockData>) matchingStatesField.get(CraftVillager.bukkitToNmsProfession(profession).b())).iterator();
+                    Iterator<IBlockData> matchingStates = ((Set<IBlockData>) matchingStatesField.get(IRegistry.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(profession.getKey())).b())).iterator();
                     return matchingStates.hasNext() ? CraftMagicNumbers.getMaterial(matchingStates.next().getBlock()) : Material.RED_BED;
                 } catch (IllegalAccessException exception) {
                     throw new RuntimeException(exception);

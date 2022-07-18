@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.util.UUIDTypeAdapter;
+import mc.dailycraft.advancedspyinventory.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -52,32 +53,36 @@ public class ItemStackBuilder {
                 GameProfile profile = headProfiles.get(headOwner);
 
                 if (profile == null) {
-                    UUID uuid;
+                    Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+                        try {
+                            UUID uuid;
 
-                    if (Bukkit.getOnlineMode()) {
-                        uuid = Bukkit.getOfflinePlayer(headOwner).getUniqueId();
-                    } else {
-                        try (Reader reader = new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + headOwner).openStream())) {
-                            uuid = UUIDTypeAdapter.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString());
+                            if (Bukkit.getOnlineMode()) {
+                                uuid = Bukkit.getOfflinePlayer(headOwner).getUniqueId();
+                            } else {
+                                try (Reader reader = new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + headOwner).openStream())) {
+                                    uuid = UUIDTypeAdapter.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString());
+                                }
+                            }
+
+                            try (Reader sessionReader = new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDTypeAdapter.fromUUID(uuid)).openStream())) {
+                                JsonObject textureProperty = new Gson().fromJson(sessionReader, JsonObject.class).get("properties").getAsJsonArray().get(0).getAsJsonObject();
+                                String value = textureProperty.get("value").getAsString();
+
+                                GameProfile gameProfile = new GameProfile(uuid, headOwner);
+                                gameProfile.getProperties().put("textures", new Property("textures", value));
+                                headProfiles.put(headOwner, gameProfile);
+                            }
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
                         }
-                    }
+                    });
+                } else {
+                    if (headField == null)
+                        (headField = meta.getClass().getDeclaredField("profile")).setAccessible(true);
 
-                    try (Reader sessionReader = new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDTypeAdapter.fromUUID(uuid)).openStream())) {
-                        JsonObject textureProperty = new Gson().fromJson(sessionReader, JsonObject.class).get("properties").getAsJsonArray().get(0).getAsJsonObject();
-                        String value = textureProperty.get("value").getAsString();
-
-                        GameProfile gameProfile = new GameProfile(uuid, headOwner);
-                        gameProfile.getProperties().put("textures", new Property("textures", value));
-                        headProfiles.put(headOwner, profile = gameProfile);
-                    }
+                    headField.set(meta, profile);
                 }
-
-                if (headField == null) {
-                    headField = meta.getClass().getDeclaredField("profile");
-                    headField.setAccessible(true);
-                }
-
-                headField.set(meta, profile);
             } catch (Exception exception) {
                 exception.printStackTrace();
             }

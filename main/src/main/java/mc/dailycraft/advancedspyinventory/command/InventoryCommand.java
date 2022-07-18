@@ -1,16 +1,16 @@
 package mc.dailycraft.advancedspyinventory.command;
 
+import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.*;
 import mc.dailycraft.advancedspyinventory.inventory.entity.*;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.FluidCollisionMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
-import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class InventoryCommand extends PlayerTabExecutor {
                             new HorseInventory<>(player, (AbstractHorse) targetEntity).getView().open();
                         else if (targetEntity.getType() == EntityType.DONKEY || targetEntity.getType() == EntityType.MULE)
                             new DonkeyInventory(player, (ChestedHorse) targetEntity).getView().open();
-                        else if (targetEntity.getType() == EntityType.LLAMA || targetEntity.getType() == EntityType.TRADER_LLAMA)
+                        else if (targetEntity.getType() == EntityType.LLAMA || (Main.VERSION >= 14 && targetEntity.getType() == EntityType.TRADER_LLAMA))
                             new LlamaInventory(player, (Llama) targetEntity).getView().open();
                         else
                             new EntityInventory<>(player, (LivingEntity) targetEntity).getView().open();
@@ -76,10 +76,17 @@ public class InventoryCommand extends PlayerTabExecutor {
 
             if (Permissions.ENTITY_VIEW.has(sender)) {
                 Player player = (Player) sender;
-                RayTraceResult result = player.getWorld().rayTrace(player.getEyeLocation(), player.getLocation().getDirection(), 6, FluidCollisionMode.ALWAYS, false, 0, entity -> entity != player);
+                Entity target = null;
 
-                if (result != null && result.getHitEntity() != null && result.getHitEntity().getUniqueId().toString().toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
-                    list.add(result.getHitEntity().getUniqueId().toString());
+                for (Entity other : player.getNearbyEntities(6, 6, 6)) {
+                    Vector n = other.getLocation().toVector().subtract(player.getLocation().toVector());
+                    if (player.getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < 1 && n.normalize().dot(player.getLocation().getDirection().normalize()) >= 0)
+                        if (target == null || target.getLocation().distanceSquared(player.getLocation()) > other.getLocation().distanceSquared(player.getLocation()))
+                            target = other;
+                }
+
+                if (target != null && player.hasLineOfSight(target))
+                    list.add(target.getUniqueId().toString());
             }
 
             return list;

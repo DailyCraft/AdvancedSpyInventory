@@ -8,7 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
-public class CustomInventoryView extends InventoryView {
+public abstract class CustomInventoryView extends InventoryView {
     private final Player viewer;
     private final BaseInventory container;
     private final Inventory inventory;
@@ -44,12 +44,6 @@ public class CustomInventoryView extends InventoryView {
     @Override
     public InventoryType getType() {
         return inventory.getType();
-    }
-
-    @NotNull
-    @Override
-    public String getTitle() {
-        return container.getTitle();
     }
 
     public void open() {

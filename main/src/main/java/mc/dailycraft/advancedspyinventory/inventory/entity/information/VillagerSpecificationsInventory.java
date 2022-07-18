@@ -61,9 +61,9 @@ public class VillagerSpecificationsInventory extends InformationInventory<Villag
                 return Material.LILY_PAD;
             case TAIGA:
                 return Material.DARK_OAK_LOG;
+            default:
+                return Material.OAK_LOG;
         }
-
-        return null;
     }
 
     @Override

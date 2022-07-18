@@ -3,6 +3,7 @@ package mc.dailycraft.advancedspyinventory.inventory;
 import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.PlayerData;
 import mc.dailycraft.advancedspyinventory.utils.*;
+import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

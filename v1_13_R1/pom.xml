@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>advancedspyinventory-v1_16_R2</artifactId>
+    <artifactId>advancedspyinventory-v1_13_R1</artifactId>
 
     <properties>
-        <minecraftVersion>1.16.3</minecraftVersion>
+        <minecraftVersion>1.13</minecraftVersion>
     </properties>
 
     <dependencies>
