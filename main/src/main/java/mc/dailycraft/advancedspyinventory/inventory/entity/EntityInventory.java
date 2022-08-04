@@ -160,7 +160,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
         } else if (rawSlot == getSize() - 7) {
             if (Permissions.ENTITY_TELEPORT.has(viewer)) {
                 if (event.isShiftClick()) {
-                    if (Permissions.PLAYER_TELEPORT_OTHERS.has(viewer))
+                    if (Permissions.ENTITY_TELEPORT_OTHERS.has(viewer))
                         entity.teleport(viewer);
                 } else
                     viewer.teleport(entity);

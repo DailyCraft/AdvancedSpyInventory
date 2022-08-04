@@ -80,7 +80,9 @@ public abstract class BaseInventory {
                 .lore(translation.format(entityKey + "z", location.getZ()))
                 .lore(translation.format(entityKey + "yaw", location.getYaw()))
                 .lore(translation.format(entityKey + "pitch", location.getPitch()))
-                .lore((isPlayer ? Permissions.PLAYER_TELEPORT : Permissions.ENTITY_TELEPORT).has(viewer), "", translation.format(entityKey + "teleport"), translation.format(entityKey + "teleport.to_me")).get();
+                .lore(isPlayer ? Permissions.PLAYER_TELEPORT.has(viewer) || Permissions.PLAYER_TELEPORT_OTHERS.has(viewer) : Permissions.ENTITY_TELEPORT.has(viewer) || Permissions.ENTITY_TELEPORT_OTHERS.has(viewer), "")
+                .lore((isPlayer ? Permissions.PLAYER_TELEPORT : Permissions.ENTITY_TELEPORT).has(viewer), "", translation.format(entityKey + "teleport"))
+                .lore((isPlayer ? Permissions.PLAYER_TELEPORT_OTHERS : Permissions.ENTITY_TELEPORT_OTHERS).has(viewer), translation.format(entityKey + "teleport.to_me")).get();
     }
 
     protected void replaceItem(InventoryClickEvent event, ItemStack informationItem) {
