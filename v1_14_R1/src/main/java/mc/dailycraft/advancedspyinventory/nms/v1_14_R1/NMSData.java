@@ -41,6 +41,13 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
+    public void putLong(String id, long value) {
+        NBTTagCompound data = getData();
+        data.setLong(id, value);
+        saveData(data);
+    }
+
+    @Override
     public float getFloat(String id) {
         return getData().getFloat(id);
     }
@@ -58,13 +65,38 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
+    public void putString(String id, String value) {
+        NBTTagCompound data = getData();
+        data.setString(id, value);
+        saveData(data);
+    }
+
+    @Override
     public List<Double> getDoubleList(String id) {
         return getData().getList(id, CraftMagicNumbers.NBT.TAG_DOUBLE).stream().map(tag -> ((NBTTagDouble) tag).asDouble()).collect(Collectors.toList());
     }
 
     @Override
+    public void putDoubleList(String id, List<Double> value) {
+        NBTTagCompound data = getData();
+        NBTTagList tag = new NBTTagList();
+        value.forEach(v -> tag.add(new NBTTagDouble(v)));
+        data.set(id, tag);
+        saveData(data);
+    }
+
+    @Override
     public List<Float> getFloatList(String id) {
         return getData().getList(id, CraftMagicNumbers.NBT.TAG_FLOAT).stream().map(tag -> ((NBTTagFloat) tag).asFloat()).collect(Collectors.toList());
+    }
+
+    @Override
+    public void putFloatList(String id, List<Float> value) {
+        NBTTagCompound data = getData();
+        NBTTagList tag = new NBTTagList();
+        value.forEach(v -> tag.add(new NBTTagFloat(v)));
+        data.set(id, tag);
+        saveData(data);
     }
 
     @Override
@@ -99,8 +131,8 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public float getMaxHealth() {
-        for (NBTBase tag : getData().getList("Attributes", 10))
-            if (((NBTTagCompound) tag).getString("Name").equals("minecraft:generic.max_health"))
+        for (NBTBase tag : getData().getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND))
+            if (((NBTTagCompound) tag).getString("Name").equals("generic.maxHealth"))
                 return ((NBTTagCompound) tag).getFloat("Base");
 
         return -1;
@@ -109,17 +141,17 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     @Override
     public void setMaxHealth(float maxHealth) {
         NBTTagCompound data = getData();
-        NBTTagList list = data.getList("Attributes", 10);
+        NBTTagList list = data.getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND);
 
         for (NBTBase nbt : list) {
-            if (((NBTTagCompound) nbt).getString("Name").equals("minecraft:generic.max_health")) {
+            if (((NBTTagCompound) nbt).getString("Name").equals("generic.maxHealth")) {
                 list.remove(nbt);
                 break;
             }
         }
 
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setString("Name", "minecraft:generic.max_health");
+        nbt.setString("Name", "generic.maxHealth");
         nbt.setFloat("Base", maxHealth);
         list.add(nbt);
         saveData(data);

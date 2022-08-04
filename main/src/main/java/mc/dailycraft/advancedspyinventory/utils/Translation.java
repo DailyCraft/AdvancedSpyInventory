@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import mc.dailycraft.advancedspyinventory.Main;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
 
 import java.io.*;
@@ -55,6 +56,22 @@ public class Translation {
             Main.getInstance().getLogger().severe("The translation of " + key + " as an incorrect format: '" + s + "'! Error: " + exception.getMessage());
             return key;
         }
+    }
+
+    public String formatColor(DyeColor color, String key, Object... parameters) {
+        return dyeColorToChat(color) + format(key, parameters);
+    }
+
+    public String formatColor(DyeColor color) {
+        return formatColor(color, "generic.color." + color.name().toLowerCase());
+    }
+
+    public String formatYesNo(boolean condition, String key) {
+        return format(key, format("generic." + (condition ? "yes" : "no")));
+    }
+
+    public String formatCondition(boolean condition, String key, Object... parameters) {
+        return condition ? " " + format(key, parameters) : "";
     }
 
     private static Map<String, String> initializeTranslations(String preKey, Set<Map.Entry<String, JsonElement>> set) {
@@ -113,5 +130,50 @@ public class Translation {
         });
 
         formatTable.rowKeySet().forEach(lang -> instances.put(lang, new Translation(lang)));
+    }
+
+    public static String dyeColorToChat(DyeColor color) {
+        if (Main.VERSION >= 16) {
+            StringBuilder sb = new StringBuilder("§x");
+
+            for (char c : Integer.toHexString(color.getColor().asRGB()).toCharArray())
+                sb.append('§').append(c);
+
+            return sb.toString();
+        } else {
+            switch (color) {
+                case WHITE:
+                default:
+                    return ChatColor.WHITE.toString();
+                case ORANGE:
+                case BROWN:
+                    return ChatColor.GOLD.toString();
+                case MAGENTA:
+                case PINK:
+                    return ChatColor.LIGHT_PURPLE.toString();
+                case LIGHT_BLUE:
+                    return ChatColor.AQUA.toString();
+                case YELLOW:
+                    return ChatColor.YELLOW.toString();
+                case LIME:
+                    return ChatColor.GREEN.toString();
+                case GRAY:
+                    return ChatColor.DARK_GRAY.toString();
+                case LIGHT_GRAY:
+                    return ChatColor.GRAY.toString();
+                case CYAN:
+                    return ChatColor.DARK_AQUA.toString();
+                case PURPLE:
+                    return ChatColor.DARK_PURPLE.toString();
+                case BLUE:
+                    return ChatColor.BLUE.toString();
+                case GREEN:
+                    return ChatColor.DARK_GREEN.toString();
+                case RED:
+                    return ChatColor.RED.toString();
+                case BLACK:
+                    return ChatColor.BLACK.toString();
+            }
+        }
     }
 }

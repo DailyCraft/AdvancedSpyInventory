@@ -3,7 +3,7 @@ package mc.dailycraft.advancedspyinventory.inventory;
 import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.PlayerData;
 import mc.dailycraft.advancedspyinventory.utils.*;
-import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -42,7 +42,7 @@ public class PlayerInventory extends BaseInventory {
             case 42:
                 return new ItemStackBuilder(getNonNull(inventory[target.getSelectedSlot()] != null ? inventory[target.getSelectedSlot()].clone() : null, InformationItems.MAIN_HAND.get(translation)))
                         .lore("")
-                        .lore(translation.format("interface.player.slot", target.getSelectedSlot() + 1) + (Permissions.PLAYER_SLOT.has(viewer) ? " " + translation.format("interface.player.slot.left") + " " + translation.format("interface.player.slot.right") : ""))
+                        .lore(translation.format("interface.player.slot", target.getSelectedSlot() + 1) + (Permissions.PLAYER_SLOT.has(viewer) ? " " + translation.format("interface.player.slot.modify") : ""))
                         .lore(target.isOnline() && Permissions.PLAYER_DROP.has(viewer), translation.format("interface.player.slot.drop"), translation.format("interface.player.slot.drop.all"))
                         .get();
 
@@ -58,8 +58,9 @@ public class PlayerInventory extends BaseInventory {
             case 46:
                 if (Permissions.PLAYER_HEALTH.has(viewer)) {
                     return new ItemStackBuilder(PotionType.INSTANT_HEAL, translation.format("interface.entity.health", target.getHealth(), target.getMaxHealth()))
-                            .lore(Permissions.PLAYER_HEALTH_MODIFY.has(viewer), translation.format("interface.entity.health.modify"))
-                            .lore(Permissions.PLAYER_HEALTH_MODIFY_MAX.has(viewer), translation.format("interface.entity.health.modify.max")).get();
+                            .lore(Permissions.PLAYER_HEALTH_MODIFY.has(viewer) || Permissions.PLAYER_HEALTH_MODIFY.has(viewer), "", translation.format("interface.entity.health.modify.0"))
+                            .lore(Permissions.PLAYER_HEALTH_MODIFY.has(viewer), "   " + translation.format("interface.entity.health.modify.1"))
+                            .lore(Permissions.PLAYER_HEALTH_MODIFY_MAX.has(viewer), "   " + translation.format("interface.entity.health.modify.2")).get();
                 }
 
                 break;
@@ -71,21 +72,19 @@ public class PlayerInventory extends BaseInventory {
                 break;
 
             case 49:
-                return new ItemStackBuilder(Material.BARRIER, Permissions.PLAYER_MODIFY.has(viewer) ? translation.format("interface.entity.clear") : translation.format("interface.entity.close")).get();
+                return new ItemStackBuilder(Material.BARRIER, translation.format("interface.entity.close"))
+                        .lore(Permissions.PLAYER_MODIFY.has(viewer), "", translation.format("interface.entity.clear"), translation.format("interface.entity.clear.warning")).get();
 
             case 51:
-                if (Permissions.PLAYER_XP.has(viewer)) {
-                    return new ItemStackBuilder(Material.EXPERIENCE_BOTTLE, translation.format("interface.player.experience", target.getExperience()))
-                            .lore(translation.format("interface.player.experience.modify"), Permissions.PLAYER_XP_MODIFY.has(viewer)).get();
-                }
+                if (Permissions.PLAYER_XP.has(viewer))
+                    return new ItemStackBuilder(Material.EXPERIENCE_BOTTLE, translation.format("interface.player.experience", target.getExperience()) + (Permissions.PLAYER_XP_MODIFY.has(viewer) ? " " + translation.format("generic.modify") : "")).get();
 
                 break;
 
             case 52:
                 if (Permissions.PLAYER_FOOD.has(viewer)) {
-                    return new ItemStackBuilder(Material.COOKED_BEEF, translation.format("interface.player.food.level", target.getFoodLevel()))
-                            .lore(translation.format("interface.player.food.saturation", target.getFoodSaturation()))
-                            .lore(Permissions.PLAYER_FOOD_MODIFY.has(viewer), "", translation.format("interface.player.food.level.modify"), translation.format("interface.player.food.saturation.modify"))
+                    return new ItemStackBuilder(Material.COOKED_BEEF, translation.format("interface.player.food.level", target.getFoodLevel()) + (Permissions.PLAYER_FOOD_MODIFY.has(viewer) ? " " + translation.format("generic.modify.left") : ""))
+                            .lore(ChatColor.WHITE + translation.format("interface.player.food.saturation", target.getFoodSaturation()) + (Permissions.PLAYER_FOOD_MODIFY.has(viewer) ? " " + translation.format("generic.modify.right") : ""))
                             .get();
                 }
 
@@ -180,29 +179,32 @@ public class PlayerInventory extends BaseInventory {
                     viewer.sendMessage(translation.format("interface.player.own"));
             }
         } else if (rawSlot == getSize() - 8) {
-            if (Permissions.PLAYER_HEALTH_MODIFY.has(viewer) && event.getClick() == ClickType.LEFT)
-                Main.NMS.signInterface((CustomInventoryView) event.getView(), "health", target.getHealth(), 0f, target.getMaxHealth(), Float::parseFloat, target::setHealth);
-            else if (Permissions.PLAYER_HEALTH_MODIFY_MAX.has(viewer) && event.getClick() == ClickType.RIGHT)
-                Main.NMS.signInterface((CustomInventoryView) event.getView(), "health.max", target.getMaxHealth(), 0.1f, Float.MAX_VALUE, Float::parseFloat, target::setMaxHealth);
+            if (Permissions.PLAYER_HEALTH_MODIFY.has(viewer) && event.isLeftClick())
+                openSign("health", target.getHealth(), 0f, target.getMaxHealth(), Float::parseFloat, target::setHealth);
+            else if (Permissions.PLAYER_HEALTH_MODIFY_MAX.has(viewer) && event.isRightClick())
+                openSign("health.max", target.getMaxHealth(), 0.1f, Float.MAX_VALUE, Float::parseFloat, target::setMaxHealth);
         } else if (rawSlot == getSize() - 7) {
             if (Permissions.PLAYER_TELEPORT.has(viewer)) {
-                viewer.teleport(target.getLocation());
-                viewer.closeInventory();
+                if (event.isShiftClick()) {
+                    if (Permissions.PLAYER_TELEPORT_OTHERS.has(viewer) && !target.equals(viewer))
+                        target.setLocation(viewer.getLocation());
+                } else
+                    viewer.teleport(target.getLocation());
             }
         } else if (rawSlot == getSize() - 5) {
-            if (Permissions.PLAYER_MODIFY.has(viewer))
+            if (Permissions.PLAYER_MODIFY.has(viewer) && event.isShiftClick())
                 event.getInventory().clear();
             else
                 viewer.closeInventory();
         } else if (rawSlot == getSize() - 3) {
             if (Permissions.PLAYER_XP_MODIFY.has(viewer))
-                Main.NMS.signInterface((CustomInventoryView) event.getView(), "experience", target.getExperience(), 0f, Float.MAX_VALUE, Float::parseFloat, target::setExperience);
+                openSign("experience", target.getExperience(), 0f, Float.MAX_VALUE, Float::parseFloat, target::setExperience);
         } else if (rawSlot == getSize() - 2) {
-            if (Permissions.PLAYER_FOOD_MODIFY.has(viewer) && (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.RIGHT)) {
-                if (event.getClick() == ClickType.LEFT)
-                    Main.NMS.signInterface((CustomInventoryView) event.getView(), "food.level", target.getFoodLevel(), 0, Integer.MAX_VALUE, Integer::parseInt, target::setFoodLevel);
-                else
-                    Main.NMS.signInterface((CustomInventoryView) event.getView(), "food.saturation", target.getFoodSaturation(), 0f, Float.MAX_VALUE, Float::parseFloat, target::setFoodSaturation);
+            if (Permissions.PLAYER_FOOD_MODIFY.has(viewer)) {
+                if (event.isLeftClick())
+                    openSign("food.level", target.getFoodLevel(), 0, Integer.MAX_VALUE, Integer::parseInt, target::setFoodLevel);
+                else if (event.isRightClick())
+                    openSign("food.saturation", target.getFoodSaturation(), 0f, Float.MAX_VALUE, Float::parseFloat, target::setFoodSaturation);
             }
         } else if (rawSlot == getSize() - 1) {
             if (target.equals(viewer) && Permissions.ENDER.has(viewer) || Permissions.ENDER_OTHERS.has(viewer))

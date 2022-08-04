@@ -21,8 +21,7 @@ public class NMSContainer implements IInventory {
 
     static {
         try {
-            handle = CraftItemStack.class.getDeclaredField("handle");
-            handle.setAccessible(true);
+            (handle = CraftItemStack.class.getDeclaredField("handle")).setAccessible(true);
         } catch (NoSuchFieldException exception) {
             throw new RuntimeException(exception);
         }
@@ -58,7 +57,7 @@ public class NMSContainer implements IInventory {
             try {
                 return (ItemStack) handle.get(item);
             } catch (IllegalAccessException exception) {
-                throw new RuntimeException(exception);
+                exception.printStackTrace();
             }
         }
 

@@ -25,15 +25,23 @@ public abstract class NMSData {
 
     public abstract long getLong(String id);
 
+    public abstract void putLong(String id, long value);
+
     public abstract float getFloat(String id);
 
     public abstract void putFloat(String id, float value);
 
     public abstract String getString(String id);
 
+    public abstract void putString(String id, String value);
+
     public abstract List<Double> getDoubleList(String id);
 
+    public abstract void putDoubleList(String id, List<Double> value);
+
     public abstract List<Float> getFloatList(String id);
+
+    public abstract void putFloatList(String id, List<Float> value);
 
     public abstract ItemStack[] getArray(String id, int size, Function<Integer, Integer> slotConversion);
 

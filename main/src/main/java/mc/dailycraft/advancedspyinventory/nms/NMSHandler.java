@@ -1,26 +1,31 @@
 package mc.dailycraft.advancedspyinventory.nms;
 
+import io.netty.channel.ChannelPipeline;
 import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
-import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
+import mc.dailycraft.advancedspyinventory.utils.Triplet;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public interface NMSHandler {
-    default String worldId(World world) {
-        if (Main.VERSION >= 19)
-            return world.getKey().getKey();
+    default NamespacedKey worldKey(World world) {
+        if (Main.VERSION > 18)
+            return world.getKey();
         else
-            return world.getName();
+            return NamespacedKey.minecraft(world.getName());
     }
+
+    ItemStack getEquipment(LivingEntity entity, EquipmentSlot slot);
 
     NMSData getData(UUID playerUuid);
 
@@ -30,14 +35,7 @@ public interface NMSHandler {
         player.openInventory(view);
     }
 
-    <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter);
-
-    default <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Consumer<T> runAfter) {
-        signInterface(view, formatKey, defaultValue, minimumValue, maximumValue, stringToT, t -> {
-            runAfter.accept(t);
-            return true;
-        });
-    }
+    Triplet<?> openSign(Player player, Location loc);
 
     default String[] getVillagerProfessions() {
         return null;

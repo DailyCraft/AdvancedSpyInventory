@@ -28,10 +28,11 @@ public class EnderChestInventory extends BaseInventory {
         if (index < getSize() - 9)
             return target.getEnderChest()[index];
         else if (index == getSize() - 9) {
-            if (Permissions.INVENTORY.has(viewer))
+            if (Permissions.PLAYER_VIEW.has(viewer))
                 return new ItemStackBuilder(Material.CHEST, translation.format("interface.enderchest.inventory")).get();
         } else if (index == getSize() - 5)
-            return new ItemStackBuilder(Material.BARRIER, translation.format("interface." + (target.equals(viewer) && Permissions.ENDER_MODIFY.has(viewer) || Permissions.ENDER_OTHERS_MODIFY.has(viewer) ? "enderchest.clear" : "entity.close"))).get();
+            return new ItemStackBuilder(Material.BARRIER, translation.format("interface.entity.close"))
+                    .lore(target.equals(viewer) && Permissions.ENDER_MODIFY.has(viewer) || Permissions.ENDER_OTHERS_MODIFY.has(viewer), "", translation.format("interface.entity.clear"), translation.format("interface.entity.clear.warning")).get();
 
         return VOID_ITEM;
     }
@@ -65,10 +66,10 @@ public class EnderChestInventory extends BaseInventory {
             else if (rawSlot < getSize() - 9)
                 viewer.sendMessage(translation.format("permission.enderchest.modify"));
         } else if (rawSlot == getSize() - 9) {
-            if (Permissions.INVENTORY.has(viewer))
+            if (Permissions.PLAYER_VIEW.has(viewer))
                 new PlayerInventory(viewer, target).getView().open();
         } else if (rawSlot == getSize() - 5) {
-            if (target.equals(viewer) && Permissions.ENDER_MODIFY.has(viewer) || Permissions.ENDER_OTHERS_MODIFY.has(viewer))
+            if ((target.equals(viewer) && Permissions.ENDER_MODIFY.has(viewer) || Permissions.ENDER_OTHERS_MODIFY.has(viewer)) && event.isShiftClick())
                 event.getInventory().clear();
             else
                 viewer.closeInventory();

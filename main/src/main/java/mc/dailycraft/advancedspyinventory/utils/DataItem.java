@@ -27,7 +27,7 @@ public class DataItem<T extends LivingEntity> {
     }
 
     public void click(EntityInventory<T> inventory, InventoryClickEvent event, EntityType type, Player viewer) {
-        if (Permissions.hasPermissionModify(type, viewer))
+        if (Permissions.hasPermissionModify(type, viewer) && click != null)
             click.accept(inventory, event, inventory.entity);
     }
 

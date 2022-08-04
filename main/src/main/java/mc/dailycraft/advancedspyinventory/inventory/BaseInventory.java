@@ -1,10 +1,9 @@
 package mc.dailycraft.advancedspyinventory.inventory;
 
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
 import mc.dailycraft.advancedspyinventory.Main;
-import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
-import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
-import mc.dailycraft.advancedspyinventory.utils.Permissions;
-import mc.dailycraft.advancedspyinventory.utils.Translation;
+import mc.dailycraft.advancedspyinventory.utils.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,6 +11,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class BaseInventory {
@@ -69,15 +71,16 @@ public abstract class BaseInventory {
 
     protected ItemStack getLocationItemStack(Location location, boolean isPlayer) {
         String entityKey = "interface.entity.";
+        NamespacedKey worldKey = Main.NMS.worldKey(location.getWorld());
 
         return new ItemStackBuilder(Material.ARROW, translation.format(entityKey + "location"))
-                .lore(translation.format(entityKey + "world", Main.NMS.worldId(location.getWorld()), translation.format(entityKey + "world.environment." + location.getWorld().getEnvironment().name().toLowerCase())))
+                .lore(translation.format(entityKey + "world", Main.VERSION < 16 ? worldKey.getKey() : worldKey, translation.format(entityKey + "world.environment." + location.getWorld().getEnvironment().name().toLowerCase())))
                 .lore(translation.format(entityKey + "x", location.getX()))
                 .lore(translation.format(entityKey + "y", location.getY()))
                 .lore(translation.format(entityKey + "z", location.getZ()))
                 .lore(translation.format(entityKey + "yaw", location.getYaw()))
                 .lore(translation.format(entityKey + "pitch", location.getPitch()))
-                .lore((isPlayer ? Permissions.PLAYER_TELEPORT : Permissions.ENTITY_TELEPORT).has(viewer), "", translation.format(entityKey + "teleport")).get();
+                .lore((isPlayer ? Permissions.PLAYER_TELEPORT : Permissions.ENTITY_TELEPORT).has(viewer), "", translation.format(entityKey + "teleport"), translation.format(entityKey + "teleport.to_me")).get();
     }
 
     protected void replaceItem(InventoryClickEvent event, ItemStack informationItem) {
@@ -105,48 +108,56 @@ public abstract class BaseInventory {
         });
     }
 
-    public static String dyeToChatColor(DyeColor color) {
-        if (Main.VERSION >= 16) {
-            StringBuilder sb = new StringBuilder("§x");
+    protected <T extends Number> void openSign(String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter) {
+        Location loc = viewer.getLocation().clone();
+        loc.setY(0);
 
-            for (char c : Integer.toHexString(color.getColor().asRGB()).toCharArray())
-                sb.append('§').append(c);
+        viewer.closeInventory();
+        viewer.sendBlockChange(loc, (Main.VERSION > 13 ? Material.OAK_SIGN : Material.getMaterial("SIGN")).createBlockData());
+        viewer.sendSignChange(loc, new String[] {defaultValue.toString(), "^^^^^^^^^^^^^^^", translation.format("sign." + formatKey + ".0"), translation.format("sign." + formatKey + ".1")});
 
-            return sb.toString();
-        } else {
-            switch (color) {
-                case WHITE:
-                default:
-                    return ChatColor.WHITE.toString();
-                case ORANGE:
-                case BROWN:
-                    return ChatColor.GOLD.toString();
-                case MAGENTA:
-                case PINK:
-                    return ChatColor.LIGHT_PURPLE.toString();
-                case LIGHT_BLUE:
-                    return ChatColor.AQUA.toString();
-                case YELLOW:
-                    return ChatColor.YELLOW.toString();
-                case LIME:
-                    return ChatColor.GREEN.toString();
-                case GRAY:
-                    return ChatColor.DARK_GRAY.toString();
-                case LIGHT_GRAY:
-                    return ChatColor.GRAY.toString();
-                case CYAN:
-                    return ChatColor.DARK_AQUA.toString();
-                case PURPLE:
-                    return ChatColor.DARK_PURPLE.toString();
-                case BLUE:
-                    return ChatColor.BLUE.toString();
-                case GREEN:
-                    return ChatColor.DARK_GREEN.toString();
-                case RED:
-                    return ChatColor.RED.toString();
-                case BLACK:
-                    return ChatColor.BLACK.toString();
+        Triplet<Object> triplet = (Triplet<Object>) Main.NMS.openSign(viewer, loc);
+        String handlerId = Main.getInstance().getName().toLowerCase() + "_sign_" + new Random().nextLong();
+
+        triplet.pipeline.addBefore("packet_handler", handlerId, new ChannelDuplexHandler() {
+            @Override
+            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                if (triplet.packet.isInstance(msg)) {
+                    String line = triplet.line.apply(msg);
+                    T result;
+
+                    try {
+                        T converted = line.isEmpty() ? defaultValue : stringToT.apply(line);
+
+                        if (converted.doubleValue() < minimumValue.doubleValue())
+                            result = minimumValue;
+                        else if (converted.doubleValue() > maximumValue.doubleValue())
+                            result = maximumValue;
+                        else
+                            result = converted;
+                    } catch (NumberFormatException exception) {
+                        result = defaultValue;
+                    }
+
+                    viewer.sendBlockChange(loc, loc.getBlock().getBlockData());
+
+                    final T finalResult = result;
+                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                        if (runAfter.test(finalResult))
+                            getView().open();
+                    });
+
+                    triplet.pipeline.channel().eventLoop().submit(() -> triplet.pipeline.remove(handlerId));
+                } else
+                    super.channelRead(ctx, msg);
             }
-        }
+        });
+    }
+
+    protected <T extends Number> void openSign(String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Consumer<T> runAfter) {
+        openSign(formatKey, defaultValue, minimumValue, maximumValue, stringToT, t -> {
+            runAfter.accept(t);
+            return true;
+        });
     }
 }

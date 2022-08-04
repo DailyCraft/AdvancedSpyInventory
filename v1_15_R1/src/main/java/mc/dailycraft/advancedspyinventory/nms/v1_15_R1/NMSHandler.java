@@ -1,44 +1,46 @@
 package mc.dailycraft.advancedspyinventory.nms.v1_15_R1;
 
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
-import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
-import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
-import mc.dailycraft.advancedspyinventory.utils.Translation;
+import mc.dailycraft.advancedspyinventory.utils.Triplet;
 import net.minecraft.server.v1_15_R1.*;
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_15_R1.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftOcelot;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_15_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftContainer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHandler {
     private static Field matchingStatesField = null;
     private static Method isTrustingMethod = null, setTrustingMethod = null;
+
+    @Override
+    public ItemStack getEquipment(LivingEntity entity, EquipmentSlot slot) {
+        return CraftItemStack.asCraftMirror(((CraftLivingEntity) entity).getHandle().getEquipment(CraftEquipmentSlot.getNMS(slot)));
+    }
 
     @Override
     public NMSData getData(UUID playerUuid) {
@@ -111,68 +113,10 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     }
 
     @Override
-    public <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter) {
-        EntityPlayer nmsViewer = ((CraftPlayer) view.getPlayer()).getHandle();
-        Translation translation = Translation.of(view.getPlayer());
-        BlockPosition position = new BlockPosition(nmsViewer.getPositionVector().add(0, -nmsViewer.getPositionVector().y, 0));
-
-        TileEntitySign teSign = new TileEntitySign();
-        teSign.setPosition(position);
-
-        teSign.a(0, new ChatComponentText(defaultValue.toString()));
-        teSign.a(1, new ChatComponentText("^^^^^^^^^^^^^^^"));
-        teSign.a(2, new ChatComponentText(translation.format("sign." + formatKey + ".0")));
-        teSign.a(3, new ChatComponentText(translation.format("sign." + formatKey + ".1")));
-
-        view.getPlayer().closeInventory();
-
-        PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange(nmsViewer.world, position);
-        packet.block = ((CraftBlockData) Material.OAK_SIGN.createBlockData()).getState();
-        nmsViewer.playerConnection.sendPacket(packet);
-        nmsViewer.playerConnection.sendPacket(teSign.getUpdatePacket());
-        nmsViewer.playerConnection.sendPacket(new PacketPlayOutOpenSignEditor(position));
-
-        ChannelPipeline pipeline = nmsViewer.playerConnection.networkManager.channel.pipeline();
-
-        String handlerId = Main.getInstance().getName().toLowerCase() + "_sign_" + new Random().nextLong();
-
-        pipeline.addBefore("packet_handler", handlerId, new ChannelDuplexHandler() {
-            @Override
-            public void channelRead(ChannelHandlerContext context, Object msg) {
-                if (msg instanceof PacketPlayInUpdateSign) {
-                    T result;
-
-                    try {
-                        String line = ((PacketPlayInUpdateSign) msg).c()[0];
-                        T converted = line.isEmpty() ? defaultValue : stringToT.apply(line);
-
-                        if (converted.doubleValue() < minimumValue.doubleValue())
-                            result = minimumValue;
-                        else if (converted.doubleValue() > maximumValue.doubleValue())
-                            result = maximumValue;
-                        else
-                            result = converted;
-                    } catch (NumberFormatException exception) {
-                        result = defaultValue;
-                    }
-
-                    PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange(nmsViewer.world, position);
-                    packet.block = ((CraftBlockData) view.getPlayer().getLocation().getBlock().getBlockData()).getState();
-                    nmsViewer.playerConnection.sendPacket(packet);
-                    pipeline.channel().eventLoop().submit(() -> pipeline.remove(handlerId));
-
-                    final T finalResult = result;
-                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
-                        if (runAfter.test(finalResult))
-                            view.open();
-                    });
-
-                    return;
-                }
-
-                context.fireChannelRead(msg);
-            }
-        });
+    public Triplet<?> openSign(Player player, Location loc) {
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+        connection.sendPacket(new PacketPlayOutOpenSignEditor(new BlockPosition(loc.getX(), loc.getY(), loc.getZ())));
+        return new Triplet<>(connection.networkManager.channel.pipeline(), PacketPlayInUpdateSign.class, packet -> packet.c()[0]);
     }
 
     @SuppressWarnings("unchecked")
@@ -205,8 +149,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     public boolean isOcelotTrusting(Ocelot ocelot) {
         if (isTrustingMethod == null) {
             try {
-                isTrustingMethod = EntityOcelot.class.getDeclaredMethod("isTrusting");
-                isTrustingMethod.setAccessible(true);
+                (isTrustingMethod = EntityOcelot.class.getDeclaredMethod("isTrusting")).setAccessible(true);
             } catch (NoSuchMethodException exception) {
                 exception.printStackTrace();
             }
@@ -223,8 +166,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     public void setOcelotTrusting(Ocelot ocelot, boolean trusting) {
         if (setTrustingMethod == null) {
             try {
-                setTrustingMethod = EntityOcelot.class.getDeclaredMethod("setTrusting", boolean.class);
-                setTrustingMethod.setAccessible(true);
+                (setTrustingMethod = EntityOcelot.class.getDeclaredMethod("setTrusting", boolean.class)).setAccessible(true);
             } catch (NoSuchMethodException exception) {
                 exception.printStackTrace();
             }

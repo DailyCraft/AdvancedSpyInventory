@@ -1,8 +1,49 @@
 {
+  "generic": {
+    "yes": "§aOui",
+    "no": "§cNon",
+    "size": "Taille : §a%,d",
+    "type": "Type",
+    "type_": "Type: §a%s",
+    "variant": "Variante",
+    "color_": "Couleur : %s",
+    "color": {
+      "": "Couleur",
+      "white": "Blanc",
+      "orange": "Orange",
+      "magenta": "Magenta",
+      "light_blue": "Bleu clair",
+      "yellow": "Jaune",
+      "lime": "Vert clair",
+      "pink": "Rose",
+      "gray": "Gris",
+      "light_gray": "Gris clair",
+      "cyan": "Cyan",
+      "purple": "Violet",
+      "blue": "Bleu",
+      "brown": "Marron",
+      "green": "Vert",
+      "red": "Rouge",
+      "black": "Noir",
+      "creamy": "§eCrémeux"
+    },
+    "modify": {
+      "": "§7(Modifier : §eClic§7)",
+      "left": "§7(Modifier : §eClic gauche§7)",
+      "right": "§7(Modifier : §eClic droit§7)"
+    },
+    "toggle": {
+      "": "§7(Changer : §eClic§7)",
+      "left": "§7(Changer : §eClic gauche§7)",
+      "right": "§7(Changer : §eClic droit§7)"
+    }
+  },
+
   "command": {
     "not_player_uuid": "§cLe UUID n'est pas celui d'un joueur",
     "never_connected": "§cLe joueur ne s'est jamais connecté au serveur",
     "not_player": "§cCette commande ne peut être utilisée que par des joueurs",
+    "inventory.only_one": "§cSeulement une entité est autorisée",
     "inventory.player": "§cVous n'avez pas la permission d'ouvrir l'inventaire des joueurs",
     "inventory.entity": "§cVous n'avez pas la permission d'ouvrir l'inventaire des entités",
     "enderchest.other": "§cVous n'avez pas la permission d'ouvrir le coffre de l'ender des autres joueurs"
@@ -13,13 +54,11 @@
     "dead": "§cL'entité que vous espionnez est morte.",
     "entity": {
       "title": "Inventaire de §l%s",
-      "clear": "§cVider l'inventaire",
       "close": "Fermer",
-      "health": {
-        "": "Vie : §a%,.2f §7/ §a%,.2f",
-        "modify": "§aClic gauche §7pour modifier §ela vie du joueur",
-        "modify.max": "§aClic droit §7pour modifier §ela vie maximale du joueur"
-      },
+      "clear": "§cVider le contenu §7(Shift + Clic)",
+      "clear.warning": "§c§l\u26a0 Avertissement : §cCette action ne peut pas être annulée.",
+      "health": "Vie : §a%,.2f §7/ §a%,.2f",
+      "health.modify": ["Modifier :", "§6Vie §7\u2192 §eClic gauche", "§6Vie maximale §7\u2129 §eClic droit"],
       "location": "Localisation",
       "world": "Monde : §a%s §7(type : §2%s§7)",
       "world.environment": {
@@ -33,7 +72,8 @@
       "z": "Z : §a%,.2f",
       "yaw": "Yaw : §e%,.2f",
       "pitch": "Pitch : §e%,.02f",
-      "teleport": "\u2192 §aCliquer§7 pour §ese téléporter",
+      "teleport": "§6Se téléporter §7(Clic)",
+      "teleport.to_me": "§6 Le téléporter à moi §7(Shift + Clic)",
       "tamed": "Dompteur : §a%s",
       "untamed": "Indompté",
       "modify": "§cVous n'avez pas la permission de modifier l'inventaire",
@@ -42,35 +82,88 @@
     "player": {
       "slot": {
         "": "Slot : §a%d",
-        "left": "§c(Clic gauche -1)",
-        "right": "§a(Clic droit +1)",
-        "drop": "§aShift + Clic gauche§7 pour §eforcer le drop",
-        "drop.all": "§aShift + Clic droit§7 pour §eforcer le drop de tout"
+        "modify": "§c(Clic gauche §l-1§c) §a(Clic droit §l+1§a)",
+        "drop": "§6Forcer à jeter §7(Shift + Clic gauche)",
+        "drop.all": "§6Forcer à tout jeter §7(Shift + Clic Droit)"
       },
       "experience": "Expérience : §a%,.2f",
-      "experience.modify": "§aCliquer §7pour modifier le §eniveau d'expérience",
-      "food": {
-        "level": "Niveau de nourriture : §a%,d",
-        "saturation": "Saturation alimentaire : §a%,.2f",
-        "level.modify": "§aClic gauche §7pour modifier le §eniveau de nourriture",
-        "saturation.modify": "§aClic droit §7pour modifier la §esaturation alimentaire"
-      },
+      "food.level": "Niveau de nourriture : §a%,d",
+      "food.saturation": "Saturation : §a%,.2f",
       "enderchest": "Ouvrir son §5coffre de l'ender",
       "own": "§cVous ne pouvez pas modifier votre propre inventaire"
     },
     "enderchest": {
       "title": "Coffre de l'ender de §l%s",
-      "clear": "§cVider le coffre de l'ender",
       "inventory": "Ouvrir son inventaire",
       "modify": "§cVous n'avez pas la permission de modifier le coffre de l'ender"
     },
     "information": {
-      "modify": "\u2192 §aCliquer§7 pour §emodifier",
-      "switch": "\u2192 §aCliquer§7 pour §eéchanger",
       "selected": "§cDéjà sélectionné",
       "select": "§aCliquer pour sélectionner",
       "back": "§cRetour"
     },
+    "allay.owner": "Propriétaire : §a%s",
+    "allay.unowned": "Sans propriétaire",
+    "axolotl.variant": {
+      "lucy": "Leucistique",
+      "wild": "Sauvage",
+      "gold": "Or",
+      "cyan": "Cyan",
+      "blue": "Bleu"
+    },
+    "axolotl.dead": "Fait le mort : %s",
+    "bat.awake": "Est éveillée : %s",
+    "cat.type": {
+      "tabby": "Tigré brun",
+      "black": "Bicolore",
+      "red": "Tigré roux",
+      "siamese": "Siamois",
+      "british_shorthair": "British Shorthair",
+      "calico": "Calico",
+      "persian": "Persan",
+      "ragdoll": "Ragdoll",
+      "white": "Angora",
+      "jellie": "Jellie",
+      "all_black": "Panthère",
+      "wild": "Sauvage"
+    },
+    "donkey.no_chest": "L'animal ne porte pas de coffre",
+    "fox.type": {
+      "red": "§6Roux",
+      "snow": "§fPolaire"
+    },
+    "goat": {
+      "screaming": "Est criante : %s",
+      "horn": {
+        "": "A des cornes ?",
+        "left": "Gauche : %s",
+        "right": "Droite : %s"
+      }
+    },
+    "iron_golem.player_created": "Créé par un joueur : %s",
+    "ocelot.trusting": "Fait confiance aux joueurs : %s",
+    "panda.gene": {
+      "": "Gène",
+      "hidden": "Gène caché",
+      "normal": "Normal",
+      "lazy": "Paresseux",
+      "worried": "Inquiet",
+      "playful": "Joueur",
+      "brown": "Brun",
+      "weak": "Faible",
+      "aggressive": "Agressif"
+    },
+    "rabbit.type": {
+      "brown": "Marron",
+      "white": "Blanc",
+      "black": "Noir",
+      "black_and_white": "Noir et blanc",
+      "gold": "Or",
+      "salt_and_pepper": "Sel et poivre",
+      "the_killer_bunny": "Le lapin tueur"
+    },
+    "sheep.title": "Couleur de la laine de %s",
+    "snow_golem.pumpkin": "A une citrouille sur sa tête : %s",
     "villager": {
       "profession": {
         "": "Profession : §a%s",
@@ -91,7 +184,6 @@
         "weaponsmith": "Forgeron d'armes"
       },
       "type": {
-        "": "Type : §a%s",
         "desert": "Désert",
         "jungle": "Jungle",
         "plains": "Plaine",
@@ -107,101 +199,8 @@
         "type": "Modifier le type du villageois"
       }
     },
-    "sheep": {
-      "title": "Couleur de la laine de %s",
-      "color": {
-        "": "Couleur de la laine : %s",
-        "white": "Blanc",
-        "orange": "Orange",
-        "magenta": "Magenta",
-        "light_blue": "Bleu clair",
-        "yellow": "Jaune",
-        "lime": "Vert clair",
-        "pink": "Rose",
-        "gray": "Gris",
-        "light_gray": "Gris clair",
-        "cyan": "Cyan",
-        "purple": "Violet",
-        "blue": "Bleu",
-        "brown": "Marron",
-        "green": "Vert",
-        "red": "Rouge",
-        "black": "Noir"
-      }
-    },
-    "donkey.no_chest": "L'animal ne porte pas de coffre",
-    "llama": {
-      "color": "Couleur du llama",
-      "creamy": "§eCrémeux",
-      "white": "§fBlanc",
-      "brown": "§6Marron",
-      "gray": "Gris"
-    },
-    "iron_golem.player_creation": "Créé par un joueur",
-    "iron_golem.natural_creation": "Non créé par un joueur, il est apparu naturellement",
-    "fox": {
-      "type": "Type de renard",
-      "red": "§6Roux",
-      "snow": "§fPolaire"
-    },
-    "panda.gene": "Gène : §a%s",
-    "panda.hidden_gene": "Gène caché : §a%s",
-    "slime.size": "Taille du slime : §a%,d",
-    "snowman.pumpkin": {
-      "": "A une citrouille sur sa tête",
-      "yes": "§aOui",
-      "no": "§cNon"
-    },
     "wolf.angry": "Est en colère : %s",
-    "wolf.angry.modify": "§aCliquer§7 pour basculer §eson état de colère",
-    "wolf.collar": "Collar color: %s",
-    "ocelot.trusting": "Fait confiance aux joueurs : %s",
-    "cat.type": {
-      "": "Type de chat",
-      "tabby": "Tigré brun",
-      "black": "Bicolore",
-      "red": "Tigré roux",
-      "siamese": "Siamois",
-      "british_shorthair": "British Shorthair",
-      "calico": "Calico",
-      "persian": "Persan",
-      "ragdoll": "Ragdoll",
-      "white": "Angora",
-      "jellie": "Jellie",
-      "all_black": "Panthère"
-    },
-    "phantom.size": "Taille du Phantom : §a%d",
-    "bat.awake": "Est éveillée : %s",
-    "mooshroom.variant": "Variante de Champimeuh : %s",
-    "rabbit.type": {
-      "": "Type de lapin",
-      "brown": "Marron",
-      "white": "Blanc",
-      "black": "Noir",
-      "black_and_white": "Noir et blanc",
-      "gold": "Or",
-      "salt_and_pepper": "Sel et poivre",
-      "the_killer_bunny": "Le lapin tueur"
-    },
-    "goat": {
-      "screaming": "Est criante : %s",
-      "horn": {
-        "": "A des cornes ?",
-        "left": "Gauche : %s",
-        "right": "Droite : %s"
-      }
-    },
-    "allay.owner": "Propriétaire : §a%s",
-    "allay.unowned": "Sans propriétaire",
-    "axolotl.variant": {
-      "": "Variente d'Axolotl",
-      "lucy": "Leucistique",
-      "wild": "Sauvage",
-      "gold": "Or",
-      "cyan": "Cyan",
-      "blue": "Bleu"
-    },
-    "axolotl.dead": "Fait le mort : %s"
+    "wolf.collar": "Couleur du collier : %s"
   },
 
   "sign": {
@@ -210,8 +209,7 @@
     "experience": ["§1Saisir un nouveau", "§1§lnombre d'experience"],
     "food.level": ["§1Saisir un nouveau", "§1§lniveau de nourriture"],
     "food.saturation": ["§1Saisir une nouvelle", "§1§lsaturation alimentaire"],
-    "slime": ["§1Entrer une nouvelle", "§1§ltaille pour le slime"],
-    "phantom": ["§1Entrer une nouvelle", "§1§ltaille pour le phantom"]
+    "size": ["§1Entrer une nouvelle", "§1§ltaille"]
   },
 
   "item": {
@@ -244,6 +242,7 @@
         "health.modify.max": "Permet de modifier la limite de vie maximale des joueurs",
         "location": "Permet de voir la localisation des joueurs",
         "teleport": "Permet de se téléporter aux joueurs",
+        "teleport.others": "Permet de téléporter les joueurs à soi",
         "xp": "Permet de voir l'expérience des joueurs",
         "xp.modify": "Permet de modifier l'expérience des joueurs",
         "food": "Permet de voir le niveau de nourriture des joueurs",
@@ -257,6 +256,7 @@
         "health.modify.max": "Permet de modifier la limite de vie maximale des entités",
         "location": "Permet de voir la position des entités",
         "teleport": "Permet de se téléporter aux entités",
+        "teleport.others": "Permet de téléporter les entités à soi",
         "tamed": "Permet de voir si l'animal est apprivoisé",
         "information.specific": "Permet de voir plus d'informations à propos des entités '%s'",
         "information.specific.modify": "Permet de modifier l'information que l'on peut voir avec 'advancedspyinventory.inventory.entity.information.%s'",
@@ -269,10 +269,6 @@
       "modify": "Permet de modifier son propre coffre de l'ender",
       "others": "Permet d'inspecter le coffre de l'ender des autres joueurs",
       "others.modify": "Permet de modifier le coffre de l'ender des autres joueurs"
-    },
-    "config": {
-      "": "Permet d'accéder à la commande /asi et des voir les valeurs de la configuration",
-      "modify": "Permet de modifier les valeurs dans la configuration et de la recharger"
     }
   }
 }

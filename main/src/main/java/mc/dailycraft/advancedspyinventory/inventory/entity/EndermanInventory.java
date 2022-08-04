@@ -15,7 +15,7 @@ public class EndermanInventory extends EntityInventory<Enderman> {
 
     @Override
     public ItemStack getItem(int index) {
-        return index == 4 ? getNonNull(new ItemStack(entity.getCarriedBlock().getMaterial()), InformationItems.ENDERMAN_CARRIED.get(translation)) : super.getItem(index);
+        return index == 4 ? getNonNull(entity.getCarriedBlock() != null ? new ItemStack(entity.getCarriedBlock().getMaterial()) : null, InformationItems.ENDERMAN_CARRIED.get(translation)) : super.getItem(index);
     }
 
     @Override

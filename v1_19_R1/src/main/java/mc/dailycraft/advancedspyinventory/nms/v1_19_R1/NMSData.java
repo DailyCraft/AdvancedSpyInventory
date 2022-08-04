@@ -3,6 +3,9 @@ package mc.dailycraft.advancedspyinventory.nms.v1_19_R1;
 import mc.dailycraft.advancedspyinventory.Main;
 import net.minecraft.Util;
 import net.minecraft.nbt.*;
+import net.minecraft.server.dedicated.DedicatedPlayerList;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
@@ -18,6 +21,26 @@ import java.util.UUID;
 import java.util.function.Function;
 
 public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
+    private static final PlayerDataStorage playerIo;
+
+    static {
+        DedicatedPlayerList handle = ((CraftServer) Bukkit.getServer()).getHandle();
+        PlayerDataStorage playerIo1;
+
+        try {
+            playerIo1 = handle.playerIo;
+        } catch (NoSuchFieldError error) {
+            // 1.19 Support
+            try {
+                playerIo1 = (PlayerDataStorage) PlayerList.class.getField("r").get(handle);
+            } catch (IllegalAccessException | NoSuchFieldException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
+
+        playerIo = playerIo1;
+    }
+
     public NMSData(UUID playerUuid) {
         super(playerUuid);
     }
@@ -40,6 +63,13 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
+    public void putLong(String id, long value) {
+        CompoundTag data = getData();
+        data.putLong(id, value);
+        saveData(data);
+    }
+
+    @Override
     public float getFloat(String id) {
         return getData().getFloat(id);
     }
@@ -57,13 +87,38 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
+    public void putString(String id, String value) {
+        CompoundTag data = getData();
+        data.putString(id, value);
+        saveData(data);
+    }
+
+    @Override
     public List<Double> getDoubleList(String id) {
         return getData().getList(id, CraftMagicNumbers.NBT.TAG_DOUBLE).stream().map(tag -> ((DoubleTag) tag).getAsDouble()).toList();
     }
 
     @Override
+    public void putDoubleList(String id, List<Double> value) {
+        CompoundTag data = getData();
+        ListTag tag = new ListTag();
+        value.forEach(v -> tag.add(DoubleTag.valueOf(v)));
+        data.put(id, tag);
+        saveData(data);
+    }
+
+    @Override
     public List<Float> getFloatList(String id) {
         return getData().getList(id, CraftMagicNumbers.NBT.TAG_FLOAT).stream().map(tag -> ((FloatTag) tag).getAsFloat()).toList();
+    }
+
+    @Override
+    public void putFloatList(String id, List<Float> value) {
+        CompoundTag data = getData();
+        ListTag tag = new ListTag();
+        value.forEach(v -> tag.add(FloatTag.valueOf(v)));
+        data.put(id, tag);
+        saveData(data);
     }
 
     @Override
@@ -98,7 +153,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public float getMaxHealth() {
-        for (Tag tag : getData().getList("Attributes", 10))
+        for (Tag tag : getData().getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND))
             if (((CompoundTag) tag).getString("Name").equals("minecraft:generic.max_health"))
                 return ((CompoundTag) tag).getFloat("Base");
 
@@ -108,7 +163,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     @Override
     public void setMaxHealth(float maxHealth) {
         CompoundTag data = getData();
-        ListTag list = data.getList("Attributes", 10);
+        ListTag list = data.getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND);
 
         for (Tag nbt : list) {
             if (((CompoundTag) nbt).getString("Name").equals("minecraft:generic.max_health")) {
@@ -125,14 +180,14 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     private CompoundTag getData() {
-        return ((CraftServer) Bukkit.getServer()).getHandle().playerIo.getPlayerData(playerUuid.toString());
+        return playerIo.getPlayerData(playerUuid.toString());
     }
 
     private void saveData(CompoundTag data) {
         if (getOfflinePlayer().isOnline())
             ((CraftPlayer) getOfflinePlayer().getPlayer()).getHandle().save(data);
         else {
-            File playerDir = ((CraftServer) Bukkit.getServer()).getHandle().playerIo.getPlayerDir();
+            File playerDir = playerIo.getPlayerDir();
 
             try {
                 File file = File.createTempFile(playerUuid + "-", ".dat", playerDir);

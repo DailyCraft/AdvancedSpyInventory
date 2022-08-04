@@ -11,10 +11,21 @@ import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NMSContainer implements Container {
+    private static final Field handle;
+
+    static {
+        try {
+            (handle = CraftItemStack.class.getDeclaredField("handle")).setAccessible(true);
+        } catch (NoSuchFieldException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
     private final BaseInventory container;
     private final List<HumanEntity> viewers = new ArrayList<>();
 
@@ -34,7 +45,17 @@ public class NMSContainer implements Container {
 
     @Override
     public ItemStack getItem(int index) {
-        return CraftItemStack.asNMSCopy(container.getItem(index));
+        org.bukkit.inventory.ItemStack item = container.getItem(index);
+
+        if (item instanceof CraftItemStack) {
+            try {
+                return (ItemStack) handle.get(item);
+            } catch (IllegalAccessException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+        return CraftItemStack.asNMSCopy(item);
     }
 
     @Override

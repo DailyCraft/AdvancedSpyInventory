@@ -1,47 +1,49 @@
 package mc.dailycraft.advancedspyinventory.nms.v1_18_R1;
 
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
-import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
-import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
-import mc.dailycraft.advancedspyinventory.utils.Translation;
+import mc.dailycraft.advancedspyinventory.utils.Triplet;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_18_R1.CraftEquipmentSlot;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_18_R1.util.CraftNamespacedKey;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHandler {
     private static Field matchingStatesField = null;
 
     @Override
-    public String worldId(World world) {
-        return ((CraftWorld) world).getHandle().dimension().location().toString();
+    public NamespacedKey worldKey(World world) {
+        return CraftNamespacedKey.fromMinecraft(((CraftWorld) world).getHandle().dimension().location());
+    }
+
+    @Override
+    public ItemStack getEquipment(LivingEntity entity, EquipmentSlot slot) {
+        return CraftItemStack.asCraftMirror(((CraftLivingEntity) entity).getHandle().getItemBySlot(CraftEquipmentSlot.getNMS(slot)));
     }
 
     @Override
@@ -55,63 +57,10 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     }
 
     @Override
-    public <T extends Number> void signInterface(CustomInventoryView view, String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter) {
-        ServerPlayer nmsViewer = ((CraftPlayer) view.getPlayer()).getHandle();
-        Translation translation = Translation.of(view.getPlayer());
-        BlockPos position = new BlockPos(nmsViewer.position().add(0, -nmsViewer.position().y, 0));
-
-        SignBlockEntity teSign = new SignBlockEntity(position, ((CraftBlockData) Material.OAK_SIGN.createBlockData()).getState());
-
-        teSign.setMessage(0, new TextComponent(defaultValue.toString()));
-        teSign.setMessage(1, new TextComponent("^".repeat(15)));
-        teSign.setMessage(2, new TextComponent(translation.format("sign." + formatKey + ".0")));
-        teSign.setMessage(3, new TextComponent(translation.format("sign." + formatKey + ".1")));
-
-        view.getPlayer().closeInventory();
-
-        nmsViewer.connection.send(new ClientboundBlockUpdatePacket(position, ((CraftBlockData) Material.OAK_SIGN.createBlockData()).getState()));
-        nmsViewer.connection.send(teSign.getUpdatePacket());
-        nmsViewer.connection.send(new ClientboundOpenSignEditorPacket(position));
-
-        ChannelPipeline pipeline = nmsViewer.connection.connection.channel.pipeline();
-
-        String handlerId = Main.getInstance().getName().toLowerCase() + "_sign_" + new Random().nextLong();
-
-        pipeline.addBefore("packet_handler", handlerId, new ChannelDuplexHandler() {
-            @Override
-            public void channelRead(ChannelHandlerContext context, Object msg) {
-                if (msg instanceof ServerboundSignUpdatePacket) {
-                    T result;
-
-                    try {
-                        String line = ((ServerboundSignUpdatePacket) msg).getLines()[0];
-                        T converted = line.isEmpty() ? defaultValue : stringToT.apply(line);
-
-                        if (converted.doubleValue() < minimumValue.doubleValue())
-                            result = minimumValue;
-                        else if (converted.doubleValue() > maximumValue.doubleValue())
-                            result = maximumValue;
-                        else
-                            result = converted;
-                    } catch (NumberFormatException exception) {
-                        result = defaultValue;
-                    }
-
-                    nmsViewer.connection.send(new ClientboundBlockUpdatePacket(position, ((CraftBlockData) view.getPlayer().getLocation().getBlock().getBlockData()).getState()));
-                    pipeline.channel().eventLoop().submit(() -> pipeline.remove(handlerId));
-
-                    final T finalResult = result;
-                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
-                        if (runAfter.test(finalResult))
-                            view.open();
-                    });
-
-                    return;
-                }
-
-                context.fireChannelRead(msg);
-            }
-        });
+    public Triplet<?> openSign(Player player, Location loc) {
+        ServerGamePacketListenerImpl connection = ((CraftPlayer) player).getHandle().connection;
+        connection.send(new ClientboundOpenSignEditorPacket(new BlockPos(loc.getX(), loc.getY(), loc.getZ())));
+        return new Triplet<>(connection.connection.channel.pipeline(), ServerboundSignUpdatePacket.class, packet -> packet.getLines()[0]);
     }
 
     @SuppressWarnings("unchecked")

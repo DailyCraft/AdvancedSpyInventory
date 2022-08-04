@@ -7,9 +7,11 @@ import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,12 +28,28 @@ public class InventoryCommand extends PlayerTabExecutor {
             Translation translation = Translation.of(player);
 
             if (args.length == 1) {
-                UUID targetUuid;
+                UUID targetUuid = null;
 
-                try {
-                    targetUuid = UUID.fromString(args[0]);
-                } catch (IllegalArgumentException exception) {
-                    targetUuid = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
+                if (Main.VERSION >= 13) {
+                    try {
+                        List<Entity> entities = Bukkit.selectEntities(sender, args[0]);
+
+                        if (entities.size() == 1)
+                            targetUuid = entities.get(0).getUniqueId();
+                        else if (entities.size() > 1) {
+                            sender.sendMessage(translation.format("command.inventory.only_one"));
+                            return true;
+                        }
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                }
+
+                if (targetUuid == null) {
+                    try {
+                        targetUuid = UUID.fromString(args[0]);
+                    } catch (IllegalArgumentException exception) {
+                        targetUuid = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
+                    }
                 }
 
                 Entity targetEntity = Bukkit.getEntity(targetUuid);
@@ -78,14 +96,21 @@ public class InventoryCommand extends PlayerTabExecutor {
                 Player player = (Player) sender;
                 Entity target = null;
 
-                for (Entity other : player.getNearbyEntities(6, 6, 6)) {
-                    Vector n = other.getLocation().toVector().subtract(player.getLocation().toVector());
-                    if (player.getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < 1 && n.normalize().dot(player.getLocation().getDirection().normalize()) >= 0)
-                        if (target == null || target.getLocation().distanceSquared(player.getLocation()) > other.getLocation().distanceSquared(player.getLocation()))
-                            target = other;
+                if (Main.VERSION < 15) {
+                    for (Entity other : player.getNearbyEntities(6, 6, 6)) {
+                        Vector n = other.getLocation().toVector().subtract(player.getLocation().toVector());
+                        if (player.getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < 1 && n.normalize().dot(player.getLocation().getDirection().normalize()) >= 0)
+                            if (target == null || target.getLocation().distanceSquared(player.getLocation()) > other.getLocation().distanceSquared(player.getLocation()))
+                                target = other;
+                    }
+                } else {
+                    RayTraceResult rayTrace = player.getWorld().rayTrace(player.getEyeLocation(), player.getLocation().getDirection(), 6, FluidCollisionMode.ALWAYS, false, 0, entity -> entity != player);
+
+                    if (rayTrace != null)
+                        target = rayTrace.getHitEntity();
                 }
 
-                if (target != null && player.hasLineOfSight(target))
+                if (target != null && player.hasLineOfSight(target) && target.getUniqueId().toString().toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                     list.add(target.getUniqueId().toString());
             }
 

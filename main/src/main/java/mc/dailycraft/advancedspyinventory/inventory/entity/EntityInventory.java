@@ -10,7 +10,6 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.entity.memory.MemoryKey;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -28,14 +27,14 @@ import java.util.UUID;
 
 public class EntityInventory<T extends LivingEntity> extends BaseInventory {
     private static final Map<EntityType, DataItem<?>> DATA_ITEMS = new HashMap<>();
+
     public final T entity;
     protected @Nullable InventorySize inventorySize;
     private int villagerTick = 0;
 
     public EntityInventory(Player viewer, T entity, int rows) {
         super(viewer, rows);
-        this.entity = entity;
-        this.inventorySize = entity instanceof InventoryHolder ? InventorySize.values()[((InventoryHolder) entity).getInventory().getSize() - 1] : null;
+        inventorySize = (this.entity = entity) instanceof InventoryHolder ? InventorySize.values()[((InventoryHolder) entity).getInventory().getSize() - 1] : null;
     }
 
     @Override
@@ -54,19 +53,21 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             return ((InventoryHolder) entity).getInventory().getItem(inventorySize.toSlot(index));
 
         if (index >= getSize() - 17 && index <= getSize() - 14 || index == getSize() - 12 || index == getSize() - 11)
-            return getNonNull(getEquipmentItem(EquipmentSlot.values()[Math.abs(index - getSize() + 12)]), InformationItems.values()[Math.abs(index - getSize() + 12)].warning(translation));
+            return getNonNull(Main.NMS.getEquipment(entity, EquipmentSlot.values()[Math.abs(index - getSize() + 12)]), InformationItems.values()[Math.abs(index - getSize() + 12)].warning(translation));
 
         else if (index == getSize() - 8) {
             if (Permissions.ENTITY_HEALTH.has(viewer)) {
                 return new ItemStackBuilder(PotionType.INSTANT_HEAL, translation.format("interface.entity.health", entity.getHealth(), entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()))
-                        .lore(Permissions.ENTITY_HEALTH_MODIFY.has(viewer), translation.format("interface.entity.health.modify"))
-                        .lore(Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer), translation.format("interface.entity.health.modify.max")).get();
+                        .lore(Permissions.ENTITY_HEALTH_MODIFY.has(viewer) || Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer), "", translation.format("interface.entity.health.modify.0"))
+                        .lore(Permissions.ENTITY_HEALTH_MODIFY.has(viewer), "   " + translation.format("interface.entity.health.modify.1"))
+                        .lore(Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer), "   " + translation.format("interface.entity.health.modify.2")).get();
             }
         } else if (index == getSize() - 7) {
             if (Permissions.ENTITY_LOCATION.has(viewer))
                 return getLocationItemStack(entity.getLocation(), false);
         } else if (index == getSize() - 5)
-            return new ItemStackBuilder(Material.BARRIER, Permissions.ENTITY_MODIFY.has(viewer) ? translation.format("interface.entity.clear") : translation.format("interface.entity.close")).get();
+            return new ItemStackBuilder(Material.BARRIER, translation.format("interface.entity.close"))
+                    .lore(Permissions.ENTITY_MODIFY.has(viewer), "", translation.format("interface.entity.clear"), translation.format("interface.entity.clear.warning")).get();
         else if (index == getSize() - 3) {
             EntityType type = entity.getType();
 
@@ -90,14 +91,18 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         return new ItemStackBuilder("MHF_Question", translation.format("interface.entity.tamed", translation.format("interface.entity.unknown"))).get();
                 } else
                     return new ItemStackBuilder(LocalDateTime.now().getMonth() == Month.OCTOBER && LocalDateTime.now().getDayOfMonth() == 31 ? "MHF_Herobrine" : "MHF_Question", translation.format("interface.entity.untamed")).get();
+            } else if (Main.VERSION >= 14 && entity.getType() == EntityType.PANDA) {
+                if (Permissions.hasPermission(EntityType.PANDA, viewer))
+                    return new ItemStackBuilder(Material.DEBUG_STICK, formatModify("interface.panda.gene.hidden"))
+                            .enumLore(translation, Panda.Gene.values(), ((Panda) entity).getHiddenGene(), "interface.panda.gene").get();
             } else if (Main.VERSION >= 17 && entity.getType() == EntityType.AXOLOTL) {
                 if (Permissions.hasPermission(EntityType.AXOLOTL, viewer))
-                    return new ItemStackBuilder(Material.SKELETON_SKULL, translation.format("interface.axolotl.dead", translation.format("interface.snowman.pumpkin." + (((Axolotl) entity).isPlayingDead() ? "yes" : "no")))).get();
+                    return new ItemStackBuilder(Material.SKELETON_SKULL, formatToggleYesNo(((Axolotl) entity).isPlayingDead(), "interface.axolotl.dead")).get();
             } else if (Main.VERSION >= 19 && entity.getType() == EntityType.GOAT) {
                 if (Permissions.hasPermission(EntityType.GOAT, viewer)) {
                     return new ItemStackBuilder(Material.GOAT_HORN, translation.format("interface.goat.horn"))
-                            .lore(translation.format("interface.goat.horn.left", translation.format("interface.snowman.pumpkin." + (((Goat) entity).hasLeftHorn() ? "yes" : "no"))))
-                            .lore(translation.format("interface.goat.horn.right", translation.format("interface.snowman.pumpkin." + (((Goat) entity).hasRightHorn() ? "yes" : "no")))).get();
+                            .lore(ChatColor.WHITE + translation.formatYesNo(((Goat) entity).hasLeftHorn(), "interface.goat.horn.left") + translation.formatCondition(Permissions.hasPermissionModify(EntityType.GOAT, viewer), "generic.toggle.left"))
+                            .lore(ChatColor.WHITE + translation.formatYesNo(((Goat) entity).hasRightHorn(), "interface.goat.horn.right") + translation.formatCondition(Permissions.hasPermissionModify(EntityType.GOAT, viewer), "generic.toggle.right")).get();
                 }
             }
         }
@@ -130,8 +135,8 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             if (Permissions.ENTITY_MODIFY.has(viewer))
                 replaceItem(event, InformationItems.values()[Math.abs(getSize() - rawSlot - 12)].warning(translation));
         } else if (rawSlot == getSize() - 8) {
-            if (Permissions.ENTITY_HEALTH_MODIFY.has(viewer) && event.getClick() == ClickType.LEFT)
-                Main.NMS.signInterface((CustomInventoryView) event.getView(), "health", entity.getHealth(), 0d, entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), Double::parseDouble, health -> {
+            if (Permissions.ENTITY_HEALTH_MODIFY.has(viewer) && event.isLeftClick())
+                openSign("health", entity.getHealth(), 0d, entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), Double::parseDouble, health -> {
                     entity.setHealth(health);
 
                     if (entity.isDead()) {
@@ -141,8 +146,8 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                     } else
                         return true;
                 });
-            else if (Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer) && event.getClick() == ClickType.RIGHT)
-                Main.NMS.signInterface((CustomInventoryView) event.getView(), "health.max", entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), 0.1, Double.MAX_VALUE, Double::parseDouble, maxHealth -> {
+            else if (Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer) && event.isRightClick())
+                openSign("health.max", entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), 0.1, Double.MAX_VALUE, Double::parseDouble, maxHealth -> {
                     if (entity.isDead()) {
                         viewer.closeInventory();
                         viewer.sendMessage(translation.format("interface.dead"));
@@ -154,11 +159,14 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 });
         } else if (rawSlot == getSize() - 7) {
             if (Permissions.ENTITY_TELEPORT.has(viewer)) {
-                viewer.teleport(entity.getLocation());
-                viewer.closeInventory();
+                if (event.isShiftClick()) {
+                    if (Permissions.PLAYER_TELEPORT_OTHERS.has(viewer))
+                        entity.teleport(viewer);
+                } else
+                    viewer.teleport(entity);
             }
         } else if (rawSlot == getSize() - 5) {
-            if (Permissions.ENTITY_MODIFY.has(viewer))
+            if (Permissions.ENTITY_MODIFY.has(viewer) && event.isShiftClick())
                 event.getInventory().clear();
             else
                 viewer.closeInventory();
@@ -173,12 +181,17 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             if (dataItem != null)
                 dataItem.click((EntityInventory<LivingEntity>) this, event, type, viewer);
         } else if (rawSlot == getSize() - 2) {
-            if (Main.VERSION >= 19 && Permissions.hasPermissionModify(EntityType.GOAT, viewer, entity)) {
+            if (Main.VERSION >= 14 && Permissions.hasPermissionModify(EntityType.PANDA, viewer, entity)) {
+                Panda panda = (Panda) entity;
+                ItemStackBuilder.enumLoreClick(event, Panda.Gene.values(), panda.getHiddenGene(), panda::setHiddenGene);
+            } else if (Main.VERSION >= 17 && Permissions.hasPermissionModify(EntityType.AXOLOTL, viewer, entity)) {
+                ((Axolotl) entity).setPlayingDead(!((Axolotl) entity).isPlayingDead());
+            } else if (Main.VERSION >= 19 && Permissions.hasPermissionModify(EntityType.GOAT, viewer, entity)) {
                 Goat goat = (Goat) entity;
 
-                if (event.getClick() == ClickType.LEFT)
+                if (event.isLeftClick())
                     goat.setLeftHorn(!goat.hasLeftHorn());
-                else if (event.getClick() == ClickType.RIGHT)
+                else if (event.isRightClick())
                     goat.setRightHorn(!goat.hasRightHorn());
             }
         } else if (rawSlot >= getSize()) {
@@ -196,26 +209,41 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
     static {
         //<editor-fold desc="Data Items - All versions" defaultstate="collapsed">
         DATA_ITEMS.put(EntityType.BAT, new DataItem<Bat>((inv, entity) ->
-                new ItemStackBuilder(Material.LEATHER, inv.translation.format("interface.bat.awake", inv.translation.format("interface.snowman.pumpkin." + (entity.isAwake() ? "yes" : "no"))))
-                        .switchLore(inv.viewer, EntityType.BAT).get(),
+                new ItemStackBuilder(Material.LEATHER, inv.formatToggleYesNo(entity.isAwake(), "interface.bat.awake"))
+                        .get(),
                 (inv, event, entity) ->
                         entity.setAwake(!entity.isAwake())));
 
         DATA_ITEMS.put(EntityType.IRON_GOLEM, new DataItem<IronGolem>((inv, entity) ->
-                new ItemStackBuilder("MHF_Golem", inv.translation.format("interface.iron_golem." + (entity.isPlayerCreated() ? "player_creation" : "natural_creation"))).get(),
-                null));
-
-        DATA_ITEMS.put(EntityType.OCELOT, new DataItem<Ocelot>((inv, entity) ->
-                new ItemStackBuilder(Material.TROPICAL_FISH, inv.translation.format("interface.ocelot.trusting", inv.translation.format("interface.snowman.pumpkin." + (Main.NMS.isOcelotTrusting(entity) ? "yes" : "no"))))
-                        .switchLore(inv.viewer, EntityType.OCELOT).get(),
+                new ItemStackBuilder("MHF_Golem", inv.formatToggleYesNo(entity.isPlayerCreated(), "interface.iron_golem.player_created"))
+                        .get(),
                 (inv, event, entity) ->
-                        Main.NMS.setOcelotTrusting(entity, !Main.NMS.isOcelotTrusting(entity))));
+                        entity.setPlayerCreated(!entity.isPlayerCreated())));
+
+        DATA_ITEMS.put(EntityType.OCELOT, new DataItem<Ocelot>((inv, entity) -> {
+            if (Main.VERSION < 14) {
+                ItemStackBuilder builder = new ItemStackBuilder("MHF_Ocelot", inv.formatModify("generic.type"));
+
+                for (Ocelot.Type type : Ocelot.Type.values())
+                    builder.lore((entity.getCatType() == type ? "\u25ba " : "  ") + inv.translation.format("interface.cat.type." + type.name().toLowerCase().replace("_cat", "").replace("_ocelot", "")));
+
+                return builder.get();
+            }
+
+            return new ItemStackBuilder(Material.TROPICAL_FISH, inv.formatToggleYesNo(Main.NMS.isOcelotTrusting(entity), "interface.ocelot.trusting"))
+                    .get();
+        }, (inv, event, entity) -> {
+            if (Main.VERSION < 14)
+                ItemStackBuilder.enumLoreClick(event, Ocelot.Type.values(), entity.getCatType(), entity::setCatType);
+            else
+                Main.NMS.setOcelotTrusting(entity, !Main.NMS.isOcelotTrusting(entity));
+        }));
 
         DATA_ITEMS.put(EntityType.PHANTOM, new DataItem<Phantom>((inv, entity) ->
-                new ItemStackBuilder(Material.PHANTOM_MEMBRANE, inv.translation.format("interface.phantom.size", entity.getSize()))
-                        .modifyLore(inv.viewer, EntityType.PHANTOM).get(),
+                new ItemStackBuilder(Material.PHANTOM_MEMBRANE, inv.formatModify("generic.size", entity.getSize()))
+                        .get(),
                 (inv, event, entity) ->
-                        Main.NMS.signInterface((CustomInventoryView) event.getView(), "phantom", entity.getSize(), 0, 64, Integer::parseInt, result -> {
+                        inv.openSign("size", entity.getSize(), 0, 64, Integer::parseInt, result -> {
                             if (entity.isDead()) {
                                 inv.viewer.closeInventory();
                                 inv.viewer.sendMessage(inv.translation.format("interface.dead"));
@@ -226,29 +254,24 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                             }
                         })));
 
-        DATA_ITEMS.put(EntityType.RABBIT, new DataItem<Rabbit>((inv, entity) -> {
-            ItemStackBuilder builder = new ItemStackBuilder(Material.RABBIT_HIDE, inv.translation.format("interface.rabbit.type"));
-
-            for (Rabbit.Type type : Rabbit.Type.values())
-                builder.lore((entity.getRabbitType() == type ? "\u25ba " : "  ") + dyeToChatColor(getRabbitColor(type)) + inv.translation.format("interface.rabbit.type." + type.name().toLowerCase()));
-
-            return builder.switchLore(inv.viewer, EntityType.RABBIT).get();
-        }, (inv, event, entity) -> {
-            int i = entity.getRabbitType().ordinal() + 1;
-            entity.setRabbitType(Rabbit.Type.values()[i >= Rabbit.Type.values().length ? 0 : i]);
-        }));
+        DATA_ITEMS.put(EntityType.RABBIT, new DataItem<Rabbit>((inv, entity) ->
+                new ItemStackBuilder(Material.RABBIT_HIDE, inv.formatModify("generic.type"))
+                        .enumLore(inv.translation, Rabbit.Type.values(), entity.getRabbitType(), EntityInventory::getRabbitColor, "interface.rabbit.type")
+                        .get(),
+                (inv, event, entity) ->
+                        ItemStackBuilder.enumLoreClick(event, Rabbit.Type.values(), entity.getRabbitType(), entity::setRabbitType)));
 
         DATA_ITEMS.put(EntityType.SHEEP, new DataItem<Sheep>((inv, entity) ->
-                new ItemStackBuilder(entity.getColor() != null ? Material.getMaterial(entity.getColor().name() + "_WOOL") : Material.WHITE_WOOL, inv.translation.format("interface.sheep.color", dyeToChatColor(entity.getColor()) + inv.translation.format("interface.sheep.color." + entity.getColor().name().toLowerCase())))
-                        .modifyLore(inv.viewer, entity.getType()).get(),
+                new ItemStackBuilder(entity.getColor() != null ? Material.getMaterial(entity.getColor().name() + "_WOOL") : Material.WHITE_WOOL, inv.formatModify("generic.color_", inv.translation.formatColor(entity.getColor())))
+                        .get(),
                 (inv, event, entity) ->
                         new SheepColorInventory(inv.viewer, entity, (CustomInventoryView) event.getView()).getView().open()));
 
         DATA_ITEMS.put(EntityType.SLIME, new DataItem<Slime>((inv, entity) ->
-                new ItemStackBuilder(Material.SLIME_BLOCK, inv.translation.format("interface.slime.size", entity.getSize()))
-                        .modifyLore(inv.viewer, EntityType.SLIME).get(),
+                new ItemStackBuilder(Material.SLIME_BLOCK, inv.formatModify(EntityType.SLIME, "generic.size", entity.getSize()))
+                        .get(),
                 (inv, event, entity) ->
-                        Main.NMS.signInterface((CustomInventoryView) event.getView(), "slime", entity.getSize(), 1, Integer.MAX_VALUE, Integer::parseInt, result -> {
+                        inv.openSign("size", entity.getSize(), 1, Integer.MAX_VALUE, Integer::parseInt, result -> {
                             if (entity.isDead()) {
                                 inv.viewer.closeInventory();
                                 inv.viewer.sendMessage(inv.translation.format("interface.dead"));
@@ -260,10 +283,8 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         })));
 
         DATA_ITEMS.put(EntityType.SNOWMAN, new DataItem<Snowman>((inv, entity) ->
-                new ItemStackBuilder(Material.CARVED_PUMPKIN, inv.translation.format("interface.snowman.pumpkin"))
-                        .lore((!entity.isDerp() ? "\u25ba " : "  ") + inv.translation.format("interface.snowman.pumpkin.yes"))
-                        .lore((entity.isDerp() ? "\u25ba " : "  ") + inv.translation.format("interface.snowman.pumpkin.no"))
-                        .switchLore(inv.viewer, entity.getType()).get(),
+                new ItemStackBuilder(Material.CARVED_PUMPKIN, inv.formatToggleYesNo(!entity.isDerp(), "interface.snow_golem.pumpkin"))
+                        .get(),
                 (inv, event, entity) ->
                         entity.setDerp(!entity.isDerp())));
 
@@ -274,14 +295,14 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 for (String profession : Main.NMS.getVillagerProfessions())
                     builder.lore((Main.NMS.getVillagerProfession(entity).equals(profession) ? "\u25ba " : "  ") + inv.translation.format("interface.villager.profession." + profession.toLowerCase().replace("_", "")));
 
-                return builder.switchLore(inv.viewer, EntityType.VILLAGER).get();
+                return builder.get();
             } else {
                 if (inv.villagerTick >= 80)
                     inv.villagerTick = 0;
 
-                return new ItemStackBuilder(++inv.villagerTick < 40 ? Main.NMS.getVillagerProfessionMaterial(entity.getProfession()) : VillagerSpecificationsInventory.getMaterialOfType(entity.getVillagerType()), inv.translation.format("interface.villager.specifications"))
+                return new ItemStackBuilder(++inv.villagerTick < 40 ? Main.NMS.getVillagerProfessionMaterial(entity.getProfession()) : VillagerSpecificationsInventory.getMaterialOfType(entity.getVillagerType()), inv.formatModify("interface.villager.specifications"))
                         .lore(inv.translation.format("interface.villager.profession", (inv.villagerTick < 40 ? "§l" : "") + inv.translation.format("interface.villager.profession." + entity.getProfession().name().toLowerCase())))
-                        .lore(inv.translation.format("interface.villager.type", (inv.villagerTick >= 40 ? "§l" : "") + inv.translation.format("interface.villager.type." + entity.getVillagerType().name().toLowerCase()))).get();
+                        .lore(inv.translation.format("generic.type_", (inv.villagerTick >= 40 ? "§l" : "") + inv.translation.format("interface.villager.type." + entity.getVillagerType().name().toLowerCase()))).get();
             }
         }, (inv, event, entity) -> {
             if (Main.VERSION < 14) {
@@ -300,10 +321,9 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
         }));
 
         DATA_ITEMS.put(EntityType.WOLF, new DataItem<Wolf>((inv, entity) ->
-                new ItemStackBuilder(Material.BONE, inv.translation.format("interface.wolf.angry", inv.translation.format("interface.snowman.pumpkin." + (entity.isAngry() ? "yes" : "no"))))
-                        .lore(Permissions.hasPermissionModify(EntityType.WOLF, entity), inv.translation.format("interface.wolf.angry.modify"))
+                new ItemStackBuilder(Material.BONE, inv.formatToggleYesNo(entity.isAngry(), "interface.wolf.angry"))
                         .lore("")
-                        .lore(inv.translation.format("interface.wolf.collar", dyeToChatColor(entity.getCollarColor()) + inv.translation.format("interface.sheep.color." + entity.getCollarColor().name().toLowerCase())))
+                        .lore(inv.translation.format("interface.wolf.collar", inv.translation.formatColor(entity.getCollarColor())))
                         .get(),
                 (inv, event, entity) ->
                         entity.setAngry(!entity.isAngry())));
@@ -311,62 +331,50 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
 
         if (Main.VERSION >= 14) {
             //<editor-fold desc="Data Items - 1.14+ versions" defaultstate="collapsed">
-            DATA_ITEMS.put(EntityType.CAT, new DataItem<Cat>((inv, entity) -> {
-                ItemStackBuilder builder = new ItemStackBuilder(Material.TROPICAL_FISH, inv.translation.format("interface.cat.type"));
-
-                for (Cat.Type type : Cat.Type.values())
-                    builder.lore((entity.getCatType() == type ? "\u25ba " : "  ") + inv.translation.format("interface.cat.type." + type.name().toLowerCase()));
-
-                return builder
-                        .switchLore(inv.viewer, EntityType.CAT)
-                        .lore("")
-                        .lore(inv.translation.format("interface.wolf.collar", dyeToChatColor(entity.getCollarColor()) + inv.translation.format("interface.sheep.color." + entity.getCollarColor().name().toLowerCase())))
-                        .get();
-            }, (inv, event, entity) -> {
-                int i = entity.getCatType().ordinal() + 1;
-                entity.setCatType(Cat.Type.values()[i >= Cat.Type.values().length ? 0 : i]);
-            }));
+            DATA_ITEMS.put(EntityType.CAT, new DataItem<Cat>((inv, entity) ->
+                    new ItemStackBuilder(Material.TROPICAL_FISH, inv.formatModify("generic.type"))
+                            .enumLore(inv.translation, Cat.Type.values(), entity.getCatType(), "interface.cat.type")
+                            .lore("")
+                            .lore(inv.translation.format("interface.wolf.collar", inv.translation.formatColor(entity.getCollarColor())))
+                            .get(),
+                    (inv, event, entity) ->
+                            ItemStackBuilder.enumLoreClick(event, Cat.Type.values(), entity.getCatType(), entity::setCatType)));
 
             DATA_ITEMS.put(EntityType.FOX, new DataItem<Fox>((inv, entity) ->
-                    new ItemStackBuilder(entity.getFoxType() == Fox.Type.RED ? Material.SPRUCE_SAPLING : Material.SNOW_BLOCK, inv.translation.format("interface.fox.type", inv.translation.format("interface.fox.type." + entity.getFoxType().name().toLowerCase())))
-                            .lore((entity.getFoxType() == Fox.Type.RED ? "\u25ba " : "  ") + inv.translation.format("interface.fox.red"))
-                            .lore((entity.getFoxType() == Fox.Type.SNOW ? "\u25ba " : "  ") + inv.translation.format("interface.fox.snow"))
-                            .switchLore(inv.viewer, entity.getType()).get(),
+                    new ItemStackBuilder(entity.getFoxType() == Fox.Type.RED ? Material.SPRUCE_SAPLING : Material.SNOW_BLOCK, inv.formatToggle("generic.type"))
+                            .enumLore(inv.translation, Fox.Type.values(), entity.getFoxType(), "interface.fox.type")
+                            .get(),
                     (inv, event, entity) ->
                             entity.setFoxType(entity.getFoxType() == Fox.Type.RED ? Fox.Type.SNOW : Fox.Type.RED)));
 
             DATA_ITEMS.put(EntityType.MUSHROOM_COW, new DataItem<MushroomCow>((inv, entity) -> {
                 boolean isRed = entity.getVariant() == MushroomCow.Variant.RED;
-                return new ItemStackBuilder(isRed ? Material.RED_MUSHROOM_BLOCK : Material.BROWN_MUSHROOM_BLOCK, inv.translation.format("interface.mooshroom.variant", dyeToChatColor(isRed ? DyeColor.RED : DyeColor.BROWN) + inv.translation.format("interface.sheep.color." + (isRed ? DyeColor.RED : DyeColor.BROWN).name().toLowerCase())))
-                        .switchLore(inv.viewer, EntityType.MUSHROOM_COW)
+                return new ItemStackBuilder(isRed ? Material.RED_MUSHROOM_BLOCK : Material.BROWN_MUSHROOM_BLOCK, inv.formatToggle("generic.variant"))
+                        .lore((isRed ? "§2\u25ba " : "  ") + Translation.dyeColorToChat(DyeColor.RED) + "§l" + inv.translation.format("generic.color.red"))
+                        .lore((!isRed ? "§2\u25ba " : "  ") + Translation.dyeColorToChat(DyeColor.BROWN) + "§l" + inv.translation.format("generic.color.brown"))
                         .get();
             }, (inv, event, entity) ->
                     entity.setVariant(entity.getVariant() == MushroomCow.Variant.RED ? MushroomCow.Variant.BROWN : MushroomCow.Variant.RED)));
 
-
             DATA_ITEMS.put(EntityType.PANDA, new DataItem<Panda>((inv, entity) ->
-                    new ItemStackBuilder(Material.BAMBOO, inv.translation.format("interface.panda.gene", entity.getMainGene()))
-                            .lore(inv.translation.format("interface.panda.hidden_gene", entity.getHiddenGene())).get(),
-                    null));
+                    new ItemStackBuilder(Material.BAMBOO, inv.formatModify("interface.panda.gene"))
+                            .enumLore(inv.translation, Panda.Gene.values(), entity.getMainGene(), "interface.panda.gene").get(),
+                    (inv, event, entity) ->
+                            ItemStackBuilder.enumLoreClick(event, Panda.Gene.values(), entity.getMainGene(), entity::setMainGene)));
             //</editor-fold>
         }
 
         if (Main.VERSION >= 17) {
             //<editor-fold desc="Data Items - 1.17+ versions" defaultstate="collapsed">
-            DATA_ITEMS.put(EntityType.AXOLOTL, new DataItem<Axolotl>((inv, entity) -> {
-                ItemStackBuilder builder = new ItemStackBuilder(Material.getMaterial(getAxolotlColor(entity.getVariant()).name() + "_WOOL"), inv.translation.format("interface.axolotl.variant"));
-
-                for (Axolotl.Variant variant : Axolotl.Variant.values())
-                    builder.lore((entity.getVariant() == variant ? "\u25ba " : "  ") + dyeToChatColor(getAxolotlColor(variant)) + inv.translation.format("interface.axolotl.variant." + variant.name().toLowerCase()));
-
-                return builder.switchLore(inv.viewer, EntityType.AXOLOTL).get();
-            }, (inv, event, entity) -> {
-                int i = entity.getVariant().ordinal() + 1;
-                entity.setVariant(Axolotl.Variant.values()[i >= Axolotl.Variant.values().length ? 0 : i]);
-            }));
+            DATA_ITEMS.put(EntityType.AXOLOTL, new DataItem<Axolotl>((inv, entity) ->
+                    new ItemStackBuilder(Material.getMaterial(getAxolotlColor(entity.getVariant()).name() + "_WOOL"), inv.formatModify("generic.variant"))
+                            .enumLore(inv.translation, Axolotl.Variant.values(), entity.getVariant(), EntityInventory::getAxolotlColor, "interface.axolotl.variant")
+                            .get(),
+                    (inv, event, entity) ->
+                            ItemStackBuilder.enumLoreClick(event, Axolotl.Variant.values(), entity.getVariant(), entity::setVariant)));
 
             DATA_ITEMS.put(EntityType.GOAT, new DataItem<Goat>((inv, entity) ->
-                    new ItemStackBuilder(Material.SCULK_SENSOR, inv.translation.format("interface.goat.screaming", inv.translation.format("interface.snowman.pumpkin." + (entity.isScreaming() ? "yes" : "no")))).get(),
+                    new ItemStackBuilder(Material.SCULK_SENSOR, inv.formatToggleYesNo(entity.isScreaming(), "interface.goat.screaming")).get(),
                     (inv, event, entity) ->
                             entity.setScreaming(!entity.isScreaming())));
             //</editor-fold>
@@ -378,37 +386,13 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 UUID memory = entity.getMemory(MemoryKey.LIKED_PLAYER);
 
                 if (memory != null) {
-                    OfflinePlayer player = Bukkit.getOfflinePlayer(memory);
-                    return new ItemStackBuilder(player.getName(), inv.translation.format("interface.allay.owner", player.getName())).get();
+                    String playerName = Bukkit.getOfflinePlayer(memory).getName();
+                    return new ItemStackBuilder(playerName, inv.translation.format("interface.allay.owner", playerName)).get();
                 } else
                     return new ItemStackBuilder("MHF_Question", inv.translation.format("interface.allay.unowned")).get();
             }, null));
             //</editor-fold>
         }
-    }
-
-    private ItemStack getEquipmentItem(EquipmentSlot slot) {
-        EntityEquipment equipment = entity.getEquipment();
-
-        if (equipment == null)
-            return null;
-
-        switch (slot) {
-            case HEAD:
-                return equipment.getHelmet();
-            case CHEST:
-                return equipment.getChestplate();
-            case LEGS:
-                return equipment.getLeggings();
-            case FEET:
-                return equipment.getBoots();
-            case HAND:
-                return equipment.getItemInMainHand();
-            case OFF_HAND:
-                return equipment.getItemInOffHand();
-        }
-
-        return null;
     }
 
     private void setEquipmentItem(EquipmentSlot slot, ItemStack stack) {
@@ -472,5 +456,21 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             case THE_KILLER_BUNNY:
                 return DyeColor.RED;
         }
+    }
+
+    protected String formatModify(EntityType type, String key, Object... parameters) {
+        return translation.format(key, parameters) + translation.formatCondition(Permissions.hasPermissionModify(type, viewer), "generic.modify");
+    }
+
+    protected String formatModify(String key, Object... parameters) {
+        return formatModify(entity.getType(), key, parameters);
+    }
+
+    protected String formatToggleYesNo(boolean condition, String key) {
+        return translation.formatYesNo(condition, key) + translation.formatCondition(Permissions.hasPermissionModify(entity.getType(), viewer), "generic.toggle");
+    }
+
+    protected String formatToggle(String key, Object... parameters) {
+        return translation.format(key, parameters) + translation.formatCondition(Permissions.hasPermissionModify(entity.getType(), viewer), "generic.toggle");
     }
 }

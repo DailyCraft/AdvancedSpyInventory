@@ -12,11 +12,10 @@ public class SheepColorInventory extends InformationInventory<Sheep> {
     public SheepColorInventory(Player viewer, Sheep entity, CustomInventoryView oldView) {
         super(viewer, entity, oldView, 3);
 
-        for (DyeColor color : DyeColor.values()) {
-            contents[color.ordinal()] = new ItemStackBuilder(Material.getMaterial(color.name() + "_WOOL"), dyeToChatColor(color) + translation.format("interface.sheep.color." + color.name().toLowerCase()))
+        for (DyeColor color : DyeColor.values())
+            contents[color.ordinal()] = new ItemStackBuilder(Material.getMaterial(color.name() + "_WOOL"), translation.formatColor(color))
                     .lore(translation.format("interface.information.select" + (entity.getColor() == color ? "ed" : "")))
                     .enchant(entity.getColor() == color).get();
-        }
     }
 
     @Override

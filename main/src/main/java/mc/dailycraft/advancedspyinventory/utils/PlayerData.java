@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -79,8 +80,22 @@ public class PlayerData implements AnimalTamer {
         List<Float> rotation = nms.getFloatList("Rotation");
 
         return new Location(
-                Bukkit.getWorlds().stream().filter(world -> world.getUID().getMostSignificantBits() == nms.getLong("WorldUUIDMost")).findFirst().orElseGet(() -> Bukkit.getWorlds().get(0)),
+                Bukkit.getWorlds().stream().filter(world -> world.getUID().getLeastSignificantBits() == nms.getLong("WorldUUIDLeast") && world.getUID().getMostSignificantBits() == nms.getLong("WorldUUIDMost")).findFirst().orElseGet(() -> Bukkit.getWorlds().get(0)),
                 position.get(0), position.get(1), position.get(2), rotation.get(0), rotation.get(1));
+    }
+
+    public void setLocation(Location location) {
+        if (isOnline())
+            getPlayer().teleport(location);
+        else {
+            nms.putDoubleList("Pos", Arrays.asList(location.getX(), location.getY(), location.getZ()));
+            nms.putFloatList("Rotation", Arrays.asList(location.getYaw(), location.getPitch()));
+            nms.putLong("WorldUUIDLeast", location.getWorld().getUID().getLeastSignificantBits());
+            nms.putLong("WorldUUIDMost", location.getWorld().getUID().getMostSignificantBits());
+
+            if (Main.VERSION > 15)
+                nms.putString("Dimension", Main.NMS.worldKey(location.getWorld()).toString());
+        }
     }
 
     public int getSelectedSlot() {

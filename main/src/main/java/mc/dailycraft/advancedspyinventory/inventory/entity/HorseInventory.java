@@ -19,7 +19,7 @@ public class HorseInventory<T extends AbstractHorse> extends EntityInventory<T> 
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack getItem(int index) {
+    public ItemStack getItem(int index) {
         if (index == getSize() - 24)
             return getNonNull(entity.getInventory().getSaddle(), InformationItems.SADDLE.get(translation));
         else if (index == getSize() - 22)

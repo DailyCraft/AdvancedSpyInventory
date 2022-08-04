@@ -8,10 +8,10 @@ import com.mojang.util.UUIDTypeAdapter;
 import mc.dailycraft.advancedspyinventory.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -26,6 +27,7 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class ItemStackBuilder {
     private static final Map<String, GameProfile> headProfiles = new HashMap<>();
@@ -74,7 +76,7 @@ public class ItemStackBuilder {
                                 headProfiles.put(headOwner, gameProfile);
                             }
                         } catch (Exception exception) {
-                            exception.printStackTrace();
+                            Main.getInstance().getLogger().severe("Error when loading head '" + headOwner + "'! Message: " + exception.getMessage());
                         }
                     });
                 } else {
@@ -140,12 +142,31 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public ItemStackBuilder modifyLore(Player viewer, EntityType entityType) {
-        return lore(Permissions.hasPermissionModify(entityType, viewer), "", Translation.of(viewer).format("interface.information.modify"));
+    public <T> ItemStackBuilder enumLore(Translation translation, T[] enumeration, T current, @Nullable Function<T, DyeColor> entryColor, String keyStart) {
+        for (T entry : enumeration) {
+            StringBuilder sb = new StringBuilder(current == entry ? "§2\u25ba§a " : "  ");
+            if (entryColor != null)
+                sb.append(Translation.dyeColorToChat(entryColor.apply(entry)));
+            if (current == entry)
+                sb.append("§l");
+
+            lore(sb + translation.format(keyStart + "." + (((Enum<?>) entry).name().toLowerCase())));
+        }
+
+        return this;
     }
 
-    public ItemStackBuilder switchLore(Player viewer, EntityType entityType) {
-        return lore(Permissions.hasPermissionModify(entityType, viewer), "", Translation.of(viewer).format("interface.information.switch"));
+    public <T> ItemStackBuilder enumLore(Translation translation, T[] enumeration, T current, String keyStart) {
+        return enumLore(translation, enumeration, current, null, keyStart);
+    }
+
+    public static <T> void enumLoreClick(InventoryClickEvent event, T[] enumeration, T currentValue, Consumer<T> setter) {
+        int i = ((Enum<?>) currentValue).ordinal();
+
+        if (event.isLeftClick())
+            setter.accept(enumeration[++i >= enumeration.length ? 0 : i]);
+        else if (event.isRightClick())
+            setter.accept(enumeration[--i < 0 ? enumeration.length - 1 : i]);
     }
 
     public ItemStackBuilder enchant(boolean condition) {

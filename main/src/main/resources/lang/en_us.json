@@ -1,8 +1,49 @@
 {
+  "generic": {
+    "yes": "§aYes",
+    "no": "§cNo",
+    "size": "Size: §a%,d",
+    "type": "Type",
+    "type_": "Type: §a%s",
+    "variant": "Variant",
+    "color_": "Color: %s",
+    "color": {
+      "": "Color",
+      "white": "White",
+      "orange": "Orange",
+      "magenta": "Magenta",
+      "light_blue": "Light Blue",
+      "yellow": "Yellow",
+      "lime": "Lime",
+      "pink": "Pink",
+      "gray": "Gray",
+      "light_gray": "Light Gray",
+      "cyan": "Cyan",
+      "purple": "Purple",
+      "blue": "Blue",
+      "brown": "Brown",
+      "green": "Green",
+      "red": "Red",
+      "black": "Black",
+      "creamy": "§6Creamy"
+    },
+    "modify": {
+      "": "§7(Modify: §eClick§7)",
+      "left": "§7(Modify: §eLeft Click§7)",
+      "right": "§7(Modify: §eRight Click§7)"
+    },
+    "toggle": {
+      "": "§7(Toggle: §eClick§7)",
+      "left": "§7(Toggle: §eLeft Click§7)",
+      "right": "§7(Toggle: §eRight Click§7)"
+    }
+  },
+
   "command": {
     "not_player_uuid": "§cThe UUID is not one of a player",
     "never_connected": "§cThe player never connected to the server",
     "not_player": "§cThis command can only be used by players",
+    "inventory.only_one": "§cOnly one entity is allowed",
     "inventory.player": "§cYou don't have permission to open the inventory of players",
     "inventory.entity": "§cYou don't have permission to open the inventory of entities",
     "enderchest.other": "§cYou don't have permission to open the ender chest of other players"
@@ -13,13 +54,11 @@
     "dead": "§cThe entity you are spying on is dead.",
     "entity": {
       "title": "§l%s§r's Inventory",
-      "clear": "§cClear Inventory",
       "close": "Close",
-      "health": {
-        "": "Health: §a%,.2f §7/ §a%,.2f",
-        "modify": "§aLeft Click §7to modify §eplayer health",
-        "modify.max": "§aRight Click §7to modify §eplayer max health"
-      },
+      "clear": "§cClear Content §7(Shift + Click)",
+      "clear.warning": "§c§l\u26a0 Warning: §cThis action cannot be undone.",
+      "health": "Health: §a%,.2f §7/ §a%,.2f",
+      "health.modify": ["Modify:", "§6Health §7\u2192 §eLeft Click", "§6Max Health §7\u2192 §eRight Click"],
       "location": "Location",
       "world": "World: §a%s §7(type: §2%s§7)",
       "world.environment": {
@@ -33,7 +72,8 @@
       "z": "Z: §a%,.2f",
       "yaw": "Yaw: §e%,.2f",
       "pitch": "Pitch: §e%,.02f",
-      "teleport": "\u2192 §aClick§7 to §eteleport",
+      "teleport": "§6Teleport §7(Click)",
+      "teleport.to_me": "§6Teleport to me §7(Shift + Click)",
       "tamed": "Tamer: §a%s",
       "untamed": "Untamed",
       "modify": "§cYou don't have permission to modify the inventory",
@@ -42,35 +82,88 @@
     "player": {
       "slot": {
         "": "Slot: §a%d",
-        "left": "§c(Left Click -1)",
-        "right": "§a(Right Click +1)",
-        "drop": "§aShift + Left Click§7 to §eforce drop",
-        "drop.all": "§aShift + Right Click§7 to §eforce drop all"
+        "modify": "§c(Left Click §l-1§c) §a(Right Click §l+1§a)",
+        "drop": "§6Force Drop §7(Shift + Left Click)",
+        "drop.all": "§6Force Drop All §7(Shift + Right Click)"
       },
       "experience": "Experience: §a%,.2f",
-      "experience.modify": "§aClick §7to modify the §eexperience level",
-      "food": {
-        "level": "Food Level: §a%,d",
-        "saturation": "Food Saturation: §a%,.2f",
-        "level.modify": "§aLeft Click §7to modify the §efood level",
-        "saturation.modify": "§aRight Click §7to modify the §efood saturation"
-      },
+      "food.level": "Food Level: §a%,d",
+      "food.saturation": "Saturation: §a%,.2f",
       "enderchest": "Open his §5ender chest",
       "own": "§cYou cannot modify your own inventory"
     },
     "enderchest": {
       "title": "§l%s§r's Ender Chest",
-      "clear": "§cClear Ender Chest",
       "inventory": "Open his inventory",
       "modify": "§cYou don't have permission to modify the ender chest"
     },
     "information": {
-      "modify": "\u2192 §aClick§7 to §emodify",
-      "switch": "\u2192 §aClick§7 to §eswitch",
       "selected": "§cAlready Selected",
       "select": "§aClick to select",
       "back": "§cBack"
     },
+    "allay.owner": "Owner: §a%s",
+    "allay.unowned": "Unowned",
+    "axolotl.variant": {
+      "lucy": "Leucistic",
+      "wild": "Wild",
+      "gold": "Gold",
+      "cyan": "Cyan",
+      "blue": "Blue"
+    },
+    "axolotl.dead": "Playing dead: %s",
+    "bat.awake": "Is awake: %s",
+    "cat.type": {
+      "tabby": "Tabby",
+      "black": "Tuxedo",
+      "red": "Red",
+      "siamese": "Siamese",
+      "british_shorthair": "British Shorthair",
+      "calico": "Calico",
+      "persian": "Persian",
+      "ragdoll": "Ragdoll",
+      "white": "White",
+      "jellie": "Jellie",
+      "all_black": "Black",
+      "wild": "Wild"
+    },
+    "donkey.no_chest": "The animal doesn't carrying a chest",
+    "fox.type": {
+      "red": "§6Red",
+      "snow": "§fArctic"
+    },
+    "goat": {
+      "screaming": "Is screaming: %s",
+      "horn": {
+        "": "Has horn ?",
+        "left": "Left: %s",
+        "right": "Right: %s"
+      }
+    },
+    "iron_golem.player_created": "Created by a player: %s",
+    "ocelot.trusting": "Trusting players: %s",
+    "panda.gene": {
+      "": "Gene",
+      "hidden": "Hidden Gene",
+      "normal": "Normal",
+      "lazy": "Lazy",
+      "worried": "Worried",
+      "playful": "Playful",
+      "brown": "Brown",
+      "weak": "Weak",
+      "aggressive": "Aggressive"
+    },
+    "rabbit.type": {
+      "brown": "Brown",
+      "white": "White",
+      "black": "Black",
+      "black_and_white": "Black and White",
+      "gold": "Gold",
+      "salt_and_pepper": "Salt and Pepper",
+      "the_killer_bunny": "The Killer Bunny"
+    },
+    "sheep.title": "%s's wool color",
+    "snow_golem.pumpkin": "Has a pumpkin on his head: %s",
     "villager": {
       "profession": {
         "": "Profession: §a%s",
@@ -91,7 +184,6 @@
         "weaponsmith": "Weaponsmith"
       },
       "type": {
-        "": "Type: §a%s",
         "desert": "Desert",
         "jungle": "Jungle",
         "plains": "Plains",
@@ -107,101 +199,8 @@
         "type": "Modify the villager type"
       }
     },
-    "sheep": {
-      "title": "%s's wool color",
-      "color": {
-        "": "Wool color: %s",
-        "white": "White",
-        "orange": "Orange",
-        "magenta": "Magenta",
-        "light_blue": "Light Blue",
-        "yellow": "Yellow",
-        "lime": "Lime",
-        "pink": "Pink",
-        "gray": "Gray",
-        "light_gray": "Light Gray",
-        "cyan": "Cyan",
-        "purple": "Purple",
-        "blue": "Blue",
-        "brown": "Brown",
-        "green": "Green",
-        "red": "Red",
-        "black": "Black"
-      }
-    },
-    "donkey.no_chest": "The animal doesn't carrying a chest",
-    "llama": {
-      "color": "Llama color",
-      "creamy": "§eCreamy",
-      "white": "§fWhite",
-      "brown": "§6Brown",
-      "gray": "Gray"
-    },
-    "iron_golem.player_creation": "Created by a player",
-    "iron_golem.natural_creation": "Not created by a player, it spawned naturally",
-    "fox": {
-      "type": "Fox Type",
-      "red": "§6Red",
-      "snow": "§fArctic"
-    },
-    "panda.gene": "Gene: §a%s",
-    "panda.hidden_gene": "Hidden Gene: §a%s",
-    "slime.size": "Slime size: §a%,d",
-    "snowman.pumpkin": {
-      "": "Has a pumpkin on his head",
-      "yes": "§aYes",
-      "no": "§cNo"
-    },
     "wolf.angry": "Is angry: %s",
-    "wolf.angry.modify": "§aClick§7 to toggle §eangry",
-    "wolf.collar": "Collar color: %s",
-    "ocelot.trusting": "Trusting players: %s",
-    "cat.type": {
-      "": "Cat Type",
-      "tabby": "Tabby",
-      "black": "Tuxedo",
-      "red": "Red",
-      "siamese": "Siamese",
-      "british_shorthair": "British Shorthair",
-      "calico": "Calico",
-      "persian": "Persian",
-      "ragdoll": "Ragdoll",
-      "white": "White",
-      "jellie": "Jellie",
-      "all_black": "Black"
-    },
-    "phantom.size": "Phantom size: §a%d",
-    "bat.awake": "Is awake: %s",
-    "mooshroom.variant": "Mooshroom Variant: %s",
-    "rabbit.type": {
-      "": "Rabbit Type",
-      "brown": "Brown",
-      "white": "White",
-      "black": "Black",
-      "black_and_white": "Black and White",
-      "gold": "Gold",
-      "salt_and_pepper": "Salt and Pepper",
-      "the_killer_bunny": "The Killer Bunny"
-    },
-    "goat": {
-      "screaming": "Is screaming: %s",
-      "horn": {
-        "": "Has horn ?",
-        "left": "Left: %s",
-        "right": "Right: %s"
-      }
-    },
-    "allay.owner": "Owner: §a%s",
-    "allay.unowned": "Unowned",
-    "axolotl.variant": {
-      "": "Axolotl Variant",
-      "lucy": "Leucistic",
-      "wild": "Wild",
-      "gold": "Gold",
-      "cyan": "Cyan",
-      "blue": "Blue"
-    },
-    "axolotl.dead": "Playing dead: %s"
+    "wolf.collar": "Collar color: %s"
   },
 
   "sign": {
@@ -210,8 +209,7 @@
     "experience": ["§1Enter new", "§1§lexperience amount"],
     "food.level": ["§1Enter new", "§1§lfood level"],
     "food.saturation": ["§1Enter new", "§1§lfood saturation"],
-    "slime": ["§1Enter new", "§1§lslime size"],
-    "phantom": ["§1Enter new", "§1§lphantom size"]
+    "size": ["§1Enter new", "§1§lsize"]
   },
 
   "item": {
@@ -220,7 +218,7 @@
     "leggings": "Leggings",
     "boots": "Boots",
     "main_hand": "Main Hand",
-    "off_hand": "Secondary Hand",
+    "off_hand": "Off Hand",
     "saddle": "Saddle",
     "horse_armor": "Horse Armor",
     "llama_decor": "Llama decor",
@@ -243,7 +241,8 @@
         "health.modify": "Allows you to modify the player health",
         "health.modify.max": "Allows you to modify the player maximum health limit",
         "location": "Allows you to see the player's location",
-        "teleport": "Allows you to teleport to player's location",
+        "teleport": "Allows you to teleport to the player",
+        "teleport.others": "Allows you to teleport the player to you",
         "xp": "Allows you to see the player experience",
         "xp.modify": "Allows you to modify the player experience",
         "food": "Allows you to see the player's food level",
@@ -256,7 +255,8 @@
         "health.modify": "Allows you to modify the entity health",
         "health.modify.max": "Allows you to modify the entity maximum health limit",
         "location": "Allows you to see the entity's location",
-        "teleport": "Allows you to teleport the entity location",
+        "teleport": "Allows you to teleport to the entity",
+        "teleport.others": "Allows you to teleport the entity to you",
         "tamed": "Allows you to see if the entity is tamed",
         "information.specific": "Allows you to see more information about '%s' entities",
         "information.specific.modify": "Allows you to modify the information that can be seen with 'advancedspyinventory.inventory.entity.information.%s'",
@@ -269,10 +269,6 @@
       "modify": "Allows you to modify your own ender chest",
       "others": "Allows you to inspect the ender chest of other players",
       "others.modify": "Allows you to modify the ender chest of other players"
-    },
-    "config": {
-      "": "Allows you to access to /asi command and see config values",
-      "modify": "Allows you to modify values in config and to reload it"
     }
   }
 }

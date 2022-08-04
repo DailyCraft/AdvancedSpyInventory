@@ -3,6 +3,7 @@ package mc.dailycraft.advancedspyinventory.inventory.entity;
 import mc.dailycraft.advancedspyinventory.utils.InformationItems;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Llama;
@@ -32,12 +33,12 @@ public class LlamaInventory extends HorseInventory<Llama> {
             return getNonNull(entity.getInventory().getItem(1), InformationItems.LLAMA_DECOR.get(translation));
         else if (index == getSize() - 3) {
             if (Permissions.hasPermission(EntityType.LLAMA, viewer)) {
-                return new ItemStackBuilder(entity.getColor() == Llama.Color.CREAMY ? Material.MILK_BUCKET : entity.getColor() == Llama.Color.GRAY ? Material.DIORITE : Material.valueOf(entity.getColor().name() + "_WOOL"), translation.format("interface.llama.color"))
-                        .lore((entity.getColor() == Llama.Color.CREAMY ? "\u25ba " : "  ") + translation.format("interface.llama.creamy"))
-                        .lore((entity.getColor() == Llama.Color.WHITE ? "\u25ba " : "  ") + translation.format("interface.llama.white"))
-                        .lore((entity.getColor() == Llama.Color.BROWN ? "\u25ba " : "  ") + translation.format("interface.llama.brown"))
-                        .lore((entity.getColor() == Llama.Color.GRAY ? "\u25ba " : "  ") + translation.format("interface.llama.gray"))
-                        .switchLore(viewer, EntityType.LLAMA).get();
+                return new ItemStackBuilder(entity.getColor() == Llama.Color.CREAMY ? Material.MILK_BUCKET : entity.getColor() == Llama.Color.GRAY ? Material.DIORITE : Material.getMaterial(entity.getColor().name() + "_WOOL"), formatModify("generic.color"))
+                        .lore((entity.getColor() == Llama.Color.CREAMY ? "§2\u25ba " : "  ") + translation.format("generic.color.creamy"))
+                        .lore((entity.getColor() == Llama.Color.WHITE ? "§2\u25ba " : "  ") + translation.formatColor(DyeColor.WHITE))
+                        .lore((entity.getColor() == Llama.Color.BROWN ? "§2\u25ba " : "  ") + translation.formatColor(DyeColor.BROWN))
+                        .lore((entity.getColor() == Llama.Color.GRAY ? "§2\u25ba " : "  ") + translation.formatColor(DyeColor.GRAY))
+                        .get();
             }
         }
 
@@ -79,7 +80,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
                 replaceItem(event, InformationItems.LLAMA_DECOR.get(translation));
         } else if (rawSlot == getSize() - 3) {
             if (Permissions.hasPermissionModify(EntityType.LLAMA, viewer))
-                entity.setColor(Llama.Color.values()[entity.getColor().ordinal() + 1 == Llama.Color.values().length ? 0 : entity.getColor().ordinal() + 1]);
+                ItemStackBuilder.enumLoreClick(event, Llama.Color.values(), entity.getColor(), entity::setColor);
         } else
             super.onClick(event, rawSlot);
     }
