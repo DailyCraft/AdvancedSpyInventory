@@ -98,13 +98,14 @@ public enum Permissions {
         types.add(EntityType.IRON_GOLEM);
         types.add(EntityType.LLAMA);
         types.add(EntityType.OCELOT);
-        types.add(EntityType.PHANTOM);
         types.add(EntityType.RABBIT);
         types.add(EntityType.SHEEP);
         types.add(EntityType.SLIME);
         types.add(EntityType.SNOWMAN);
         types.add(EntityType.VILLAGER);
         types.add(EntityType.WOLF);
+        if (Main.VERSION >= 13)
+            types.add(EntityType.PHANTOM);
         if (Main.VERSION >= 14) {
             types.add(EntityType.CAT);
             types.add(EntityType.FOX);

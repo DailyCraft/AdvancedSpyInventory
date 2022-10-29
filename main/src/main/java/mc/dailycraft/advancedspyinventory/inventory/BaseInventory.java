@@ -8,8 +8,10 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -17,7 +19,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class BaseInventory {
-    protected static final ItemStack VOID_ITEM = new ItemStackBuilder(Material.GRAY_STAINED_GLASS_PANE, "").get();
+    private static final Constructor<? extends CustomInventoryView> VIEW_CONSTRUCTOR;
+
+    protected static final ItemStack VOID_ITEM = ItemStackBuilder.ofStainedGlassPane(DyeColor.GRAY, "").get();
 
     protected final Player viewer;
     protected final Translation translation;
@@ -48,9 +52,8 @@ public abstract class BaseInventory {
 
     public CustomInventoryView getView() {
         try {
-            return (CustomInventoryView) Class.forName("mc.dailycraft.advancedspyinventory.utils.CustomInventoryView" + (Main.VERSION <= 13 ? "Old" : "New"))
-                    .getConstructor(Player.class, BaseInventory.class).newInstance(viewer, this);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException exception) {
+            return VIEW_CONSTRUCTOR.newInstance(viewer, this);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException exception) {
             throw new RuntimeException(exception);
         }
     }
@@ -69,6 +72,15 @@ public abstract class BaseInventory {
         }
     }
 
+    protected void shift(InventoryClickEvent event, int slot, EquipmentSlot equipmentSlot, Function<InformationItems, Function<Translation, ItemStack>> informationItem, String orEndsWith) {
+        shift(event, slot, informationItem.apply(InformationItems.of(equipmentSlot)).apply(Translation.of(((Player) event.getWhoClicked()).getLocale())), current -> {
+            if (Main.VERSION > 16)
+                return current.getEquipmentSlot() == equipmentSlot;
+            else
+                return (Main.VERSION > 12 ? current.getKey().getKey() : current.name().toLowerCase()).endsWith(orEndsWith);
+        });
+    }
+
     protected ItemStack getLocationItemStack(Location location, boolean isPlayer) {
         String entityKey = "interface.entity.";
         NamespacedKey worldKey = Main.NMS.worldKey(location.getWorld());
@@ -81,7 +93,7 @@ public abstract class BaseInventory {
                 .lore(translation.format(entityKey + "yaw", location.getYaw()))
                 .lore(translation.format(entityKey + "pitch", location.getPitch()))
                 .lore(isPlayer ? Permissions.PLAYER_TELEPORT.has(viewer) || Permissions.PLAYER_TELEPORT_OTHERS.has(viewer) : Permissions.ENTITY_TELEPORT.has(viewer) || Permissions.ENTITY_TELEPORT_OTHERS.has(viewer), "")
-                .lore((isPlayer ? Permissions.PLAYER_TELEPORT : Permissions.ENTITY_TELEPORT).has(viewer), "", translation.format(entityKey + "teleport"))
+                .lore((isPlayer ? Permissions.PLAYER_TELEPORT : Permissions.ENTITY_TELEPORT).has(viewer), translation.format(entityKey + "teleport"))
                 .lore((isPlayer ? Permissions.PLAYER_TELEPORT_OTHERS : Permissions.ENTITY_TELEPORT_OTHERS).has(viewer), translation.format(entityKey + "teleport.to_me")).get();
     }
 
@@ -115,7 +127,14 @@ public abstract class BaseInventory {
         loc.setY(0);
 
         viewer.closeInventory();
-        viewer.sendBlockChange(loc, (Main.VERSION > 13 ? Material.OAK_SIGN : Material.getMaterial("SIGN")).createBlockData());
+
+        if (Main.VERSION > 13)
+            viewer.sendBlockChange(loc, Material.OAK_SIGN.createBlockData());
+        else if (Main.VERSION > 12)
+            viewer.sendBlockChange(loc, Material.getMaterial("SIGN").createBlockData());
+        else
+            viewer.sendBlockChange(loc, Material.getMaterial("SIGN_POST"), (byte) 0);
+
         viewer.sendSignChange(loc, new String[] {defaultValue.toString(), "^^^^^^^^^^^^^^^", translation.format("sign." + formatKey + ".0"), translation.format("sign." + formatKey + ".1")});
 
         Triplet<Object> triplet = (Triplet<Object>) Main.NMS.openSign(viewer, loc);
@@ -141,7 +160,10 @@ public abstract class BaseInventory {
                         result = defaultValue;
                     }
 
-                    viewer.sendBlockChange(loc, loc.getBlock().getBlockData());
+                    if (Main.VERSION > 12)
+                        viewer.sendBlockChange(loc, loc.getBlock().getBlockData());
+                    else
+                        viewer.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
 
                     final T finalResult = result;
                     Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
@@ -161,5 +183,14 @@ public abstract class BaseInventory {
             runAfter.accept(t);
             return true;
         });
+    }
+
+    static {
+        try {
+            VIEW_CONSTRUCTOR = (Constructor<CustomInventoryView>) Class.forName("mc.dailycraft.advancedspyinventory.utils.CustomInventoryView" + (Main.VERSION <= 13 ? "Old" : "New"))
+                    .getConstructor(Player.class, BaseInventory.class);
+        } catch (NoSuchMethodException | ClassNotFoundException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 }

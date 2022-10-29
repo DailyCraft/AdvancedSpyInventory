@@ -46,7 +46,6 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
         this(viewer, entity, 2);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ItemStack getItem(int index) {
         if (inventorySize != null && inventorySize.hasSlot(index))
@@ -74,11 +73,12 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             if (type == EntityType.MAGMA_CUBE)
                 type = EntityType.SLIME;
 
-            DataItem<LivingEntity> dataItem = (DataItem<LivingEntity>) DATA_ITEMS.get(type);
+            @SuppressWarnings("unchecked")
+            DataItem<T> dataItem = (DataItem<T>) DATA_ITEMS.get(type);
 
             if (dataItem != null) {
                 try {
-                    return dataItem.get((EntityInventory<LivingEntity>) this, type, viewer);
+                    return dataItem.get(this, type, viewer);
                 } catch (NoPermissionException ignored) {
                 }
             }
@@ -125,7 +125,6 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
         return translation.format("interface.entity.title", entity.getName());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onClick(InventoryClickEvent event, int rawSlot) {
         if (inventorySize != null && inventorySize.hasSlot(rawSlot) && Permissions.ENTITY_MODIFY.has(viewer))
@@ -176,10 +175,11 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             if (type == EntityType.MAGMA_CUBE)
                 type = EntityType.SLIME;
 
-            DataItem<LivingEntity> dataItem = (DataItem<LivingEntity>) DATA_ITEMS.get(type);
+            @SuppressWarnings("unchecked")
+            DataItem<T> dataItem = (DataItem<T>) DATA_ITEMS.get(type);
 
             if (dataItem != null)
-                dataItem.click((EntityInventory<LivingEntity>) this, event, type, viewer);
+                dataItem.click(this, event, type, viewer);
         } else if (rawSlot == getSize() - 2) {
             if (Main.VERSION >= 14 && Permissions.hasPermissionModify(EntityType.PANDA, viewer, entity)) {
                 Panda panda = (Panda) entity;
@@ -198,10 +198,10 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             if (Permissions.ENTITY_MODIFY.has(viewer)) {
                 event.setCancelled(false);
 
-                shift(event, getSize() - 17, InformationItems.HELMET.warning(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.HEAD : current.getKey().getKey().endsWith("_helmet"));
-                shift(event, getSize() - 16, InformationItems.CHESTPLATE.warning(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.CHEST : current.getKey().getKey().endsWith("_chestplate"));
-                shift(event, getSize() - 15, InformationItems.LEGGINGS.warning(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.LEGS : current.getKey().getKey().endsWith("_leggings"));
-                shift(event, getSize() - 14, InformationItems.BOOTS.warning(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.FEET : current.getKey().getKey().endsWith("_boots"));
+                shift(event, getSize() - 17, EquipmentSlot.HEAD, item -> item::warning, "_helmet");
+                shift(event, getSize() - 16, EquipmentSlot.CHEST, item -> item::warning, "_chestplate");
+                shift(event, getSize() - 15, EquipmentSlot.LEGS, item -> item::warning, "_leggings");
+                shift(event, getSize() - 14, EquipmentSlot.FEET, item -> item::warning, "_boots");
             }
         }
     }
@@ -239,21 +239,6 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 Main.NMS.setOcelotTrusting(entity, !Main.NMS.isOcelotTrusting(entity));
         }));
 
-        DATA_ITEMS.put(EntityType.PHANTOM, new DataItem<Phantom>((inv, entity) ->
-                new ItemStackBuilder(Material.PHANTOM_MEMBRANE, inv.formatModify("generic.size", entity.getSize()))
-                        .get(),
-                (inv, event, entity) ->
-                        inv.openSign("size", entity.getSize(), 0, 64, Integer::parseInt, result -> {
-                            if (entity.isDead()) {
-                                inv.viewer.closeInventory();
-                                inv.viewer.sendMessage(inv.translation.format("interface.dead"));
-                                return false;
-                            } else {
-                                entity.setSize(result);
-                                return true;
-                            }
-                        })));
-
         DATA_ITEMS.put(EntityType.RABBIT, new DataItem<Rabbit>((inv, entity) ->
                 new ItemStackBuilder(Material.RABBIT_HIDE, inv.formatModify("generic.type"))
                         .enumLore(inv.translation, Rabbit.Type.values(), entity.getRabbitType(), EntityInventory::getRabbitColor, "interface.rabbit.type")
@@ -262,7 +247,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         ItemStackBuilder.enumLoreClick(event, Rabbit.Type.values(), entity.getRabbitType(), entity::setRabbitType)));
 
         DATA_ITEMS.put(EntityType.SHEEP, new DataItem<Sheep>((inv, entity) ->
-                new ItemStackBuilder(entity.getColor() != null ? Material.getMaterial(entity.getColor().name() + "_WOOL") : Material.WHITE_WOOL, inv.formatModify("generic.color_", inv.translation.formatColor(entity.getColor())))
+                new ItemStackBuilder(Main.VERSION > 12 ? new ItemStack(entity.getColor() != null ? Material.getMaterial(entity.getColor().name() + "_WOOL") : Material.WHITE_WOOL) : new ItemStack(Material.getMaterial("WOOL"), 1, entity.getColor().getWoolData()), inv.formatModify("generic.color_", inv.translation.formatColor(entity.getColor())))
                         .get(),
                 (inv, event, entity) ->
                         new SheepColorInventory(inv.viewer, entity, (CustomInventoryView) event.getView()).getView().open()));
@@ -283,7 +268,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         })));
 
         DATA_ITEMS.put(EntityType.SNOWMAN, new DataItem<Snowman>((inv, entity) ->
-                new ItemStackBuilder(Material.CARVED_PUMPKIN, inv.formatToggleYesNo(!entity.isDerp(), "interface.snow_golem.pumpkin"))
+                new ItemStackBuilder(Main.VERSION > 12 ? Material.CARVED_PUMPKIN : Material.PUMPKIN, inv.formatToggleYesNo(!entity.isDerp(), "interface.snow_golem.pumpkin"))
                         .get(),
                 (inv, event, entity) ->
                         entity.setDerp(!entity.isDerp())));
@@ -328,6 +313,25 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 (inv, event, entity) ->
                         entity.setAngry(!entity.isAngry())));
         //</editor-fold>
+
+        if (Main.VERSION >= 13) {
+            //<editor-fold desc="Data Items - 1.13+ versions" defaultstate="collapsed">
+            DATA_ITEMS.put(EntityType.PHANTOM, new DataItem<Phantom>((inv, entity) ->
+                    new ItemStackBuilder(Material.PHANTOM_MEMBRANE, inv.formatModify("generic.size", entity.getSize()))
+                            .get(),
+                    (inv, event, entity) ->
+                            inv.openSign("size", entity.getSize(), 0, 64, Integer::parseInt, result -> {
+                                if (entity.isDead()) {
+                                    inv.viewer.closeInventory();
+                                    inv.viewer.sendMessage(inv.translation.format("interface.dead"));
+                                    return false;
+                                } else {
+                                    entity.setSize(result);
+                                    return true;
+                                }
+                            })));
+            //</editor-fold>
+        }
 
         if (Main.VERSION >= 14) {
             //<editor-fold desc="Data Items - 1.14+ versions" defaultstate="collapsed">
@@ -423,6 +427,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
         }
     }
 
+    // 1.17+ only
     private static DyeColor getAxolotlColor(Axolotl.Variant variant) {
         if (variant == Axolotl.Variant.LUCY)
             return DyeColor.PINK;

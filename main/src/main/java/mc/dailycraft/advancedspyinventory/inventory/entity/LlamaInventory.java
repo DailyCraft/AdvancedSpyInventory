@@ -1,5 +1,6 @@
 package mc.dailycraft.advancedspyinventory.inventory.entity;
 
+import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.InformationItems;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
@@ -24,16 +25,29 @@ public class LlamaInventory extends HorseInventory<Llama> {
             if (entity.isCarryingChest())
                 return entity.getInventory().getItem(index + (index <= 1 + strength ? 0 : index <= 10 + strength ? strength - 9 : strength * 2 - 18));
             else
-                return new ItemStackBuilder(Material.BLACK_STAINED_GLASS_PANE, translation.format("interface.donkey.no_chest")).get();
+                return ItemStackBuilder.ofStainedGlassPane(DyeColor.BLACK, translation.format("interface.donkey.no_chest")).get();
         } else if (index > 1 && index <= 6 || index > 10 && index <= 15 || index > 19 && index <= 24)
-            return new ItemStackBuilder(Material.WHITE_STAINED_GLASS_PANE, "").get();
+            return ItemStackBuilder.ofStainedGlassPane(DyeColor.WHITE, "").get();
         else if (index == 30)
-            return getNonNull(entity.getInventory().getSaddle(), InformationItems.SADDLE.warning(translation));
+            return getNonNull(entity.getInventory().getItem(0), InformationItems.SADDLE.warning(translation));
         else if (index == 32)
-            return getNonNull(entity.getInventory().getItem(1), InformationItems.LLAMA_DECOR.get(translation));
+            return getNonNull(entity.getInventory().getDecor(), InformationItems.LLAMA_DECOR.get(translation));
         else if (index == getSize() - 3) {
             if (Permissions.hasPermission(EntityType.LLAMA, viewer)) {
-                return new ItemStackBuilder(entity.getColor() == Llama.Color.CREAMY ? Material.MILK_BUCKET : entity.getColor() == Llama.Color.GRAY ? Material.DIORITE : Material.getMaterial(entity.getColor().name() + "_WOOL"), formatModify("generic.color"))
+                ItemStack stack;
+
+                if (entity.getColor() == Llama.Color.CREAMY)
+                    stack = new ItemStack(Material.MILK_BUCKET);
+                else if (Main.VERSION > 12) {
+                    stack = new ItemStack(entity.getColor() == Llama.Color.GRAY ? Material.DIORITE : Material.getMaterial(entity.getColor().name() + "_WOOL"));
+                } else {
+                    if (entity.getColor() == Llama.Color.GRAY)
+                        stack = new ItemStack(Material.STONE, 1, (short) 3);
+                    else
+                        stack = new ItemStack(Material.getMaterial("WOOL"), 1, DyeColor.valueOf(entity.getColor().name()).getWoolData());
+                }
+
+                return new ItemStackBuilder(stack, formatModify("generic.color"))
                         .lore((entity.getColor() == Llama.Color.CREAMY ? "§2\u25ba " : "  ") + translation.format("generic.color.creamy"))
                         .lore((entity.getColor() == Llama.Color.WHITE ? "§2\u25ba " : "  ") + translation.formatColor(DyeColor.WHITE))
                         .lore((entity.getColor() == Llama.Color.BROWN ? "§2\u25ba " : "  ") + translation.formatColor(DyeColor.BROWN))
@@ -55,7 +69,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
                 entity.getInventory().setItem(0, stack);
         } else if (index == 32) {
             if (!stack.equals(InformationItems.LLAMA_DECOR.get(translation)))
-                entity.getInventory().setItem(1, stack);
+                entity.getInventory().setDecor(stack);
         } else
             super.setItem(index, stack);
     }
@@ -64,7 +78,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
     public void onClick(InventoryClickEvent event, int rawSlot) {
         if (rawSlot >= getSize() && Permissions.ENTITY_MODIFY.has(viewer)) {
             shift(event, 30, InformationItems.SADDLE.warning(translation), current -> current == Material.SADDLE);
-            shift(event, 32, InformationItems.LLAMA_DECOR.get(translation), current -> current.getKey().getKey().endsWith("_carpet"));
+            shift(event, 32, InformationItems.LLAMA_DECOR.get(translation), current -> Main.VERSION > 12 ? current.getKey().getKey().endsWith("_carpet") : current == Material.getMaterial("CARPET"));
         }
 
         if (entity.isCarryingChest()) {

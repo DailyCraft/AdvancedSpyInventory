@@ -20,11 +20,12 @@ public interface NMSHandler {
     default NamespacedKey worldKey(World world) {
         if (Main.VERSION > 18) // 1.19+ - Method implemented
             return world.getKey();
-        else // 1.15- - Worlds not save with a key
+        else // 1.15- - Worlds not saved with a key
             return NamespacedKey.minecraft(world.getName());
     }
 
     // To use CraftItemStack#asCraftMirror instead of CraftItemStack#asBukkitCopy
+    // 1.14- - Method not implemented in Bukkit
     ItemStack getEquipment(LivingEntity entity, EquipmentSlot slot);
 
     NMSData getData(UUID playerUuid);
@@ -55,12 +56,12 @@ public interface NMSHandler {
         return null;
     }
 
-    // 1.16-1.14 - Method not implemented in Bukkit
+    // 1.14-1.16 - Method not implemented in Bukkit
     default boolean isOcelotTrusting(Ocelot ocelot) {
         return ocelot.isTrusting();
     }
 
-    // 1.16-1.14 - Method not implemented in Bukkit
+    // 1.14-1.16 - Method not implemented in Bukkit
     default void setOcelotTrusting(Ocelot ocelot, boolean trusting) {
         ocelot.setTrusting(trusting);
     }

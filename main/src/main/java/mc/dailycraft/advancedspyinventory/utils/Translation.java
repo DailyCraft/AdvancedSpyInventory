@@ -16,9 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Translation {
-    private static final Map<String, Translation> instances = new HashMap<>();
+    private static final Map<String, Translation> INSTANCES = new HashMap<>();
     private static final String DEFAULT_LANGUAGE;
-    private static final Table<String, String, String> formatTable = HashBasedTable.create();
+    private static final Table<String, String, String> FORMAT_TABLE = HashBasedTable.create();
 
     private final String locale;
     private final Locale javaLocale;
@@ -29,7 +29,7 @@ public class Translation {
     }
 
     public static Translation of(String locale) {
-        Translation translation = instances.get(locale);
+        Translation translation = INSTANCES.get(locale);
         return translation == null ? of() : translation;
     }
 
@@ -38,16 +38,16 @@ public class Translation {
     }
 
     public static Translation of() {
-        Translation translation = instances.get(DEFAULT_LANGUAGE);
-        return translation != null ? translation : instances.get("en_us");
+        Translation translation = INSTANCES.get(DEFAULT_LANGUAGE);
+        return translation != null ? translation : INSTANCES.get("en_us");
     }
 
     public String format(String key, Object... parameters) {
         String s;
 
-        if ((s = formatTable.get(locale, key)) == null)
-            if ((s = formatTable.get(DEFAULT_LANGUAGE, key)) == null)
-                if ((s = formatTable.get("en_us", key)) == null)
+        if ((s = FORMAT_TABLE.get(locale, key)) == null)
+            if ((s = FORMAT_TABLE.get(DEFAULT_LANGUAGE, key)) == null)
+                if ((s = FORMAT_TABLE.get("en_us", key)) == null)
                     return key;
 
         try {
@@ -97,8 +97,8 @@ public class Translation {
     static {
         DEFAULT_LANGUAGE = Main.getInstance().getConfig().getString("default_language").toLowerCase();
 
-        formatTable.clear();
-        instances.clear();
+        FORMAT_TABLE.clear();
+        INSTANCES.clear();
 
         File langDir = new File(Main.getInstance().getDataFolder(), "lang");
 
@@ -110,7 +110,7 @@ public class Translation {
         for (String lang : new String[] {"en_us", "fr_fr"}) {
             if (Main.getInstance().getConfig().getBoolean("dynamic_language") || lang.equals(DEFAULT_LANGUAGE)) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(Translation.class.getClassLoader().getResourceAsStream("lang/" + lang + ".json"), StandardCharsets.UTF_8))) {
-                    initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> formatTable.put(lang, key, value));
+                    initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(lang, key, value));
                 } catch (IOException exception) {
                     exception.printStackTrace();
                 }
@@ -122,14 +122,14 @@ public class Translation {
 
             if (Main.getInstance().getConfig().getBoolean("dynamic_language") || lang.equals(DEFAULT_LANGUAGE)) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-                    initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> formatTable.put(lang, key, value));
+                    initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(lang, key, value));
                 } catch (IOException exception) {
                     exception.printStackTrace();
                 }
             }
         });
 
-        formatTable.rowKeySet().forEach(lang -> instances.put(lang, new Translation(lang)));
+        FORMAT_TABLE.rowKeySet().forEach(lang -> INSTANCES.put(lang, new Translation(lang)));
     }
 
     public static String dyeColorToChat(DyeColor color) {
@@ -141,6 +141,9 @@ public class Translation {
 
             return sb.toString();
         } else {
+            if (Main.VERSION < 13 && color == DyeColor.valueOf("SILVER"))
+                return ChatColor.GRAY.toString();
+
             switch (color) {
                 case WHITE:
                 default:

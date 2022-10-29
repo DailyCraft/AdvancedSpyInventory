@@ -45,7 +45,7 @@ public class NMSContainer implements IInventory {
     @Nullable
     @Override
     public IChatBaseComponent getCustomName() {
-        return new ChatComponentText(container.getTitle());
+        return getDisplayName();
     }
 
     @Override

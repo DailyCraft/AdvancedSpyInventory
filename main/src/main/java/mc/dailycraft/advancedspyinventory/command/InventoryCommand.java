@@ -30,7 +30,7 @@ public class InventoryCommand extends PlayerTabExecutor {
             if (args.length == 1) {
                 UUID targetUuid = null;
 
-                if (Main.VERSION >= 13) {
+                if (Main.VERSION > 12) {
                     try {
                         List<Entity> entities = Bukkit.selectEntities(sender, args[0]);
 
@@ -96,18 +96,18 @@ public class InventoryCommand extends PlayerTabExecutor {
                 Player player = (Player) sender;
                 Entity target = null;
 
-                if (Main.VERSION < 15) {
+                if (Main.VERSION > 14) {
+                    RayTraceResult rayTrace = player.getWorld().rayTrace(player.getEyeLocation(), player.getLocation().getDirection(), 6, FluidCollisionMode.ALWAYS, false, 0, entity -> entity != player);
+
+                    if (rayTrace != null)
+                        target = rayTrace.getHitEntity();
+                } else {
                     for (Entity other : player.getNearbyEntities(6, 6, 6)) {
                         Vector n = other.getLocation().toVector().subtract(player.getLocation().toVector());
                         if (player.getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < 1 && n.normalize().dot(player.getLocation().getDirection().normalize()) >= 0)
                             if (target == null || target.getLocation().distanceSquared(player.getLocation()) > other.getLocation().distanceSquared(player.getLocation()))
                                 target = other;
                     }
-                } else {
-                    RayTraceResult rayTrace = player.getWorld().rayTrace(player.getEyeLocation(), player.getLocation().getDirection(), 6, FluidCollisionMode.ALWAYS, false, 0, entity -> entity != player);
-
-                    if (rayTrace != null)
-                        target = rayTrace.getHitEntity();
                 }
 
                 if (target != null && player.hasLineOfSight(target) && target.getUniqueId().toString().toLowerCase().startsWith(args[args.length - 1].toLowerCase()))

@@ -12,8 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class PlayerData implements AnimalTamer {
@@ -59,10 +57,9 @@ public class PlayerData implements AnimalTamer {
     }
 
     public float getMaxHealth() {
-        if (isOnline())
-            return (float) getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-
-        return nms.getMaxHealth();
+        return isOnline()
+                ? (float) getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()
+                : nms.getMaxHealth();
     }
 
     public void setMaxHealth(float maxHealth) {
@@ -76,20 +73,22 @@ public class PlayerData implements AnimalTamer {
         if (isOnline())
             return getPlayer().getLocation();
 
-        List<Double> position = nms.getDoubleList("Pos");
-        List<Float> rotation = nms.getFloatList("Rotation");
+        double[] position = nms.getList("Pos");
+        double[] rotation = nms.getList("Rotation");
 
         return new Location(
-                Bukkit.getWorlds().stream().filter(world -> world.getUID().getLeastSignificantBits() == nms.getLong("WorldUUIDLeast") && world.getUID().getMostSignificantBits() == nms.getLong("WorldUUIDMost")).findFirst().orElseGet(() -> Bukkit.getWorlds().get(0)),
-                position.get(0), position.get(1), position.get(2), rotation.get(0), rotation.get(1));
+                Bukkit.getWorlds().stream()
+                        .filter(world -> world.getUID().getLeastSignificantBits() == nms.getLong("WorldUUIDLeast") && world.getUID().getMostSignificantBits() == nms.getLong("WorldUUIDMost"))
+                        .findFirst().orElse(Bukkit.getWorlds().get(0)),
+                position[0], position[1], position[2], (float) rotation[0], (float) rotation[1]);
     }
 
     public void setLocation(Location location) {
         if (isOnline())
             getPlayer().teleport(location);
         else {
-            nms.putDoubleList("Pos", Arrays.asList(location.getX(), location.getY(), location.getZ()));
-            nms.putFloatList("Rotation", Arrays.asList(location.getYaw(), location.getPitch()));
+            nms.putList("Pos", new double[] {location.getX(), location.getY(), location.getZ()}, false);
+            nms.putList("Rotation", new double[] {location.getYaw(), location.getPitch()}, true);
             nms.putLong("WorldUUIDLeast", location.getWorld().getUID().getLeastSignificantBits());
             nms.putLong("WorldUUIDMost", location.getWorld().getUID().getMostSignificantBits());
 

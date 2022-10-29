@@ -16,7 +16,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -94,29 +93,18 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
-    public List<Double> getDoubleList(String id) {
-        return getData().getList(id, CraftMagicNumbers.NBT.TAG_DOUBLE).stream().map(tag -> ((DoubleTag) tag).getAsDouble()).toList();
+    public double[] getList(String id) {
+        return ((ListTag) getData().get(id)).stream().mapToDouble(t -> ((NumericTag) t).getAsDouble()).toArray();
     }
 
     @Override
-    public void putDoubleList(String id, List<Double> value) {
+    public void putList(String id, double[] value, boolean isFloat) {
         CompoundTag data = getData();
         ListTag tag = new ListTag();
-        value.forEach(v -> tag.add(DoubleTag.valueOf(v)));
-        data.put(id, tag);
-        saveData(data);
-    }
 
-    @Override
-    public List<Float> getFloatList(String id) {
-        return getData().getList(id, CraftMagicNumbers.NBT.TAG_FLOAT).stream().map(tag -> ((FloatTag) tag).getAsFloat()).toList();
-    }
+        for (double v : value)
+            tag.add(isFloat ? FloatTag.valueOf((float) v) : DoubleTag.valueOf(v));
 
-    @Override
-    public void putFloatList(String id, List<Float> value) {
-        CompoundTag data = getData();
-        ListTag tag = new ListTag();
-        value.forEach(v -> tag.add(FloatTag.valueOf(v)));
         data.put(id, tag);
         saveData(data);
     }

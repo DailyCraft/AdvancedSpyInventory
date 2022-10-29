@@ -12,10 +12,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     public NMSData(UUID playerUuid) {
@@ -71,29 +69,18 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
-    public List<Double> getDoubleList(String id) {
-        return getData().getList(id, CraftMagicNumbers.NBT.TAG_DOUBLE).stream().map(tag -> ((NBTTagDouble) tag).asDouble()).collect(Collectors.toList());
+    public double[] getList(String id) {
+        return ((NBTTagList) getData().get(id)).stream().mapToDouble(t -> ((NBTNumber) t).asDouble()).toArray();
     }
 
     @Override
-    public void putDoubleList(String id, List<Double> value) {
+    public void putList(String id, double[] value, boolean isFloat) {
         NBTTagCompound data = getData();
         NBTTagList tag = new NBTTagList();
-        value.forEach(v -> tag.add(NBTTagDouble.a(v)));
-        data.set(id, tag);
-        saveData(data);
-    }
 
-    @Override
-    public List<Float> getFloatList(String id) {
-        return getData().getList(id, CraftMagicNumbers.NBT.TAG_FLOAT).stream().map(tag -> ((NBTTagFloat) tag).asFloat()).collect(Collectors.toList());
-    }
+        for (double v : value)
+            tag.add(isFloat ? NBTTagFloat.a((float) v) : NBTTagDouble.a(v));
 
-    @Override
-    public void putFloatList(String id, List<Float> value) {
-        NBTTagCompound data = getData();
-        NBTTagList tag = new NBTTagList();
-        value.forEach(v -> tag.add(NBTTagFloat.a(v)));
         data.set(id, tag);
         saveData(data);
     }

@@ -2,7 +2,7 @@ package mc.dailycraft.advancedspyinventory.inventory.entity;
 
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
-import org.bukkit.Material;
+import org.bukkit.DyeColor;
 import org.bukkit.entity.ChestedHorse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,7 +19,7 @@ public class DonkeyInventory extends HorseInventory<ChestedHorse> {
             if (entity.isCarryingChest())
                 return entity.getInventory().getItem(index - (index <= 6 ? 0 : index <= 15 ? 4 : 8));
             else
-                return new ItemStackBuilder(Material.BLACK_STAINED_GLASS_PANE, translation.format("interface.donkey.no_chest")).get();
+                return ItemStackBuilder.ofStainedGlassPane(DyeColor.BLACK, translation.format("interface.donkey.no_chest")).get();
         }
 
         return super.getItem(index);

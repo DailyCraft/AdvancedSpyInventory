@@ -40,7 +40,14 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder(ItemStack stack, String displayName) {
         this(stack);
-        modifyMeta(meta -> meta.setDisplayName(displayName != null ? ChatColor.RESET.toString() + ChatColor.WHITE + displayName : null));
+        displayName(displayName);
+    }
+
+    public static ItemStackBuilder ofStainedGlassPane(DyeColor color, String displayName) {
+        if (Main.VERSION > 12)
+            return new ItemStackBuilder(Material.getMaterial(color.name() + "_STAINED_GLASS_PANE"), displayName);
+        else
+            return new ItemStackBuilder(new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"), 1, color.getWoolData()), displayName);
     }
 
     public ItemStackBuilder(Material material, String displayName) {
@@ -48,7 +55,8 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder(String headOwner, String displayName) {
-        this(Material.PLAYER_HEAD, displayName);
+        stack = Main.VERSION > 12 ? new ItemStack(Material.PLAYER_HEAD) : new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 3);
+        displayName(displayName);
 
         this.<SkullMeta>modifyMeta(meta -> {
             try {
@@ -97,6 +105,10 @@ public class ItemStackBuilder {
             meta.setBasePotionData(new PotionData(potionType));
             meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
         });
+    }
+
+    public ItemStackBuilder displayName(String displayName) {
+        return modifyMeta(meta -> meta.setDisplayName(displayName != null ? ChatColor.RESET.toString() + ChatColor.WHITE + displayName : null));
     }
 
     public ItemStackBuilder lore(String line, boolean newLine) {

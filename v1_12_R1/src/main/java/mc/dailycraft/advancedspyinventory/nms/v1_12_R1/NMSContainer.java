@@ -1,14 +1,13 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_13_R2;
+package mc.dailycraft.advancedspyinventory.nms.v1_12_R1;
 
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -33,8 +32,8 @@ public class NMSContainer implements IInventory {
     }
 
     @Override
-    public IChatBaseComponent getDisplayName() {
-        return new ChatComponentText(container.getTitle());
+    public String getName() {
+        return container.getTitle();
     }
 
     @Override
@@ -42,10 +41,9 @@ public class NMSContainer implements IInventory {
         return true;
     }
 
-    @Nullable
     @Override
-    public IChatBaseComponent getCustomName() {
-        return getDisplayName();
+    public IChatBaseComponent getScoreboardDisplayName() {
+        return new ChatComponentText(getName());
     }
 
     @Override
@@ -54,7 +52,7 @@ public class NMSContainer implements IInventory {
     }
 
     @Override
-    public boolean P_() {
+    public boolean x_() {
         return false;
     }
 

@@ -1,22 +1,43 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_15_R1;
+package mc.dailycraft.advancedspyinventory.nms.v1_12_R1;
 
 import mc.dailycraft.advancedspyinventory.Main;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
 public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
+    private static final Function<NBTTagList, List<NBTBase>> GET_LIST;
+
+    static {
+        try {
+            Field list = NBTTagList.class.getDeclaredField("list");
+            list.setAccessible(true);
+
+            GET_LIST = tag -> {
+                try {
+                    return (List<NBTBase>) list.get(tag);
+                } catch (IllegalAccessException exception) {
+                    throw new RuntimeException(exception);
+                }
+            };
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public NMSData(UUID playerUuid) {
         super(playerUuid);
     }
@@ -71,7 +92,12 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public double[] getList(String id) {
-        return ((NBTTagList) getData().get(id)).stream().mapToDouble(t -> ((NBTNumber) t).asDouble()).toArray();
+        return GET_LIST.apply((NBTTagList) getData().get(id)).stream().mapToDouble(t -> {
+            if (t instanceof NBTTagFloat)
+                return ((NBTTagFloat) t).asDouble();
+            else
+                return ((NBTTagDouble) t).asDouble();
+        }).toArray();
     }
 
     @Override
@@ -80,7 +106,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
         NBTTagList tag = new NBTTagList();
 
         for (double v : value)
-            tag.add(isFloat ? NBTTagFloat.a((float) v) : NBTTagDouble.a(v));
+            tag.add(isFloat ? new NBTTagFloat((float) v) : new NBTTagDouble(v));
 
         data.set(id, tag);
         saveData(data);
@@ -91,8 +117,8 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
         ItemStack[] array = new ItemStack[size];
         Arrays.fill(array, new ItemStack(Material.AIR));
 
-        getData().getList(id, CraftMagicNumbers.NBT.TAG_COMPOUND).stream().map(tag -> (NBTTagCompound) tag)
-                .forEach(tag -> array[slotConversion.apply((int) tag.getByte("Slot"))] = CraftItemStack.asBukkitCopy(net.minecraft.server.v1_15_R1.ItemStack.a(tag)));
+        GET_LIST.apply(getData().getList(id, CraftMagicNumbers.NBT.TAG_COMPOUND)).stream().map(tag -> (NBTTagCompound) tag)
+                .forEach(tag -> array[slotConversion.apply((int) tag.getByte("Slot"))] = CraftItemStack.asBukkitCopy(new net.minecraft.server.v1_12_R1.ItemStack(tag)));
 
         return array;
     }
@@ -104,7 +130,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
         NBTTagList list = data.getList(id, CraftMagicNumbers.NBT.TAG_COMPOUND);
 
         for (int i = 0; i < list.size(); i++) {
-            if (list.getCompound(i).getByte("Slot") == slot) {
+            if (list.get(i).getByte("Slot") == slot) {
                 list.remove(i);
                 break;
             }
@@ -118,7 +144,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public float getMaxHealth() {
-        for (NBTBase tag : getData().getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND))
+        for (NBTBase tag : GET_LIST.apply(getData().getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND)))
             if (((NBTTagCompound) tag).getString("Name").equals("generic.maxHealth"))
                 return ((NBTTagCompound) tag).getFloat("Base");
 
@@ -128,7 +154,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     @Override
     public void setMaxHealth(float maxHealth) {
         NBTTagCompound data = getData();
-        NBTTagList list = data.getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND);
+        List<NBTBase> list = GET_LIST.apply(data.getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND));
 
         for (NBTBase nbt : list) {
             if (((NBTTagCompound) nbt).getString("Name").equals("generic.maxHealth")) {

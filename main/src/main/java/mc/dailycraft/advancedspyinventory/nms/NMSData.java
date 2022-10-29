@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -35,13 +34,9 @@ public abstract class NMSData {
 
     public abstract void putString(String id, String value);
 
-    public abstract List<Double> getDoubleList(String id);
+    public abstract double[] getList(String id);
 
-    public abstract void putDoubleList(String id, List<Double> value);
-
-    public abstract List<Float> getFloatList(String id);
-
-    public abstract void putFloatList(String id, List<Float> value);
+    public abstract void putList(String id, double[] value, boolean isFloat);
 
     public abstract ItemStack[] getArray(String id, int size, Function<Integer, Integer> slotConversion);
 

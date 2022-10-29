@@ -77,7 +77,7 @@ public class PlayerInventory extends BaseInventory {
 
             case 51:
                 if (Permissions.PLAYER_XP.has(viewer))
-                    return new ItemStackBuilder(Material.EXPERIENCE_BOTTLE, translation.format("interface.player.experience", target.getExperience()) + (Permissions.PLAYER_XP_MODIFY.has(viewer) ? " " + translation.format("generic.modify") : "")).get();
+                    return new ItemStackBuilder(Main.VERSION > 12 ? Material.EXPERIENCE_BOTTLE : Material.getMaterial("EXP_BOTTLE"), translation.format("interface.player.experience", target.getExperience()) + (Permissions.PLAYER_XP_MODIFY.has(viewer) ? " " + translation.format("generic.modify") : "")).get();
 
                 break;
 
@@ -216,10 +216,10 @@ public class PlayerInventory extends BaseInventory {
                 if (Permissions.PLAYER_MODIFY.has(viewer)) {
                     event.setCancelled(false);
 
-                    shift(event, 37, InformationItems.HELMET.get(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.HEAD : current.getKey().getKey().endsWith("_helmet"));
-                    shift(event, 38, InformationItems.CHESTPLATE.get(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.CHEST : current.getKey().getKey().endsWith("_chestplate"));
-                    shift(event, 39, InformationItems.LEGGINGS.get(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.LEGS : current.getKey().getKey().endsWith("_leggings"));
-                    shift(event, 40, InformationItems.BOOTS.get(translation), current -> Main.VERSION > 16 ? current.getEquipmentSlot() == EquipmentSlot.FEET : current.getKey().getKey().endsWith("_boots"));
+                    shift(event, 37, EquipmentSlot.HEAD, item -> item::get, "_helmet");
+                    shift(event, 38, EquipmentSlot.CHEST, item -> item::get, "_chestplate");
+                    shift(event, 39, EquipmentSlot.LEGS, item -> item::get, "_leggings");
+                    shift(event, 40, EquipmentSlot.FEET, item -> item::get, "_boots");
                 }
             }
         }
