@@ -97,7 +97,7 @@ public class InventoryCommand extends PlayerTabExecutor {
                 Entity target = null;
 
                 if (Main.VERSION > 14) {
-                    RayTraceResult rayTrace = player.getWorld().rayTrace(player.getEyeLocation(), player.getLocation().getDirection(), 6, FluidCollisionMode.ALWAYS, false, 0, entity -> entity != player);
+                    RayTraceResult rayTrace = player.getWorld().rayTrace(player.getEyeLocation(), player.getLocation().getDirection(), 6, FluidCollisionMode.ALWAYS, false, 0, entity -> entity != player && entity instanceof LivingEntity);
 
                     if (rayTrace != null)
                         target = rayTrace.getHitEntity();

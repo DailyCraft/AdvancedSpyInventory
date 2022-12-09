@@ -7,6 +7,7 @@ import mc.dailycraft.advancedspyinventory.utils.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -98,7 +99,7 @@ public abstract class BaseInventory {
     }
 
     protected void replaceItem(InventoryClickEvent event, ItemStack informationItem) {
-        if (event.getCurrentItem() != null && event.getCurrentItem().equals(informationItem) && (event.getCursor() == null || event.getCursor().getType() == Material.AIR)) {
+        if (event.getCurrentItem() != null && event.getCurrentItem().equals(informationItem) && (event.getCursor() == null || event.getCursor().getType() == Material.AIR) || (event.getCurrentItem().equals(informationItem) && event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
             event.setCancelled(true);
             return;
         }

@@ -34,7 +34,9 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
 
     public EntityInventory(Player viewer, T entity, int rows) {
         super(viewer, rows);
-        inventorySize = (this.entity = entity) instanceof InventoryHolder ? InventorySize.values()[((InventoryHolder) entity).getInventory().getSize() - 1] : null;
+
+        if (!((this.entity = entity) instanceof AbstractHorse))
+            inventorySize = entity instanceof InventoryHolder ? InventorySize.values()[((InventoryHolder) entity).getInventory().getSize() - 1] : null;
     }
 
     @Override
