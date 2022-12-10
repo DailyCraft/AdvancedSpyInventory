@@ -73,7 +73,7 @@
       "yaw": "Yaw : §e%,.2f",
       "pitch": "Pitch : §e%,.02f",
       "teleport": "§6Se téléporter §7(Clic)",
-      "teleport.to_me": "§6 Le téléporter à moi §7(Shift + Clic)",
+      "teleport.to_me": "§6Le téléporter à moi §7(Shift + Clic)",
       "tamed": "Dompteur : §a%s",
       "untamed": "Indompté",
       "modify": "§cVous n'avez pas la permission de modifier l'inventaire",
