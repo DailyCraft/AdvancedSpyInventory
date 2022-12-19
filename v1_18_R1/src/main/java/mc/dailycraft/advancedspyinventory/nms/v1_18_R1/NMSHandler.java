@@ -1,16 +1,17 @@
 package mc.dailycraft.advancedspyinventory.nms.v1_18_R1;
 
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
+import mc.dailycraft.advancedspyinventory.utils.ResourceKey;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R1.CraftEquipmentSlot;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
@@ -20,7 +21,6 @@ import org.bukkit.craftbukkit.v1_18_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_18_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -37,8 +37,9 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     private static Field matchingStatesField = null;
 
     @Override
-    public NamespacedKey worldKey(World world) {
-        return CraftNamespacedKey.fromMinecraft(((CraftWorld) world).getHandle().dimension().location());
+    public ResourceKey worldKey(World world) {
+        return ResourceKey.fromOther(((CraftWorld) world).getHandle().dimension().location(),
+                ResourceLocation::getNamespace, ResourceLocation::getPath);
     }
 
     @Override

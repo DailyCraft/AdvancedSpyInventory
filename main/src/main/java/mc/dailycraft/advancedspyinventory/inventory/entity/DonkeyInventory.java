@@ -6,6 +6,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.ChestedHorse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 public class DonkeyInventory extends HorseInventory<ChestedHorse> {
@@ -13,11 +14,12 @@ public class DonkeyInventory extends HorseInventory<ChestedHorse> {
         super(viewer, entity, 6);
     }
 
+    // Casting is mandatory for 1.12- support.
     @Override
     public ItemStack getItem(int index) {
         if (index > 1 && index <= 6 || index > 10 && index <= 15 || index > 19 && index <= 24) {
             if (entity.isCarryingChest())
-                return entity.getInventory().getItem(index - (index <= 6 ? 0 : index <= 15 ? 4 : 8));
+                return ((InventoryHolder) entity).getInventory().getItem(index - (index <= 6 ? 0 : index <= 15 ? 4 : 8));
             else
                 return ItemStackBuilder.ofStainedGlassPane(DyeColor.BLACK, translation.format("interface.donkey.no_chest")).get();
         }
@@ -25,10 +27,11 @@ public class DonkeyInventory extends HorseInventory<ChestedHorse> {
         return super.getItem(index);
     }
 
+    // Casting is mandatory for 1.12- support.
     @Override
     public void setItem(int index, ItemStack stack) {
         if (entity.isCarryingChest() && (index > 1 && index <= 6 || index > 10 && index <= 15 || index > 19 && index <= 24))
-            entity.getInventory().setItem(index - (index <= 6 ? 0 : index <= 15 ? 4 : 8), stack);
+            ((InventoryHolder) entity).getInventory().setItem(index - (index <= 6 ? 0 : index <= 15 ? 4 : 8), stack);
 
         super.setItem(index, stack);
     }

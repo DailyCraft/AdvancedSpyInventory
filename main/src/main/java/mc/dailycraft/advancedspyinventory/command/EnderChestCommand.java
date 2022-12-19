@@ -1,5 +1,6 @@
 package mc.dailycraft.advancedspyinventory.command;
 
+import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.EnderChestInventory;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
@@ -34,7 +35,7 @@ public class EnderChestCommand extends PlayerTabExecutor {
                         targetUuid = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
                     }
 
-                    Entity targetEntity = Bukkit.getEntity(targetUuid);
+                    Entity targetEntity = Main.NMS.getEntity(targetUuid);
 
                     if (targetEntity == null || targetEntity instanceof Player) {
                         if (Bukkit.getOfflinePlayer(targetUuid).isOnline() || Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore())

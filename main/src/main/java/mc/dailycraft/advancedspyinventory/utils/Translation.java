@@ -34,7 +34,7 @@ public class Translation {
     }
 
     public static Translation of(Player player) {
-        return of(player.getLocale());
+        return of(Main.NMS.getPlayerLocale(player));
     }
 
     public static Translation of() {

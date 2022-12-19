@@ -52,7 +52,7 @@ public class InventoryCommand extends PlayerTabExecutor {
                     }
                 }
 
-                Entity targetEntity = Bukkit.getEntity(targetUuid);
+                Entity targetEntity = Main.NMS.getEntity(targetUuid);
 
                 if (targetEntity == null || targetEntity.getType() == EntityType.PLAYER) {
                     if (Permissions.PLAYER_VIEW.has(player)) {

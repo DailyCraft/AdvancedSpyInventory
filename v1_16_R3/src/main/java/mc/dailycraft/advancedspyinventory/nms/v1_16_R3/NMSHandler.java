@@ -1,11 +1,11 @@
 package mc.dailycraft.advancedspyinventory.nms.v1_16_R3;
 
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
+import mc.dailycraft.advancedspyinventory.utils.ResourceKey;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftEquipmentSlot;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -16,7 +16,6 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
@@ -37,8 +36,9 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     private static Method isTrustingMethod = null, setTrustingMethod = null;
 
     @Override
-    public NamespacedKey worldKey(World world) {
-        return CraftNamespacedKey.fromMinecraft(((CraftWorld) world).getHandle().getDimensionKey().a());
+    public ResourceKey worldKey(World world) {
+        return ResourceKey.fromOther(((CraftWorld) world).getHandle().getDimensionKey().a(),
+                MinecraftKey::getNamespace, MinecraftKey::getKey);
     }
 
     @Override

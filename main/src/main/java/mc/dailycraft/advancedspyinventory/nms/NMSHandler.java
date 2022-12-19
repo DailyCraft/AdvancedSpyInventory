@@ -2,10 +2,11 @@ package mc.dailycraft.advancedspyinventory.nms;
 
 import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
+import mc.dailycraft.advancedspyinventory.utils.ResourceKey;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
@@ -17,11 +18,11 @@ import java.util.UUID;
 
 public interface NMSHandler {
     // 1.16-1.18 - Method not implemented in Bukkit.
-    default NamespacedKey worldKey(World world) {
+    default ResourceKey worldKey(World world) {
         if (Main.VERSION > 18) // 1.19+ - Method implemented
-            return world.getKey();
+            return new ResourceKey(world.getKey());
         else // 1.15- - Worlds not saved with a key
-            return NamespacedKey.minecraft(world.getName());
+            return ResourceKey.minecraft(world.getName());
     }
 
     // To use CraftItemStack#asCraftMirror instead of CraftItemStack#asBukkitCopy
@@ -69,5 +70,15 @@ public interface NMSHandler {
     // 1.16- - Method not implemented in Bukkit
     default void dropItem(Player player, boolean dropAll) {
         player.dropItem(dropAll);
+    }
+
+    // 1.11- - Method not implemented in Bukkit
+    default String getPlayerLocale(Player player) {
+        return player.getLocale();
+    }
+
+    // 1.11- - Method not implemented in Bukkit
+    default Entity getEntity(UUID uuid) {
+        return Bukkit.getEntity(uuid);
     }
 }

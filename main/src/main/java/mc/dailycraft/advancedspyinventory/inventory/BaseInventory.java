@@ -74,7 +74,7 @@ public abstract class BaseInventory {
     }
 
     protected void shift(InventoryClickEvent event, int slot, EquipmentSlot equipmentSlot, Function<InformationItems, Function<Translation, ItemStack>> informationItem, String orEndsWith) {
-        shift(event, slot, informationItem.apply(InformationItems.of(equipmentSlot)).apply(Translation.of(((Player) event.getWhoClicked()).getLocale())), current -> {
+        shift(event, slot, informationItem.apply(InformationItems.of(equipmentSlot)).apply(Translation.of((Player) event.getWhoClicked())), current -> {
             if (Main.VERSION > 16)
                 return current.getEquipmentSlot() == equipmentSlot;
             else
@@ -84,7 +84,7 @@ public abstract class BaseInventory {
 
     protected ItemStack getLocationItemStack(Location location, boolean isPlayer) {
         String entityKey = "interface.entity.";
-        NamespacedKey worldKey = Main.NMS.worldKey(location.getWorld());
+        ResourceKey worldKey = Main.NMS.worldKey(location.getWorld());
 
         return new ItemStackBuilder(Material.ARROW, translation.format(entityKey + "location"))
                 .lore(translation.format(entityKey + "world", Main.VERSION < 16 ? worldKey.getKey() : worldKey, translation.format(entityKey + "world.environment." + location.getWorld().getEnvironment().name().toLowerCase())))
