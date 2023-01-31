@@ -85,6 +85,7 @@ public class PlayerInventory extends BaseInventory {
                 if (Permissions.PLAYER_FOOD.has(viewer)) {
                     return new ItemStackBuilder(Material.COOKED_BEEF, translation.format("interface.player.food.level", target.getFoodLevel()) + (Permissions.PLAYER_FOOD_MODIFY.has(viewer) ? " " + translation.format("generic.modify.left") : ""))
                             .lore(ChatColor.WHITE + translation.format("interface.player.food.saturation", target.getFoodSaturation()) + (Permissions.PLAYER_FOOD_MODIFY.has(viewer) ? " " + translation.format("generic.modify.right") : ""))
+                            .lore(ChatColor.WHITE + translation.format("interface.player.food.exhaustion", target.getExhaustion()) + (Permissions.PLAYER_FOOD_MODIFY.has(viewer) ? " " + translation.format("generic.modify.shift") : ""))
                             .get();
                 }
 
@@ -202,7 +203,9 @@ public class PlayerInventory extends BaseInventory {
                 openSign("experience", target.getExperience(), 0f, Float.MAX_VALUE, Float::parseFloat, target::setExperience);
         } else if (rawSlot == getSize() - 2) {
             if (Permissions.PLAYER_FOOD_MODIFY.has(viewer)) {
-                if (event.isLeftClick())
+                if (event.getClick().isShiftClick())
+                    openSign("food.exhaustion", target.getExhaustion(), 0f, Float.MAX_VALUE, Float::parseFloat, target::setExhaustion);
+                else if (event.getClick().isLeftClick())
                     openSign("food.level", target.getFoodLevel(), 0, Integer.MAX_VALUE, Integer::parseInt, target::setFoodLevel);
                 else if (event.isRightClick())
                     openSign("food.saturation", target.getFoodSaturation(), 0f, Float.MAX_VALUE, Float::parseFloat, target::setFoodSaturation);

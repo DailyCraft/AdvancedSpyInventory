@@ -30,7 +30,8 @@
     "modify": {
       "": "§7(Modifier : §eClic§7)",
       "left": "§7(Modifier : §eClic gauche§7)",
-      "right": "§7(Modifier : §eClic droit§7)"
+      "right": "§7(Modifier : §eClic droit§7)",
+      "shift": "§7(Modifier : §eShift §7+ §eClic§7)"
     },
     "toggle": {
       "": "§7(Changer : §eClic§7)",
@@ -89,6 +90,7 @@
       "experience": "Expérience : §a%,.2f",
       "food.level": "Niveau de nourriture : §a%,d",
       "food.saturation": "Saturation : §a%,.2f",
+      "food.exhaustion": "Épuisement : §a%,.3f",
       "enderchest": "Ouvrir son §5coffre de l'ender",
       "own": "§cVous ne pouvez pas modifier votre propre inventaire"
     },
@@ -211,6 +213,7 @@
     "experience": ["§1Saisir un nouveau", "§1§lnombre d'experience"],
     "food.level": ["§1Saisir un nouveau", "§1§lniveau de nourriture"],
     "food.saturation": ["§1Saisir une nouvelle", "§1§lsaturation alimentaire"],
+    "food.exhaustion": ["§1Saisir un nouveau", "§1§lépuisement"],
     "size": ["§1Entrer une nouvelle", "§1§ltaille"]
   },
 

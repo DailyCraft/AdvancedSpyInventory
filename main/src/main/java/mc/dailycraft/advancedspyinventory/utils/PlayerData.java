@@ -176,6 +176,17 @@ public class PlayerData implements AnimalTamer {
             nms.putFloat("foodSaturationLevel", saturation);
     }
 
+    public float getExhaustion() {
+        return isOnline() ? getPlayer().getExhaustion() : nms.getFloat("foodExhaustionLevel");
+    }
+
+    public void setExhaustion(float exhaustion) {
+        if (isOnline())
+            getPlayer().setExhaustion(exhaustion);
+        else
+            nms.putFloat("foodExhaustionLevel", exhaustion);
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof AnimalTamer ? getUniqueId() == ((AnimalTamer) obj).getUniqueId() : getOfflinePlayer().equals(obj);

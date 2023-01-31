@@ -30,7 +30,8 @@
     "modify": {
       "": "§7(Modify: §eClick§7)",
       "left": "§7(Modify: §eLeft Click§7)",
-      "right": "§7(Modify: §eRight Click§7)"
+      "right": "§7(Modify: §eRight Click§7)",
+      "shift": "§7(Modify: §eShift §7+ §eClick§7)"
     },
     "toggle": {
       "": "§7(Toggle: §eClick§7)",
@@ -89,6 +90,7 @@
       "experience": "Experience: §a%,.2f",
       "food.level": "Food Level: §a%,d",
       "food.saturation": "Saturation: §a%,.2f",
+      "food.exhaustion": "Exhaustion: §a%,.3f",
       "enderchest": "Open his §5ender chest",
       "own": "§cYou cannot modify your own inventory"
     },
@@ -211,6 +213,7 @@
     "experience": ["§1Enter new", "§1§lexperience amount"],
     "food.level": ["§1Enter new", "§1§lfood level"],
     "food.saturation": ["§1Enter new", "§1§lfood saturation"],
+    "food.exhaustion": ["§1Enter new", "§1§lexhaustion"],
     "size": ["§1Enter new", "§1§lsize"]
   },
 
