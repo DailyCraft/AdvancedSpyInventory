@@ -82,7 +82,7 @@
     "player": {
       "slot": {
         "": "Slot: §a%d",
-        "modify": "§c(Left Click §l-1§c) §a(Right Click §l+1§a)",
+        "modify": "§e(Hotbar Buttons) §7OR §c(Left Click §l-1§c) §a(Right Click §l+1§a)",
         "drop": "§6Force Drop §7(Shift + Left Click)",
         "drop.all": "§6Force Drop All §7(Shift + Right Click)"
       },

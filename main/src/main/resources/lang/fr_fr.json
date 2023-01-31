@@ -82,7 +82,7 @@
     "player": {
       "slot": {
         "": "Slot : §a%d",
-        "modify": "§c(Clic gauche §l-1§c) §a(Clic droit §l+1§a)",
+        "modify": "§e(Boutons de la hotbar) §7OU §c(Clic gauche §l-1§c) §a(Clic droit §l+1§a)",
         "drop": "§6Forcer à jeter §7(Shift + Clic gauche)",
         "drop.all": "§6Forcer à tout jeter §7(Shift + Clic Droit)"
       },

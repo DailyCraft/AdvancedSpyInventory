@@ -149,7 +149,8 @@ public class PlayerInventory extends BaseInventory {
                         target.setSelectedSlot(target.getSelectedSlot() + 1);
                     else
                         target.setSelectedSlot(0);
-                }
+                } else if (event.getClick() == ClickType.NUMBER_KEY)
+                    target.setSelectedSlot(event.getHotbarButton());
             }
 
             if (target.isOnline() && Permissions.PLAYER_DROP.has(viewer)) {
