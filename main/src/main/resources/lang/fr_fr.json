@@ -127,6 +127,7 @@
       "all_black": "Panthère",
       "wild": "Sauvage"
     },
+    "creeper.charged": "Creeper chargé : %s",
     "donkey.no_chest": "L'animal ne porte pas de coffre",
     "fox.type": {
       "red": "§6Roux",

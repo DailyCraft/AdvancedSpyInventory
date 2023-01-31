@@ -127,6 +127,7 @@
       "all_black": "Black",
       "wild": "Wild"
     },
+    "creeper.charged": "Charged Creeper: %s",
     "donkey.no_chest": "The animal doesn't carrying a chest",
     "fox.type": {
       "red": "§6Red",

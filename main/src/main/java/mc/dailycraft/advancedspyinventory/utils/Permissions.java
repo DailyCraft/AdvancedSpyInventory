@@ -95,6 +95,7 @@ public enum Permissions {
         List<EntityType> types = new ArrayList<>();
 
         types.add(EntityType.BAT);
+        types.add(EntityType.CREEPER);
         types.add(EntityType.IRON_GOLEM);
         types.add(EntityType.LLAMA);
         types.add(EntityType.OCELOT);

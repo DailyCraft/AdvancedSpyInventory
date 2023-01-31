@@ -216,6 +216,12 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 (inv, event, entity) ->
                         entity.setAwake(!entity.isAwake())));
 
+        DATA_ITEMS.put(EntityType.CREEPER, new DataItem<Creeper>((inv, entity) ->
+                new ItemStackBuilder(Main.VERSION > 13 ? new ItemStack(Material.CREEPER_HEAD) : new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 4), inv.formatToggleYesNo(entity.isPowered(), "interface.creeper.charged"))
+                        .get(),
+                (inv, event, entity) ->
+                        entity.setPowered(!entity.isPowered())));
+
         DATA_ITEMS.put(EntityType.IRON_GOLEM, new DataItem<IronGolem>((inv, entity) ->
                 new ItemStackBuilder("MHF_Golem", inv.formatToggleYesNo(entity.isPlayerCreated(), "interface.iron_golem.player_created"))
                         .get(),
