@@ -247,6 +247,12 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 Main.NMS.setOcelotTrusting(entity, !Main.NMS.isOcelotTrusting(entity));
         }));
 
+        DATA_ITEMS.put(EntityType.PIG, new DataItem<Pig>((inv, entity) ->
+                new ItemStackBuilder(Material.SADDLE, inv.formatToggleYesNo(entity.hasSaddle(), "interface.pig.saddle"))
+                        .get(),
+                (inv, event, entity) ->
+                        entity.setSaddle(!entity.hasSaddle())));
+
         DATA_ITEMS.put(EntityType.RABBIT, new DataItem<Rabbit>((inv, entity) ->
                 new ItemStackBuilder(Material.RABBIT_HIDE, inv.formatModify("generic.type"))
                         .enumLore(inv.translation, Rabbit.Type.values(), entity.getRabbitType(), EntityInventory::getRabbitColor, "interface.rabbit.type")
@@ -373,6 +379,16 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                             .enumLore(inv.translation, Panda.Gene.values(), entity.getMainGene(), "interface.panda.gene").get(),
                     (inv, event, entity) ->
                             ItemStackBuilder.enumLoreClick(event, Panda.Gene.values(), entity.getMainGene(), entity::setMainGene)));
+            //</editor-fold>
+        }
+
+        if (Main.VERSION >= 16) {
+            //<editor-fold desc="Data Items - 1.16+ versions" defaultstate="collapsed">
+            DATA_ITEMS.put(EntityType.STRIDER, new DataItem<Strider>((inv, entity) ->
+                    new ItemStackBuilder(Material.SADDLE, inv.formatToggleYesNo(entity.hasSaddle(), "interface.pig.saddle"))
+                            .get(),
+                    (inv, event, entity) ->
+                            entity.setSaddle(!entity.hasSaddle())));
             //</editor-fold>
         }
 

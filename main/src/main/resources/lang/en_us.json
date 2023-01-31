@@ -154,6 +154,7 @@
       "weak": "Weak",
       "aggressive": "Aggressive"
     },
+    "pig.saddle": "Has saddle: %s",
     "rabbit.type": {
       "brown": "Brown",
       "white": "White",

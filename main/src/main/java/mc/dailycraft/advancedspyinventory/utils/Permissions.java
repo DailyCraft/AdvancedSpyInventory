@@ -99,6 +99,7 @@ public enum Permissions {
         types.add(EntityType.IRON_GOLEM);
         types.add(EntityType.LLAMA);
         types.add(EntityType.OCELOT);
+        types.add(EntityType.PIG);
         types.add(EntityType.RABBIT);
         types.add(EntityType.SHEEP);
         types.add(EntityType.SLIME);
@@ -113,6 +114,8 @@ public enum Permissions {
             types.add(EntityType.MUSHROOM_COW);
             types.add(EntityType.PANDA);
         }
+        if (Main.VERSION >= 16)
+            types.add(EntityType.STRIDER);
         if (Main.VERSION >= 17) {
             types.add(EntityType.AXOLOTL);
             types.add(EntityType.GOAT);
