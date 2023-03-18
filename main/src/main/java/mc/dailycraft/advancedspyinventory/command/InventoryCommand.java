@@ -72,6 +72,8 @@ public class InventoryCommand extends PlayerTabExecutor {
                             new DonkeyInventory(player, (ChestedHorse) targetEntity).getView().open();
                         else if (targetEntity.getType() == EntityType.LLAMA || (Main.VERSION >= 14 && targetEntity.getType() == EntityType.TRADER_LLAMA))
                             new LlamaInventory(player, (Llama) targetEntity).getView().open();
+                        else if (Main.VERSION >= 15 && targetEntity.getType() == EntityType.BEE)
+                            new BeeInventory(player, (Bee) targetEntity).getView().open();
                         else
                             new EntityInventory<>(player, (LivingEntity) targetEntity).getView().open();
                     } else

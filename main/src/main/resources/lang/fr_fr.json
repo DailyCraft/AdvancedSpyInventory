@@ -115,6 +115,17 @@
     },
     "axolotl.dead": "Fait le mort : %s",
     "bat.awake": "Est éveillée : %s",
+    "bee": {
+      "hive": {
+        "": "Ruche",
+        "no": "Aucune ruche",
+        "location": "Localisation : §a%d %d %d",
+        "honey": "Quantité de miel : §a%d§7/§a%d",
+        "number": "Nombre d'abeilles : §a%d§7/§a%d"
+      },
+      "nectar": "A du nectar : %s",
+      "stinger": "A son dard : %s"
+    },
     "cat.type": {
       "tabby": "Tigré brun",
       "black": "Bicolore",

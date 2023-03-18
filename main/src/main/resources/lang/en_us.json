@@ -115,6 +115,17 @@
     },
     "axolotl.dead": "Playing dead: %s",
     "bat.awake": "Is awake: %s",
+    "bee": {
+      "hive": {
+        "": "Beehive",
+        "no": "No Beehive",
+        "location": "Location: §a%d %d %d",
+        "honey": "Honey Level: §a%d§7/§a%d",
+        "number": "Bees Number: §a%d§7/§a%d"
+      },
+      "nectar": "Has Nectar: %s",
+      "stinger": "Has its stinger: %s"
+    },
     "cat.type": {
       "tabby": "Tabby",
       "black": "Tuxedo",

@@ -114,6 +114,8 @@ public enum Permissions {
             types.add(EntityType.MUSHROOM_COW);
             types.add(EntityType.PANDA);
         }
+        if (Main.VERSION >= 15)
+            types.add(EntityType.BEE);
         if (Main.VERSION >= 16)
             types.add(EntityType.STRIDER);
         if (Main.VERSION >= 17) {
