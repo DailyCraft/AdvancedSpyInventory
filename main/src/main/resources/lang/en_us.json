@@ -178,7 +178,7 @@
       "the_killer_bunny": "The Killer Bunny"
     },
     "sheep.title": "%s's wool color",
-    "snow_golem.pumpkin": "Has a pumpkin on his head: %s",
+    "snow_golem.pumpkin": "Wears a pumpkin: %s",
     "villager": {
       "profession": {
         "": "Profession: §a%s",
