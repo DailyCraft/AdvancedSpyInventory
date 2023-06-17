@@ -1,0 +1,9 @@
+### Modrinth API
+GET https://api.modrinth.com/v2/project/advancedspyinventory/version?game_versions=["1.19.4"]
+User-Agent: AdvancedSpyInventory
+
+### CurseForge API
+GET https://api.curseforge.com/v1/mods/388970/files
+Accept: application/json
+x-api-key: $2a$10$jxJEM82j19MyeGsbyiQOHe.flh4Tn2gPK8ZitAS7VQxZK2Y2FFJo6
+User-Agent: AdvancedSpyInventory
