@@ -11,7 +11,9 @@ commands:
     description: Open inventory of players or entities
     usage: /<command> <Player|Entity>
     permission: advancedspyinventory.inventory
-    aliases: inv
+    aliases:
+      - inv
+      - invsee
 
   enderchest:
     description: Open ender chest of players
