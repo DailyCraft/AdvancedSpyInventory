@@ -125,7 +125,7 @@ public abstract class BaseInventory {
 
     protected <T extends Number> void openSign(String formatKey, T defaultValue, T minimumValue, T maximumValue, Function<String, T> stringToT, Predicate<T> runAfter) {
         Location loc = viewer.getLocation().clone();
-        loc.setY(0);
+        loc.setY(Math.max(0, loc.getY() - 5));
 
         viewer.closeInventory();
 

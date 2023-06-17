@@ -1,8 +1,7 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_19_R3;
+package mc.dailycraft.advancedspyinventory.nms.v1_20_R1;
 
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.Connection;
@@ -13,13 +12,14 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R3.CraftEquipmentSlot;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R1.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -60,7 +60,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
         }
 
         ServerGamePacketListenerImpl connection = ((CraftPlayer) player).getHandle().connection;
-        connection.send(new ClientboundOpenSignEditorPacket(new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
+        connection.send(new ClientboundOpenSignEditorPacket(CraftLocation.toBlockPosition(loc), true));
         try {
             return new Triplet<>(((Connection) connectionField.get(connection)).channel.pipeline(), ServerboundSignUpdatePacket.class, packet -> packet.getLines()[0]);
         } catch (IllegalAccessException exception) {

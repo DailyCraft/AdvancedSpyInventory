@@ -23,7 +23,7 @@ public class VillagerSpecificationsInventory extends InformationInventory<Villag
         contents[4] = new ItemStackBuilder(Material.CRAFTING_TABLE, translation.format("interface.villager.specifications.profession"))
                 .lore(translation.format("interface.villager.profession", translation.format("interface.villager.profession." + entity.getProfession().name().toLowerCase()))).get();
         contents[31] = new ItemStackBuilder(Material.OAK_LOG, translation.format("interface.villager.specifications.type"))
-                .lore(translation.format("interface.villager.type", translation.format("interface.villager.type." + entity.getVillagerType().name().toLowerCase()))).get();
+                .lore(translation.format("generic.type_", translation.format("interface.villager.type." + entity.getVillagerType().name().toLowerCase()))).get();
 
         for (int i = 0; i < Villager.Profession.values().length; ++i) {
             Villager.Profession profession = Villager.Profession.values()[i];
