@@ -113,6 +113,7 @@ public enum Permissions {
             types.add(EntityType.FOX);
             types.add(EntityType.MUSHROOM_COW);
             types.add(EntityType.PANDA);
+            types.add(EntityType.TRADER_LLAMA);
         }
         if (Main.VERSION >= 15)
             types.add(EntityType.BEE);
