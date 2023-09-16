@@ -1,14 +1,14 @@
 # AdvancedSpyInventory
 **A plugin to inspect ender chests and inventories of players and entities.**
 
-This plugin allows to see the inventory of the players but also their ender chest, whether they are online or not. But although a lot of plugins already allow you to do, special features are present in addition to this plugin.
+This plugin allows you to see the inventory of the players and their ender chest, online or not. Although a lot of plugins already allow you to do this, special features are present in this plugin.
 
-Indeed, the inventory and ender chest of the players is only the base, you could also see the inventory of the entities if they have one and see their equipment.
-<br>For players as well as entities, you will be able to see and modify information like **health, food bar, number of experience and position**, for animals that are tamed, you will also know it.
+The inventory and ender chest of the players is only the beginning, you can also see the inventory of entities, if they have one.\
+For players and entities, you will be able to see and modify information like **health**, **hunger**, **experience**, and **position**. You can also see what animals are tamed.
 
 ![Inventory](https://i.imgur.com/H1FKxsQ.png)
 
 ## Information
-For information on plugin configuration and permissions, you can go to [the wiki](https://github.com/DailyCraft/AdvancedSpyInventory/wiki).
-<br>If you find a bug or have a suggestion, you can create a [GitHub issue](https://github.com/DailyCraft/AdvancedSpyInventory/issues).
-<br>If you like my work and want to support me, you can donate on [GitHub Sponsors](https://github.com/sponsors/DailyCraft).
+For information on plugin configuration and permissions, you can go to [the wiki](https://github.com/DailyCraft/AdvancedSpyInventory/wiki).\
+If you find a bug or have a suggestion, you can create an [issue](https://github.com/DailyCraft/AdvancedSpyInventory/issues).\
+If you like my work and want to support me, you can donate on [GitHub Sponsors](https://github.com/sponsors/DailyCraft).
