@@ -4,7 +4,7 @@
 This plugin allows you to see the inventory of the players and their ender chest, online or not. Although a lot of plugins already allow you to do this, special features are present in this plugin.
 
 The inventory and ender chest of the players is only the beginning, you can also see the inventory of entities, if they have one.\
-For players and entities, you will be able to see and modify information like **health**, **hunger**, **experience**, and **position**. You can also see what animals are tamed.
+For players and entities, you will be able to see and modify information like **health**, **hunger**, **experience**, and **position**. If an animal is tamed, you can see who tamed it.
 
 ![Inventory](https://i.imgur.com/H1FKxsQ.png)
 
