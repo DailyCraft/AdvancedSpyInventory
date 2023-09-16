@@ -91,12 +91,12 @@
       "food.level": "Food Level: §a%,d",
       "food.saturation": "Saturation: §a%,.2f",
       "food.exhaustion": "Exhaustion: §a%,.3f",
-      "enderchest": "Open his §5ender chest",
+      "enderchest": "Open their §5ender chest",
       "own": "§cYou cannot modify your own inventory"
     },
     "enderchest": {
       "title": "§l%s§r's Ender Chest",
-      "inventory": "Open his inventory",
+      "inventory": "Open their inventory",
       "modify": "§cYou don't have permission to modify the ender chest"
     },
     "information": {
