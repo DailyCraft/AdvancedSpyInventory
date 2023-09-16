@@ -42,7 +42,7 @@
 
   "command": {
     "not_player_uuid": "§cThe UUID is not one of a player",
-    "never_connected": "§cThe player never connected to the server",
+    "never_connected": "§cThat player never connected to this server",
     "not_player": "§cThis command can only be used by players",
     "inventory.only_one": "§cOnly one entity is allowed",
     "inventory.player": "§cYou don't have permission to open the inventory of players",
