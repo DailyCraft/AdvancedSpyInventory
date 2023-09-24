@@ -12,7 +12,7 @@
     <artifactId>advancedspyinventory-main</artifactId>
 
     <properties>
-        <minecraftVersion>1.20.1</minecraftVersion>
+        <minecraftVersion>1.20.2</minecraftVersion>
     </properties>
 
     <repositories>
