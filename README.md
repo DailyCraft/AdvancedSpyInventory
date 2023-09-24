@@ -1,10 +1,15 @@
 # AdvancedSpyInventory
 **A plugin to inspect ender chests and inventories of players and entities.**
 
-This plugin allows you to see the inventory of the players and their ender chest, online or not. Although a lot of plugins already allow you to do this, special features are present in this plugin.
+AdvancedSpyInventory allows you to see the inventory of players, but it also provides **different functionality** which makes it all the more useful.
 
-The inventory and ender chest of the players is only the beginning, you can also see the inventory of entities, if they have one.\
-For players and entities, you will be able to see and modify information like **health**, **hunger**, **experience**, and **position**. If an entity is tamed, you can see who tamed it.
+These features are:
+- Open the **inventory** of **online and offline** players
+- Open the **ender chest** of **online and offline** players
+- View and modify the **player's characteristics**, whether online or not, such as their life, location, experience, hunger, etc.
+- View **the equipment of entities**
+- Get and modify the **characteristics of entities**, such as knowing who tamed a tameable animal, the color of sheeps, the profession of villagers, etc.
+- Open **the inventory of entities** as for villagers, enderman, etc.
 
 ![Inventory](https://i.imgur.com/H1FKxsQ.png)
 
