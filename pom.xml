@@ -11,7 +11,7 @@
 
     <name>AdvancedSpyInventory</name>
     <url>https://dev.bukkit.org/projects/advancedspyinventory</url>
-    <description>Open and modify the inventory of entities and players, online or not ! But you can also modify the ender chest of the players</description>
+    <description>Open and modify the inventory of entities and players, and the ender chest of the players, online or not!</description>
 
     <modules>
         <module>main</module>

@@ -8,7 +8,7 @@ main: ${groupId}.advancedspyinventory.Main
 
 commands:
   inventory:
-    description: Open inventory of players or entities
+    description: Open inventory of players and entities
     usage: /<command> <Player|Entity>
     permission: advancedspyinventory.inventory
     aliases:

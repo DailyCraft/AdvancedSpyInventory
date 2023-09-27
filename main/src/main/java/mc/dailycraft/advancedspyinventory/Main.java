@@ -43,7 +43,7 @@ public class Main extends JavaPlugin implements Listener {
             NMS = (NMSHandler) Class.forName(getServer().getClass().getPackage().getName().replaceFirst(".+\\.", "mc.dailycraft.advancedspyinventory.nms.") + ".NMSHandler").getConstructor().newInstance();
 
             if (updateAvailable)
-                getLogger().info("An update is available, go to the website to download the new plugin version: " + getDescription().getWebsite());
+                getLogger().info("An update is available, go to the website to download the latest version: " + getDescription().getWebsite());
 
             getCommand("inventory").setExecutor(new InventoryCommand());
             getCommand("enderchest").setExecutor(new EnderChestCommand());
