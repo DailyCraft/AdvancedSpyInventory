@@ -51,7 +51,7 @@ public class NMSContainer implements Container {
             try {
                 return (ItemStack) handle.get(item);
             } catch (IllegalAccessException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 

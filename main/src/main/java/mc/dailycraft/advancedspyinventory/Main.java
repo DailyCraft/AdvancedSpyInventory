@@ -57,7 +57,7 @@ public class Main extends JavaPlugin implements Listener {
             if (updateAvailable)
                 getLogger().severe("Please update the plugin: " + getDescription().getWebsite());
         } catch (Exception exception) {
-            exception.printStackTrace();
+            throw new RuntimeException(exception);
         }
 
         new Metrics(this, 15302);
@@ -110,7 +110,7 @@ public class Main extends JavaPlugin implements Listener {
             try (InputStreamReader reader = new InputStreamReader(connection.getInputStream())) {
                 JsonArray json = new Gson().fromJson(reader, JsonArray.class);
 
-                if (json.size() == 0 || json.get(0).getAsJsonObject().get("version_number").getAsString().equals(getDescription().getVersion()))
+                if (json.isEmpty() || json.get(0).getAsJsonObject().get("version_number").getAsString().equals(getDescription().getVersion()))
                     return;
 
                 String fileName = json.get(0).getAsJsonObject().getAsJsonArray("files").get(0).getAsJsonObject().get("filename").getAsString();
@@ -132,7 +132,7 @@ public class Main extends JavaPlugin implements Listener {
                 }
             }
         } catch (IOException exception) {
-            exception.printStackTrace();
+            throw new RuntimeException(exception);
         }
     }
 }

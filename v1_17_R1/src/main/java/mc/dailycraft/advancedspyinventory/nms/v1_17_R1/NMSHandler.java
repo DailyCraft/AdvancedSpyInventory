@@ -71,7 +71,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             try {
                 (matchingStatesField = PoiType.class.getDeclaredField("E")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 

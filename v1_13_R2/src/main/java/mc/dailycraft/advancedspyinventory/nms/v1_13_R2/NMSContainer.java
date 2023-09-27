@@ -66,7 +66,7 @@ public class NMSContainer implements IInventory {
             try {
                 return (ItemStack) handle.get(item);
             } catch (IllegalAccessException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 

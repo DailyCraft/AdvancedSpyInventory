@@ -112,7 +112,7 @@ public class Translation {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(Translation.class.getClassLoader().getResourceAsStream("lang/" + lang + ".json"), StandardCharsets.UTF_8))) {
                     initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(lang, key, value));
                 } catch (IOException exception) {
-                    exception.printStackTrace();
+                    throw new RuntimeException(exception);
                 }
             }
         }
@@ -124,7 +124,7 @@ public class Translation {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
                     initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(lang, key, value));
                 } catch (IOException exception) {
-                    exception.printStackTrace();
+                    throw new RuntimeException(exception);
                 }
             }
         });

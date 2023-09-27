@@ -62,7 +62,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             try {
                 (careerLevelField = EntityVillager.class.getDeclaredField("bQ")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 
@@ -78,7 +78,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             try {
                 careerLevelField.set(handle, 0);
             } catch (IllegalAccessException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
 
             handle.populateTrades();

@@ -160,7 +160,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
                 Util.safeReplaceFile(new File(playerDir, playerUuid + ".dat"), file, new File(playerDir, playerUuid + ".dat_old"));
             } catch (Exception exception) {
                 Main.getInstance().getLogger().severe("Failed to save player data for " + playerUuid);
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
     }

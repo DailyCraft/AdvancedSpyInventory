@@ -70,7 +70,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             try {
                 (matchingStatesField = VillagePlaceType.class.getDeclaredField("C")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 
@@ -95,7 +95,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             try {
                 (isTrustingMethod = EntityOcelot.class.getDeclaredMethod("isTrusting")).setAccessible(true);
             } catch (NoSuchMethodException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 
@@ -112,7 +112,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             try {
                 (setTrustingMethod = EntityOcelot.class.getDeclaredMethod("setTrusting", boolean.class)).setAccessible(true);
             } catch (NoSuchMethodException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 

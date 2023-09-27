@@ -73,7 +73,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             if (populateTradesMethod == null)
                 (populateTradesMethod = EntityVillager.class.getDeclaredMethod("dt")).setAccessible(true);
         } catch (NoSuchFieldException | NoSuchMethodException exception) {
-            exception.printStackTrace();
+            throw new RuntimeException(exception);
         }
 
         Career career = Career.valueOf(profession);
@@ -89,7 +89,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
                 careerLevelField.set(handle, 0);
                 populateTradesMethod.invoke(handle);
             } catch (IllegalAccessException | InvocationTargetException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         } while (getVillagerCareer(villager) != career);
     }
@@ -143,7 +143,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             try {
                 (careerField = EntityVillager.class.getDeclaredField("bK")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 
@@ -154,7 +154,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
                 if (careerIDMap.containsKey(career) && careerIDMap.get(career) == villagerCareer)
                     return career;
         } catch (IllegalAccessException exception) {
-            exception.printStackTrace();
+            throw new RuntimeException(exception);
         }
 
         return null;
@@ -165,7 +165,7 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
             try {
                 (careerField = EntityVillager.class.getDeclaredField("bK")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
-                exception.printStackTrace();
+                throw new RuntimeException(exception);
             }
         }
 
