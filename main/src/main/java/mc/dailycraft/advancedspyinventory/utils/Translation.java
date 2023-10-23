@@ -17,7 +17,7 @@ import java.util.*;
 
 public class Translation {
     private static final Map<String, Translation> INSTANCES = new HashMap<>();
-    private static final String DEFAULT_LANGUAGE;
+    private static String DEFAULT_LANGUAGE;
     private static final Table<String, String, String> FORMAT_TABLE = HashBasedTable.create();
 
     private final String locale;
@@ -38,8 +38,7 @@ public class Translation {
     }
 
     public static Translation of() {
-        Translation translation = INSTANCES.get(DEFAULT_LANGUAGE);
-        return translation != null ? translation : INSTANCES.get("en_us");
+        return INSTANCES.get(DEFAULT_LANGUAGE);
     }
 
     public String format(String key, Object... parameters) {
@@ -94,8 +93,37 @@ public class Translation {
         return result;
     }
 
+    private static boolean initializeLanguage(String language, File langDir, Gson gson) {
+        boolean b = false;
+
+        if (language.equals("en_us") || language.equals("fr_fr")) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Translation.class.getClassLoader().getResourceAsStream("lang/" + language + ".json"), StandardCharsets.UTF_8))) {
+                initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(language, key, value));
+            } catch (IOException exception) {
+                throw new RuntimeException(exception);
+            }
+
+            b = true;
+        }
+
+        for (File file : langDir.listFiles()) {
+            if (file.getName().equalsIgnoreCase(language + ".json")) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+                    initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(language, key, value));
+                } catch (IOException exception) {
+                    throw new RuntimeException(exception);
+                }
+
+                b = true;
+                break;
+            }
+        }
+
+        return b;
+    }
+
     static {
-        DEFAULT_LANGUAGE = Main.getInstance().getConfig().getString("default_language").toLowerCase();
+        DEFAULT_LANGUAGE = Main.getInstance().getConfig().getString("default_language", "en_us").toLowerCase();
 
         FORMAT_TABLE.clear();
         INSTANCES.clear();
@@ -107,27 +135,28 @@ public class Translation {
 
         Gson gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().setPrettyPrinting().create();
 
-        for (String lang : new String[] {"en_us", "fr_fr"}) {
-            if (Main.getInstance().getConfig().getBoolean("dynamic_language") || lang.equals(DEFAULT_LANGUAGE)) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(Translation.class.getClassLoader().getResourceAsStream("lang/" + lang + ".json"), StandardCharsets.UTF_8))) {
-                    initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(lang, key, value));
-                } catch (IOException exception) {
-                    throw new RuntimeException(exception);
+        if (Main.getInstance().getConfig().getBoolean("dynamic_language")) {
+            List<String> languages = new ArrayList<>();
+            languages.add("en_us");
+            languages.add("fr_fr");
+
+            for (File file : langDir.listFiles()) {
+                if (file.getName().endsWith(".json")) {
+                    String lang = file.getName().replaceFirst("\\..+", "").toLowerCase();
+                    if (!languages.contains(lang))
+                        languages.add(lang);
                 }
             }
+
+            if (!languages.contains(DEFAULT_LANGUAGE))
+                DEFAULT_LANGUAGE = "en_us";
+
+            for (String language : languages)
+                initializeLanguage(language, langDir, gson);
+        } else {
+            if (!initializeLanguage(DEFAULT_LANGUAGE, langDir, gson))
+                initializeLanguage(DEFAULT_LANGUAGE = "en_us", langDir, gson);
         }
-
-        Arrays.stream(langDir.listFiles()).filter(file -> file.getName().endsWith(".json")).forEach(file -> {
-            String lang = file.getName().replaceFirst("\\..+", "").toLowerCase();
-
-            if (Main.getInstance().getConfig().getBoolean("dynamic_language") || lang.equals(DEFAULT_LANGUAGE)) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-                    initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(lang, key, value));
-                } catch (IOException exception) {
-                    throw new RuntimeException(exception);
-                }
-            }
-        });
 
         FORMAT_TABLE.rowKeySet().forEach(lang -> INSTANCES.put(lang, new Translation(lang)));
     }
