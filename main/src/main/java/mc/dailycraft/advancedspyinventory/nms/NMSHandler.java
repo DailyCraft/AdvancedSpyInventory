@@ -1,5 +1,6 @@
 package mc.dailycraft.advancedspyinventory.nms;
 
+import com.mojang.authlib.GameProfile;
 import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.ResourceKey;
@@ -13,6 +14,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.UUID;
 
@@ -81,4 +83,7 @@ public interface NMSHandler {
     default Entity getEntity(UUID uuid) {
         return Bukkit.getEntity(uuid);
     }
+
+    // 1.20.3+ - Unwanted warning message
+    default void setHeadSerializedProfile(SkullMeta meta, GameProfile profile) {}
 }

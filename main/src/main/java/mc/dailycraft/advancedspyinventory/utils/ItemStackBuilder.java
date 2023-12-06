@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.mojang.util.UUIDTypeAdapter;
 import mc.dailycraft.advancedspyinventory.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -71,11 +70,11 @@ public class ItemStackBuilder {
                                 uuid = Bukkit.getOfflinePlayer(headOwner).getUniqueId();
                             } else {
                                 try (Reader reader = new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + headOwner).openStream())) {
-                                    uuid = UUIDTypeAdapter.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString());
+                                    uuid = UUID.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString().replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
                                 }
                             }
 
-                            try (Reader sessionReader = new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDTypeAdapter.fromUUID(uuid)).openStream())) {
+                            try (Reader sessionReader = new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "")).openStream())) {
                                 JsonObject textureProperty = new Gson().fromJson(sessionReader, JsonObject.class).get("properties").getAsJsonArray().get(0).getAsJsonObject();
                                 String value = textureProperty.get("value").getAsString();
 
@@ -92,6 +91,7 @@ public class ItemStackBuilder {
                         (headField = meta.getClass().getDeclaredField("profile")).setAccessible(true);
 
                     headField.set(meta, profile);
+                    Main.NMS.setHeadSerializedProfile(meta, profile);
                 }
             } catch (Exception exception) {
                 throw new RuntimeException(exception);

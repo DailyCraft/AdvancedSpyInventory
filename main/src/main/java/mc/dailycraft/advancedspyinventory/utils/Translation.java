@@ -93,17 +93,13 @@ public class Translation {
         return result;
     }
 
-    private static boolean initializeLanguage(String language, File langDir, Gson gson) {
-        boolean b = false;
-
+    private static void initializeLanguage(String language, File langDir, Gson gson) {
         if (language.equals("en_us") || language.equals("fr_fr")) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Translation.class.getClassLoader().getResourceAsStream("lang/" + language + ".json"), StandardCharsets.UTF_8))) {
                 initializeTranslations("", gson.fromJson(reader, JsonObject.class).entrySet()).forEach((key, value) -> FORMAT_TABLE.put(language, key, value));
             } catch (IOException exception) {
                 throw new RuntimeException(exception);
             }
-
-            b = true;
         }
 
         for (File file : langDir.listFiles()) {
@@ -114,12 +110,9 @@ public class Translation {
                     throw new RuntimeException(exception);
                 }
 
-                b = true;
                 break;
             }
         }
-
-        return b;
     }
 
     static {
@@ -154,8 +147,8 @@ public class Translation {
             for (String language : languages)
                 initializeLanguage(language, langDir, gson);
         } else {
-            if (!initializeLanguage(DEFAULT_LANGUAGE, langDir, gson))
-                initializeLanguage(DEFAULT_LANGUAGE = "en_us", langDir, gson);
+            initializeLanguage(DEFAULT_LANGUAGE, langDir, gson);
+            initializeLanguage("en_us", langDir, gson);
         }
 
         FORMAT_TABLE.rowKeySet().forEach(lang -> INSTANCES.put(lang, new Translation(lang)));
