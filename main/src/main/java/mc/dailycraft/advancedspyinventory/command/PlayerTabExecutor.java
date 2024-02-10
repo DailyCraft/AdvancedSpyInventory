@@ -19,7 +19,7 @@ public abstract class PlayerTabExecutor implements TabExecutor {
         return Arrays.stream(Bukkit.getServer().getOfflinePlayers())
                 .filter(player -> showOfflinePlayers || player.isOnline())
                 .map(OfflinePlayer::getName)
-                .filter(name -> name.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
+                .filter(name -> name != null && name.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                 .collect(Collectors.toList());
     }
 }
