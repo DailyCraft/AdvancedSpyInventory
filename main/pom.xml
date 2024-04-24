@@ -12,7 +12,7 @@
     <artifactId>advancedspyinventory-main</artifactId>
 
     <properties>
-        <minecraftVersion>1.20.4</minecraftVersion>
+        <minecraftVersion>1.20.5</minecraftVersion>
     </properties>
 
     <repositories>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>24.0.1</version>
+            <version>24.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
@@ -62,7 +62,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.5.2</version>
                 <configuration>
                     <relocations>
                         <relocation>

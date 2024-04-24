@@ -57,7 +57,7 @@ public class PlayerInventory extends BaseInventory {
 
             case 46:
                 if (Permissions.PLAYER_HEALTH.has(viewer)) {
-                    return new ItemStackBuilder(PotionType.INSTANT_HEAL, translation.format("interface.entity.health", target.getHealth(), target.getMaxHealth()))
+                    return new ItemStackBuilder(Main.VERSION >= 20.5 ? PotionType.HEALING : PotionType.valueOf("INSTANT_HEAL"), translation.format("interface.entity.health", target.getHealth(), target.getMaxHealth()))
                             .lore(Permissions.PLAYER_HEALTH_MODIFY.has(viewer) || Permissions.PLAYER_HEALTH_MODIFY.has(viewer), "", translation.format("interface.entity.health.modify.0"))
                             .lore(Permissions.PLAYER_HEALTH_MODIFY.has(viewer), "   " + translation.format("interface.entity.health.modify.1"))
                             .lore(Permissions.PLAYER_HEALTH_MODIFY_MAX.has(viewer), "   " + translation.format("interface.entity.health.modify.2")).get();

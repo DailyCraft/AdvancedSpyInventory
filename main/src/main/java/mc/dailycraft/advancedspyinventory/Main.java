@@ -31,7 +31,7 @@ import java.net.URLConnection;
 
 public class Main extends JavaPlugin implements Listener {
     public static NMSHandler NMS;
-    public static int VERSION = Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[1].replaceFirst("-.+", ""));
+    public static float VERSION = Float.parseFloat(Bukkit.getBukkitVersion().split("-")[0].substring(2));
 
     private boolean updateAvailable = false;
 

@@ -16,7 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,10 +30,13 @@ import java.util.function.Function;
 public class ItemStackBuilder {
     private static final Map<String, GameProfile> headProfiles = new HashMap<>();
     private static Field headField;
+
     private final ItemStack stack;
+    private final ItemMeta meta;
 
     public ItemStackBuilder(ItemStack stack) {
         this.stack = stack;
+        meta = stack.getItemMeta();
     }
 
     public ItemStackBuilder(ItemStack stack, String displayName) {
@@ -55,91 +57,90 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder(String headOwner, String displayName) {
         stack = Main.VERSION > 12 ? new ItemStack(Material.PLAYER_HEAD) : new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 3);
+        meta = stack.getItemMeta();
         displayName(displayName);
 
-        this.<SkullMeta>modifyMeta(meta -> {
-            try {
-                GameProfile profile = headProfiles.get(headOwner);
+        try {
+            GameProfile profile = headProfiles.get(headOwner);
 
-                if (profile == null) {
-                    Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
-                        try {
-                            UUID uuid;
+            if (profile == null) {
+                Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+                    try {
+                        UUID uuid;
 
-                            if (Bukkit.getOnlineMode()) {
-                                uuid = Bukkit.getOfflinePlayer(headOwner).getUniqueId();
-                            } else {
-                                try (Reader reader = new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + headOwner).openStream())) {
-                                    uuid = UUID.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString().replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
-                                }
+                        if (Bukkit.getOnlineMode()) {
+                            uuid = Bukkit.getOfflinePlayer(headOwner).getUniqueId();
+                        } else {
+                            try (Reader reader = new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + headOwner).openStream())) {
+                                uuid = UUID.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString().replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
                             }
-
-                            try (Reader sessionReader = new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "")).openStream())) {
-                                JsonObject textureProperty = new Gson().fromJson(sessionReader, JsonObject.class).get("properties").getAsJsonArray().get(0).getAsJsonObject();
-                                String value = textureProperty.get("value").getAsString();
-
-                                GameProfile gameProfile = new GameProfile(uuid, headOwner);
-                                gameProfile.getProperties().put("textures", new Property("textures", value));
-                                headProfiles.put(headOwner, gameProfile);
-                            }
-                        } catch (Exception exception) {
-                            Main.getInstance().getLogger().severe("Error when loading head '" + headOwner + "'! Message: " + exception.getMessage());
                         }
-                    });
-                } else {
-                    if (headField == null)
-                        (headField = meta.getClass().getDeclaredField("profile")).setAccessible(true);
 
-                    headField.set(meta, profile);
-                    Main.NMS.setHeadSerializedProfile(meta, profile);
-                }
-            } catch (Exception exception) {
-                throw new RuntimeException(exception);
+                        try (Reader sessionReader = new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "")).openStream())) {
+                            JsonObject textureProperty = new Gson().fromJson(sessionReader, JsonObject.class).get("properties").getAsJsonArray().get(0).getAsJsonObject();
+                            String value = textureProperty.get("value").getAsString();
+
+                            GameProfile gameProfile = new GameProfile(uuid, headOwner);
+                            gameProfile.getProperties().put("textures", new Property("textures", value));
+                            headProfiles.put(headOwner, gameProfile);
+                        }
+                    } catch (Exception exception) {
+                        Main.getInstance().getLogger().severe("Error when loading head '" + headOwner + "'! Message: " + exception.getMessage());
+                    }
+                });
+            } else {
+                if (headField == null)
+                    (headField = meta.getClass().getDeclaredField("profile")).setAccessible(true);
+
+                headField.set(meta, profile);
+                Main.NMS.setHeadSerializedProfile((SkullMeta) meta, profile);
             }
-        });
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     public ItemStackBuilder(PotionType potionType, String displayName) {
         this(Material.POTION, displayName);
-        this.<PotionMeta>modifyMeta(meta -> {
-            meta.setBasePotionData(new PotionData(potionType));
-            meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-        });
+        ((PotionMeta) meta).setBasePotionType(potionType);
+        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
     }
 
     public ItemStackBuilder displayName(String displayName) {
-        return modifyMeta(meta -> meta.setDisplayName(displayName != null ? ChatColor.RESET.toString() + ChatColor.WHITE + displayName : null));
+        meta.setDisplayName(displayName != null ? ChatColor.RESET.toString() + ChatColor.WHITE + displayName : null);
+        if (Main.VERSION >= 20.5 && (displayName == null || displayName.isEmpty()))
+            meta.setHideTooltip(true);
+        return this;
     }
 
     public ItemStackBuilder lore(String line, boolean newLine) {
-        return modifyMeta(meta -> {
-            List<String> lore = meta.getLore() != null ? meta.getLore() : new ArrayList<>();
+        List<String> lore = meta.getLore() != null ? meta.getLore() : new ArrayList<>();
 
-            if (newLine) {
-                StringBuilder lineBuilder = new StringBuilder(ChatColor.GRAY.toString());
-                int cCount = 0;
-                boolean nextSpace = false;
+        if (newLine) {
+            StringBuilder lineBuilder = new StringBuilder(ChatColor.GRAY.toString());
+            int cCount = 0;
+            boolean nextSpace = false;
 
-                for (char c : line.toCharArray()) {
-                    cCount++;
+            for (char c : line.toCharArray()) {
+                cCount++;
 
-                    if (cCount % 40 == 0)
-                        nextSpace = true;
+                if (cCount % 40 == 0)
+                    nextSpace = true;
 
-                    if (nextSpace && c == ' ') {
-                        lore.add(lineBuilder.toString());
-                        lineBuilder = new StringBuilder(ChatColor.getLastColors(lore.get(lore.size() - 1)));
-                        nextSpace = false;
-                    } else
-                        lineBuilder.append(c);
-                }
+                if (nextSpace && c == ' ') {
+                    lore.add(lineBuilder.toString());
+                    lineBuilder = new StringBuilder(ChatColor.getLastColors(lore.get(lore.size() - 1)));
+                    nextSpace = false;
+                } else
+                    lineBuilder.append(c);
+            }
 
-                lore.add(lineBuilder.toString());
-            } else
-                lore.add(ChatColor.GRAY + line);
+            lore.add(lineBuilder.toString());
+        } else
+            lore.add(ChatColor.GRAY + line);
 
-            meta.setLore(lore);
-        });
+        meta.setLore(lore);
+        return this;
     }
 
     public ItemStackBuilder lore(String line) {
@@ -183,24 +184,25 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder enchant(boolean condition) {
         if (condition) {
-            stack.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
-            return modifyMeta(meta -> meta.addItemFlags(ItemFlag.HIDE_ENCHANTS));
+            stack.addUnsafeEnchantment(Enchantment.PROTECTION, 1); // TODO
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
         return this;
     }
 
-    public <T extends ItemMeta> ItemStackBuilder modifyMeta(Consumer<T> consumer) {
-        if (stack.getItemMeta() != null) {
-            T meta = (T) stack.getItemMeta();
-            consumer.accept(meta);
-            stack.setItemMeta(meta);
-        }
-
-        return this;
-    }
+//    public <T extends ItemMeta> ItemStackBuilder modifyMeta(Consumer<T> consumer) {
+//        if (stack.getItemMeta() != null) {
+//            T meta = (T) stack.getItemMeta();
+//            consumer.accept(meta);
+//            stack.setItemMeta(meta);
+//        }
+//
+//        return this;
+//    }
 
     public ItemStack get() {
+        stack.setItemMeta(meta);
         return stack;
     }
 }

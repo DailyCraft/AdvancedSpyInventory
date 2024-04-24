@@ -58,7 +58,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
 
         else if (index == getSize() - 8) {
             if (Permissions.ENTITY_HEALTH.has(viewer)) {
-                return new ItemStackBuilder(PotionType.INSTANT_HEAL, translation.format("interface.entity.health", entity.getHealth(), entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()))
+                return new ItemStackBuilder(Main.VERSION >= 20.5 ? PotionType.HEALING : PotionType.valueOf("INSTANT_HEAL"), translation.format("interface.entity.health", entity.getHealth(), entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()))
                         .lore(Permissions.ENTITY_HEALTH_MODIFY.has(viewer) || Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer), "", translation.format("interface.entity.health.modify.0"))
                         .lore(Permissions.ENTITY_HEALTH_MODIFY.has(viewer), "   " + translation.format("interface.entity.health.modify.1"))
                         .lore(Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer), "   " + translation.format("interface.entity.health.modify.2")).get();
@@ -281,7 +281,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                             }
                         })));
 
-        DATA_ITEMS.put(EntityType.SNOWMAN, new DataItem<Snowman>((inv, entity) ->
+        DATA_ITEMS.put(Main.VERSION >= 20.5 ? EntityType.SNOW_GOLEM : EntityType.valueOf("SNOWMAN"), new DataItem<Snowman>((inv, entity) ->
                 new ItemStackBuilder(Main.VERSION > 12 ? Material.CARVED_PUMPKIN : Material.PUMPKIN, inv.formatToggleYesNo(!entity.isDerp(), "interface.snow_golem.pumpkin"))
                         .get(),
                 (inv, event, entity) ->
@@ -365,7 +365,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                     (inv, event, entity) ->
                             entity.setFoxType(entity.getFoxType() == Fox.Type.RED ? Fox.Type.SNOW : Fox.Type.RED)));
 
-            DATA_ITEMS.put(EntityType.MUSHROOM_COW, new DataItem<MushroomCow>((inv, entity) -> {
+            DATA_ITEMS.put(Main.VERSION >= 20.5 ? EntityType.MOOSHROOM : EntityType.valueOf("MUSHROOM_COW"), new DataItem<MushroomCow>((inv, entity) -> {
                 boolean isRed = entity.getVariant() == MushroomCow.Variant.RED;
                 return new ItemStackBuilder(isRed ? Material.RED_MUSHROOM_BLOCK : Material.BROWN_MUSHROOM_BLOCK, inv.formatToggle("generic.variant"))
                         .lore((isRed ? "§2\u25ba " : "  ") + Translation.dyeColorToChat(DyeColor.RED) + "§l" + inv.translation.format("generic.color.red"))

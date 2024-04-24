@@ -103,7 +103,7 @@ public enum Permissions {
         types.add(EntityType.RABBIT);
         types.add(EntityType.SHEEP);
         types.add(EntityType.SLIME);
-        types.add(EntityType.SNOWMAN);
+        types.add(Main.VERSION >= 20.5 ? EntityType.SNOW_GOLEM : EntityType.valueOf("SNOWMAN"));
         types.add(EntityType.VILLAGER);
         types.add(EntityType.WOLF);
         if (Main.VERSION >= 13)
@@ -111,7 +111,7 @@ public enum Permissions {
         if (Main.VERSION >= 14) {
             types.add(EntityType.CAT);
             types.add(EntityType.FOX);
-            types.add(EntityType.MUSHROOM_COW);
+            types.add(Main.VERSION >= 20.5 ? EntityType.MOOSHROOM : EntityType.valueOf("MUSHROOM_COW"));
             types.add(EntityType.PANDA);
             types.add(EntityType.TRADER_LLAMA);
         }
