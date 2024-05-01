@@ -14,7 +14,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionType;
 
 import java.util.UUID;
 
@@ -86,4 +88,9 @@ public interface NMSHandler {
 
     // 1.20.3+ - Unwanted warning message
     default void setHeadSerializedProfile(SkullMeta meta, GameProfile profile) {}
+
+    // 1.20.3+ - New API
+    default void setBasePotionType(PotionMeta meta, PotionType potionType) {
+        meta.setBasePotionType(potionType);
+    }
 }

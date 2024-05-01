@@ -1,5 +1,6 @@
 package mc.dailycraft.advancedspyinventory.nms.v1_15_R1;
 
+import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
 import net.minecraft.server.v1_15_R1.*;
@@ -25,6 +26,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -66,12 +70,10 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
                 Containers<?> windowType = null;
 
                 try {
-                    // 1.15.2
-                    Method method = CraftContainer.class.getMethod("getNotchInventoryType", Inventory.class);
-                    windowType = (Containers<?>) method.invoke(null, view.getTopInventory());
-                } catch (NoSuchMethodException exception) {
-                    // 1.15 / 1.15.1
-                    try {
+                    if (Main.VERSION == 15.2) {
+                        Method method = CraftContainer.class.getMethod("getNotchInventoryType", Inventory.class);
+                        windowType = (Containers<?>) method.invoke(null, view.getTopInventory());
+                    } else { // 1.15 / 1.15.1
                         if (view.getType() != InventoryType.CHEST) {
                             Method method = CraftContainer.class.getMethod("getNotchInventoryType", InventoryType.class);
                             windowType = (Containers<?>) method.invoke(null, view.getType());
@@ -97,10 +99,8 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
                                     break;
                             }
                         }
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException exception1) {
-                        throw new RuntimeException(exception1);
                     }
-                } catch (InvocationTargetException | IllegalAccessException exception) {
+                } catch (ReflectiveOperationException exception) {
                     throw new RuntimeException(exception);
                 }
 
@@ -182,5 +182,10 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     @Override
     public void dropItem(Player player, boolean dropAll) {
         ((CraftPlayer) player).getHandle().n(dropAll);
+    }
+
+    @Override
+    public void setBasePotionType(PotionMeta meta, PotionType potionType) {
+        meta.setBasePotionData(new PotionData(potionType));
     }
 }

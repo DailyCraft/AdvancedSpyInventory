@@ -129,7 +129,8 @@ public class Main extends JavaPlugin implements Listener {
             try (InputStreamReader reader = new InputStreamReader(connection.getInputStream())) {
                 JsonArray json = new Gson().fromJson(reader, JsonArray.class);
 
-                if (json.isEmpty() || json.get(0).getAsJsonObject().get("version_number").getAsString().equals(getDescription().getVersion()))
+                // Don't use json.isEmpty() because old GSON versions (used in old Minecraft versions) don't implement this method
+                if (json.size() == 0 || json.get(0).getAsJsonObject().get("version_number").getAsString().equals(getDescription().getVersion()))
                     return;
 
                 String fileName = json.get(0).getAsJsonObject().getAsJsonArray("files").get(0).getAsJsonObject().get("filename").getAsString();

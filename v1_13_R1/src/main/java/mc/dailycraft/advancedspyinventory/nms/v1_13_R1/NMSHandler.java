@@ -16,6 +16,9 @@ import org.bukkit.entity.Villager;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -88,5 +91,10 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     @Override
     public void dropItem(Player player, boolean dropAll) {
         ((CraftPlayer) player).getHandle().a(dropAll);
+    }
+
+    @Override
+    public void setBasePotionType(PotionMeta meta, PotionType potionType) {
+        meta.setBasePotionData(new PotionData(potionType));
     }
 }

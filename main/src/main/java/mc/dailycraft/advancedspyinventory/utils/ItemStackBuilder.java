@@ -102,8 +102,8 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder(PotionType potionType, String displayName) {
         this(Material.POTION, displayName);
-        ((PotionMeta) meta).setBasePotionType(potionType);
-        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        Main.NMS.setBasePotionType((PotionMeta) meta, potionType);
+        meta.addItemFlags(Main.VERSION >= 20.5 ? ItemFlag.HIDE_ADDITIONAL_TOOLTIP : ItemFlag.valueOf("HIDE_POTION_EFFECTS"));
     }
 
     public ItemStackBuilder displayName(String displayName) {
@@ -184,7 +184,7 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder enchant(boolean condition) {
         if (condition) {
-            stack.addUnsafeEnchantment(Enchantment.PROTECTION, 1); // TODO
+            stack.addUnsafeEnchantment(Main.VERSION >= 20.5 ? Enchantment.PROTECTION : Enchantment.getByName("PROTECTION_ENVIRONMENTAL"), 1);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 

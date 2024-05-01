@@ -21,6 +21,9 @@ import org.bukkit.entity.Villager;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -120,6 +123,11 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     public org.bukkit.entity.Entity getEntity(UUID uuid) {
         Entity entity = ((CraftServer) Bukkit.getServer()).getServer().a(uuid);
         return entity == null ? null : entity.getBukkitEntity();
+    }
+
+    @Override
+    public void setBasePotionType(PotionMeta meta, PotionType potionType) {
+        meta.setBasePotionData(new PotionData(potionType));
     }
 
     // Replicate CraftBukkit 1.12.2 functions not implemented in this version.
