@@ -39,9 +39,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         checkUpdateAvailable();
 
-        try {
-            NMS = (NMSHandler) Class.forName(getServer().getClass().getPackage().getName().replaceFirst(".+\\.", "mc.dailycraft.advancedspyinventory.nms.") + ".NMSHandler").getConstructor().newInstance();
-
+        if (checkVersionValidity()) {
             if (updateAvailable)
                 getLogger().info("An update is available, go to the website to download the latest version: " + getDescription().getWebsite());
 
@@ -51,13 +49,10 @@ public class Main extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(this, this);
             saveDefaultConfig();
             Permissions.init();
-        } catch (ClassNotFoundException exception) {
+        } else {
             getLogger().severe("The current version of the plugin doesn't support your server version.");
-
             if (updateAvailable)
                 getLogger().severe("Please update the plugin: " + getDescription().getWebsite());
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
         }
 
         new Metrics(this, 15302);
@@ -100,6 +95,30 @@ public class Main extends JavaPlugin implements Listener {
         if (updateAvailable)
             sender.sendMessage("§c[AdvancedSpyInventory] Please update the plugin: §e" + getDescription().getWebsite());
         return true;
+    }
+
+    private boolean checkVersionValidity() {
+        try {
+            String packageVersion;
+
+            if (Bukkit.getServer().getClass().getName().equals("org.bukkit.craftbukkit.CraftServer")) {
+                // New paper server (>= 1.20.5)
+                if (VERSION >= 20.5 || VERSION < 21)
+                    packageVersion = "v1_20_R4";
+                else if (VERSION >= 21)
+                    return false;
+                else
+                    throw new IllegalStateException("Unexpected server version: 1." + Bukkit.getVersion() + " (" + Bukkit.getName() + ")");
+            } else
+                packageVersion = getServer().getClass().getPackage().getName().substring(23);
+
+            NMS = (NMSHandler) Class.forName("mc.dailycraft.advancedspyinventory.nms." + packageVersion + ".NMSHandler").getConstructor().newInstance();
+            return true;
+        } catch (ClassNotFoundException exception) {
+            return false;
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     private void checkUpdateAvailable() {
