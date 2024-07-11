@@ -106,7 +106,6 @@ public class Main extends JavaPlugin implements Listener {
             String packageVersion;
 
             if (Bukkit.getServer().getClass().getName().equals("org.bukkit.craftbukkit.CraftServer")) {
-                System.out.println(Bukkit.getVersion());
                 // New paper server (>= 1.20.5)
                 if (VERSION >= 20.5 && VERSION < 21)
                     packageVersion = "v1_20_R4";
