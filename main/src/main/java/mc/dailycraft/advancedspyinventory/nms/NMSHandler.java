@@ -18,12 +18,15 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionType;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public interface NMSHandler {
+
     // 1.16-1.18 - Method not implemented in Bukkit.
     default ResourceKey worldKey(World world) {
-        if (Main.VERSION > 18) // 1.19+ - Method implemented
+        if (Main.VERSION >= 19) // 1.19+ - Method implemented
             return new ResourceKey(world.getKey());
         else // 1.15- - Worlds not saved with a key
             return ResourceKey.minecraft(world.getName());
@@ -36,6 +39,33 @@ public interface NMSHandler {
     NMSData getData(UUID playerUuid);
 
     Inventory createInventory(BaseInventory inventory);
+
+    // 1.21+ - Add NMS
+    default InventoryView createView(Player viewer, BaseInventory inventory) {
+        if (Variables.VIEW_CONSTRUCTOR == null) {
+            String version;
+
+            if (Main.VERSION >= 20)
+                version = "v1_20_R1";
+            else if (Main.VERSION >= 14)
+                version = "v1_14_R1";
+            else
+                version = "v1_11_R1";
+
+            try {
+                Variables.VIEW_CONSTRUCTOR = (Constructor<? extends InventoryView>) Class.forName("mc.dailycraft.advancedspyinventory.nms." + version + ".CustomInventoryView")
+                        .getConstructor(Player.class, BaseInventory.class);
+            } catch (NoSuchMethodException | ClassNotFoundException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
+
+        try {
+            return Variables.VIEW_CONSTRUCTOR.newInstance(viewer, inventory);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
 
     default void openInventory(Player player, InventoryView view) {
         player.openInventory(view);
@@ -92,5 +122,9 @@ public interface NMSHandler {
     // 1.20.3+ - New API
     default void setBasePotionType(PotionMeta meta, PotionType potionType) {
         meta.setBasePotionType(potionType);
+    }
+
+    class Variables {
+        private static Constructor<? extends InventoryView> VIEW_CONSTRUCTOR;
     }
 }

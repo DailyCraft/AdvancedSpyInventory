@@ -24,7 +24,7 @@ public class EnderChestCommand extends PlayerTabExecutor {
             Translation translation = Translation.of(player);
 
             if (args.length == 0)
-                new EnderChestInventory(player, player.getUniqueId()).getView().open();
+                new EnderChestInventory(player, player.getUniqueId()).open();
             else if (args.length == 1) {
                 if (Permissions.ENDER_OTHERS.has(sender)) {
                     UUID targetUuid;
@@ -39,7 +39,7 @@ public class EnderChestCommand extends PlayerTabExecutor {
 
                     if (targetEntity == null || targetEntity instanceof Player) {
                         if (Bukkit.getOfflinePlayer(targetUuid).isOnline() || Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore())
-                            new EnderChestInventory(player, targetUuid).getView().open();
+                            new EnderChestInventory(player, targetUuid).open();
                         else
                             sender.sendMessage(translation.format("command.never_connected"));
                     } else

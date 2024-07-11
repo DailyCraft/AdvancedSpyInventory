@@ -127,13 +127,13 @@ public enum Permissions {
             types.add(EntityType.ALLAY);
 
         for (EntityType type : types) {
-            String key = start + "." + (Main.VERSION > 13 ? type.getKey().getKey() : type.getName());
-            Permission perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific", Main.VERSION > 13 ? type.getKey() : type.getName()), PermissionDefault.OP, valToMap(ENTITY_VIEW.get()));
+            String key = start + "." + (Main.VERSION >= 14 ? type.getKey().getKey() : type.getName());
+            Permission perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific", Main.VERSION >= 14 ? type.getKey() : type.getName()), PermissionDefault.OP, valToMap(ENTITY_VIEW.get()));
             Bukkit.getPluginManager().addPermission(perm);
             ENTITY_INFORMATION.put(type, perm);
 
             key += ".modify";
-            perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific.modify", Main.VERSION > 13 ? type.getKey().getKey() : type.getName()), PermissionDefault.OP, valToMap(perm));
+            perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific.modify", Main.VERSION >= 14 ? type.getKey().getKey() : type.getName()), PermissionDefault.OP, valToMap(perm));
             Bukkit.getPluginManager().addPermission(perm);
             ENTITY_INFORMATION_MODIFY.put(type, perm);
         }

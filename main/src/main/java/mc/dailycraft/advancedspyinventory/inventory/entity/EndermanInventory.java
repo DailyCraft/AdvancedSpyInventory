@@ -19,7 +19,7 @@ public class EndermanInventory extends EntityInventory<Enderman> {
     @Override
     public ItemStack getItem(int index) {
         if (index == 4) {
-            if (Main.VERSION > 12) {
+            if (Main.VERSION >= 13) {
                 BlockData carried = entity.getCarriedBlock();
                 return getNonNull(carried != null ? new ItemStack(carried.getMaterial()) : null, InformationItems.ENDERMAN_CARRIED.get(translation));
             } else {
@@ -33,7 +33,7 @@ public class EndermanInventory extends EntityInventory<Enderman> {
     @Override
     public void setItem(int index, ItemStack stack) {
         if (index == 4) {
-            if (Main.VERSION > 12)
+            if (Main.VERSION >= 13)
                 entity.setCarriedBlock(stack.getType().createBlockData());
             else
                 entity.setCarriedMaterial(stack.getData());

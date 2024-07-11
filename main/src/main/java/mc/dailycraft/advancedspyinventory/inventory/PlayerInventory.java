@@ -77,7 +77,7 @@ public class PlayerInventory extends BaseInventory {
 
             case 51:
                 if (Permissions.PLAYER_XP.has(viewer))
-                    return new ItemStackBuilder(Main.VERSION > 12 ? Material.EXPERIENCE_BOTTLE : Material.getMaterial("EXP_BOTTLE"), translation.format("interface.player.experience", target.getExperience()) + (Permissions.PLAYER_XP_MODIFY.has(viewer) ? " " + translation.format("generic.modify") : "")).get();
+                    return new ItemStackBuilder(Main.VERSION >= 13 ? Material.EXPERIENCE_BOTTLE : Material.getMaterial("EXP_BOTTLE"), translation.format("interface.player.experience", target.getExperience()) + (Permissions.PLAYER_XP_MODIFY.has(viewer) ? " " + translation.format("generic.modify") : "")).get();
 
                 break;
 
@@ -212,7 +212,7 @@ public class PlayerInventory extends BaseInventory {
             }
         } else if (rawSlot == getSize() - 1) {
             if (target.equals(viewer) && Permissions.ENDER.has(viewer) || Permissions.ENDER_OTHERS.has(viewer))
-                new EnderChestInventory(viewer, target).getView().open();
+                new EnderChestInventory(viewer, target).open();
         } else if (rawSlot >= getSize()) {
             if (target.equals(viewer))
                 viewer.sendMessage(translation.format("interface.player.own"));

@@ -38,7 +38,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
 
                 if (entity.getColor() == Llama.Color.CREAMY)
                     stack = new ItemStack(Material.MILK_BUCKET);
-                else if (Main.VERSION > 12) {
+                else if (Main.VERSION >= 13) {
                     stack = new ItemStack(entity.getColor() == Llama.Color.GRAY ? Material.DIORITE : Material.getMaterial(entity.getColor().name() + "_WOOL"));
                 } else {
                     if (entity.getColor() == Llama.Color.GRAY)
@@ -78,7 +78,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
     public void onClick(InventoryClickEvent event, int rawSlot) {
         if (rawSlot >= getSize() && Permissions.ENTITY_MODIFY.has(viewer)) {
             shift(event, 30, InformationItems.SADDLE.warning(translation), current -> current == Material.SADDLE);
-            shift(event, 32, InformationItems.LLAMA_DECOR.get(translation), current -> Main.VERSION > 12 ? current.getKey().getKey().endsWith("_carpet") : current == Material.getMaterial("CARPET"));
+            shift(event, 32, InformationItems.LLAMA_DECOR.get(translation), current -> Main.VERSION >= 13 ? current.getKey().getKey().endsWith("_carpet") : current == Material.getMaterial("CARPET"));
         }
 
         if (entity.isCarryingChest()) {

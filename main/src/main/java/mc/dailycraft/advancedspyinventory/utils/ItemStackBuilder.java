@@ -45,7 +45,7 @@ public class ItemStackBuilder {
     }
 
     public static ItemStackBuilder ofStainedGlassPane(DyeColor color, String displayName) {
-        if (Main.VERSION > 12)
+        if (Main.VERSION >= 13)
             return new ItemStackBuilder(Material.getMaterial(color.name() + "_STAINED_GLASS_PANE"), displayName);
         else
             return new ItemStackBuilder(new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"), 1, color.getWoolData()), displayName);
@@ -56,7 +56,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder(String headOwner, String displayName) {
-        stack = Main.VERSION > 12 ? new ItemStack(Material.PLAYER_HEAD) : new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 3);
+        stack = Main.VERSION >= 13 ? new ItemStack(Material.PLAYER_HEAD) : new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 3);
         meta = stack.getItemMeta();
         displayName(displayName);
 
@@ -156,6 +156,8 @@ public class ItemStackBuilder {
     }
 
     public <T> ItemStackBuilder enumLore(Translation translation, T[] enumeration, T current, @Nullable Function<T, DyeColor> entryColor, String keyStart) {
+        Arrays.sort(enumeration, Comparator.comparingInt(ClassChange::enumOrdinal));
+
         for (T entry : enumeration) {
             StringBuilder sb = new StringBuilder(current == entry ? "§2\u25ba§a " : "  ");
             if (entryColor != null)
@@ -163,7 +165,7 @@ public class ItemStackBuilder {
             if (current == entry)
                 sb.append("§l");
 
-            lore(sb + translation.format(keyStart + "." + (((Enum<?>) entry).name().toLowerCase())));
+            lore(sb + translation.format(keyStart + "." + ClassChange.enumName(entry).toLowerCase()));
         }
 
         return this;
@@ -174,7 +176,8 @@ public class ItemStackBuilder {
     }
 
     public static <T> void enumLoreClick(InventoryClickEvent event, T[] enumeration, T currentValue, Consumer<T> setter) {
-        int i = ((Enum<?>) currentValue).ordinal();
+        Arrays.sort(enumeration, Comparator.comparingInt(ClassChange::enumOrdinal));
+        int i = ClassChange.enumOrdinal(currentValue);
 
         if (event.isLeftClick())
             setter.accept(enumeration[++i >= enumeration.length ? 0 : i]);

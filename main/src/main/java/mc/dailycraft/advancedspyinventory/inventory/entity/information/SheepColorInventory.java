@@ -1,21 +1,21 @@
 package mc.dailycraft.advancedspyinventory.inventory.entity.information;
 
 import mc.dailycraft.advancedspyinventory.Main;
-import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 public class SheepColorInventory extends InformationInventory<Sheep> {
-    public SheepColorInventory(Player viewer, Sheep entity, CustomInventoryView oldView) {
+    public SheepColorInventory(Player viewer, Sheep entity, InventoryView oldView) {
         super(viewer, entity, oldView, 3);
 
         for (DyeColor color : DyeColor.values())
-            contents[color.ordinal()] = new ItemStackBuilder(Main.VERSION > 12 ? new ItemStack(Material.getMaterial(color.name() + "_WOOL")) : new ItemStack(Material.getMaterial("WOOL"), 1, color.getWoolData()), translation.formatColor(color))
+            contents[color.ordinal()] = new ItemStackBuilder(Main.VERSION >= 13 ? new ItemStack(Material.getMaterial(color.name() + "_WOOL")) : new ItemStack(Material.getMaterial("WOOL"), 1, color.getWoolData()), translation.formatColor(color))
                     .lore(translation.format("interface.information.select" + (entity.getColor() == color ? "ed" : "")))
                     .enchant(entity.getColor() == color).get();
     }
@@ -30,7 +30,7 @@ public class SheepColorInventory extends InformationInventory<Sheep> {
         if (rawSlot >= 0 && rawSlot <= 15) {
             if (entity.getColor() != DyeColor.values()[rawSlot]) {
                 entity.setColor(DyeColor.values()[rawSlot]);
-                oldView.open();
+                openOld();
             }
         } else
             super.onClick(event, rawSlot);

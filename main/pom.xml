@@ -12,7 +12,7 @@
     <artifactId>advancedspyinventory-main</artifactId>
 
     <properties>
-        <minecraftVersion>1.20.6</minecraftVersion>
+        <minecraftVersion>1.21</minecraftVersion>
     </properties>
 
     <repositories>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
-            <version>5.0.51</version>
+            <version>6.0.54</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>

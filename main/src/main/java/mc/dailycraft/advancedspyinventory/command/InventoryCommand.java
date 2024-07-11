@@ -30,7 +30,7 @@ public class InventoryCommand extends PlayerTabExecutor {
             if (args.length == 1) {
                 UUID targetUuid = null;
 
-                if (Main.VERSION > 12) {
+                if (Main.VERSION >= 13) {
                     try {
                         List<Entity> entities = Bukkit.selectEntities(sender, args[0]);
 
@@ -57,7 +57,7 @@ public class InventoryCommand extends PlayerTabExecutor {
                 if (targetEntity == null || targetEntity.getType() == EntityType.PLAYER) {
                     if (Permissions.PLAYER_VIEW.has(player)) {
                         if (Bukkit.getOfflinePlayer(targetUuid).isOnline() || Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore())
-                            new PlayerInventory(player, targetUuid).getView().open();
+                            new PlayerInventory(player, targetUuid).open();
                         else
                             player.sendMessage(translation.format("command.never_connected"));
                     } else
@@ -65,17 +65,17 @@ public class InventoryCommand extends PlayerTabExecutor {
                 } else if (targetEntity instanceof LivingEntity) {
                     if (Permissions.ENTITY_VIEW.has(player)) {
                         if (targetEntity.getType() == EntityType.ENDERMAN)
-                            new EndermanInventory(player, (Enderman) targetEntity).getView().open();
+                            new EndermanInventory(player, (Enderman) targetEntity).open();
                         else if (targetEntity.getType() == EntityType.HORSE || targetEntity.getType() == EntityType.ZOMBIE_HORSE || targetEntity.getType() == EntityType.SKELETON_HORSE)
-                            new HorseInventory<>(player, (AbstractHorse) targetEntity).getView().open();
+                            new HorseInventory<>(player, (AbstractHorse) targetEntity).open();
                         else if (targetEntity.getType() == EntityType.DONKEY || targetEntity.getType() == EntityType.MULE)
-                            new DonkeyInventory(player, (ChestedHorse) targetEntity).getView().open();
+                            new DonkeyInventory(player, (ChestedHorse) targetEntity).open();
                         else if (targetEntity.getType() == EntityType.LLAMA || (Main.VERSION >= 14 && targetEntity.getType() == EntityType.TRADER_LLAMA))
-                            new LlamaInventory(player, (Llama) targetEntity).getView().open();
+                            new LlamaInventory(player, (Llama) targetEntity).open();
                         else if (Main.VERSION >= 15 && targetEntity.getType() == EntityType.BEE)
-                            new BeeInventory(player, (Bee) targetEntity).getView().open();
+                            new BeeInventory(player, (Bee) targetEntity).open();
                         else
-                            new EntityInventory<>(player, (LivingEntity) targetEntity).getView().open();
+                            new EntityInventory<>(player, (LivingEntity) targetEntity).open();
                     } else
                         player.sendMessage(translation.format("command.inventory.entity"));
                 }
@@ -98,7 +98,7 @@ public class InventoryCommand extends PlayerTabExecutor {
                 Player player = (Player) sender;
                 Entity target = null;
 
-                if (Main.VERSION > 14) {
+                if (Main.VERSION >= 15) {
                     RayTraceResult rayTrace = player.getWorld().rayTrace(player.getEyeLocation(), player.getLocation().getDirection(), 6, FluidCollisionMode.ALWAYS, false, 0, entity -> entity != player && entity instanceof LivingEntity);
 
                     if (rayTrace != null)

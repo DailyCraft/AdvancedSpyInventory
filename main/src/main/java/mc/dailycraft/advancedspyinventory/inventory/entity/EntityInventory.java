@@ -5,7 +5,6 @@ import mc.dailycraft.advancedspyinventory.inventory.entity.information.SheepColo
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.inventory.entity.information.VillagerSpecificationsInventory;
 import mc.dailycraft.advancedspyinventory.utils.*;
-import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -217,7 +216,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         entity.setAwake(!entity.isAwake())));
 
         DATA_ITEMS.put(EntityType.CREEPER, new DataItem<Creeper>((inv, entity) ->
-                new ItemStackBuilder(Main.VERSION > 13 ? new ItemStack(Material.CREEPER_HEAD) : new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 4), inv.formatToggleYesNo(entity.isPowered(), "interface.creeper.charged"))
+                new ItemStackBuilder(Main.VERSION >= 14 ? new ItemStack(Material.CREEPER_HEAD) : new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 4), inv.formatToggleYesNo(entity.isPowered(), "interface.creeper.charged"))
                         .get(),
                 (inv, event, entity) ->
                         entity.setPowered(!entity.isPowered())));
@@ -261,10 +260,10 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         ItemStackBuilder.enumLoreClick(event, Rabbit.Type.values(), entity.getRabbitType(), entity::setRabbitType)));
 
         DATA_ITEMS.put(EntityType.SHEEP, new DataItem<Sheep>((inv, entity) ->
-                new ItemStackBuilder(Main.VERSION > 12 ? new ItemStack(entity.getColor() != null ? Material.getMaterial(entity.getColor().name() + "_WOOL") : Material.WHITE_WOOL) : new ItemStack(Material.getMaterial("WOOL"), 1, entity.getColor().getWoolData()), inv.formatModify("generic.color_", inv.translation.formatColor(entity.getColor())))
+                new ItemStackBuilder(Main.VERSION >= 13 ? new ItemStack(entity.getColor() != null ? Material.getMaterial(entity.getColor().name() + "_WOOL") : Material.WHITE_WOOL) : new ItemStack(Material.getMaterial("WOOL"), 1, entity.getColor().getWoolData()), inv.formatModify("generic.color_", inv.translation.formatColor(entity.getColor())))
                         .get(),
                 (inv, event, entity) ->
-                        new SheepColorInventory(inv.viewer, entity, (CustomInventoryView) event.getView()).getView().open()));
+                        new SheepColorInventory(inv.viewer, entity, event.getView()).open()));
 
         DATA_ITEMS.put(EntityType.SLIME, new DataItem<Slime>((inv, entity) ->
                 new ItemStackBuilder(Material.SLIME_BLOCK, inv.formatModify(EntityType.SLIME, "generic.size", entity.getSize()))
@@ -282,7 +281,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         })));
 
         DATA_ITEMS.put(Main.VERSION >= 20.5 ? EntityType.SNOW_GOLEM : EntityType.valueOf("SNOWMAN"), new DataItem<Snowman>((inv, entity) ->
-                new ItemStackBuilder(Main.VERSION > 12 ? Material.CARVED_PUMPKIN : Material.PUMPKIN, inv.formatToggleYesNo(!entity.isDerp(), "interface.snow_golem.pumpkin"))
+                new ItemStackBuilder(Main.VERSION >= 13 ? Material.CARVED_PUMPKIN : Material.PUMPKIN, inv.formatToggleYesNo(!entity.isDerp(), "interface.snow_golem.pumpkin"))
                         .get(),
                 (inv, event, entity) ->
                         entity.setDerp(!entity.isDerp())));
@@ -300,8 +299,8 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                     inv.villagerTick = 0;
 
                 return new ItemStackBuilder(++inv.villagerTick < 40 ? Main.NMS.getVillagerProfessionMaterial(entity.getProfession()) : VillagerSpecificationsInventory.getMaterialOfType(entity.getVillagerType()), inv.formatModify("interface.villager.specifications"))
-                        .lore(inv.translation.format("interface.villager.profession", (inv.villagerTick < 40 ? "§l" : "") + inv.translation.format("interface.villager.profession." + entity.getProfession().name().toLowerCase())))
-                        .lore(inv.translation.format("generic.type_", (inv.villagerTick >= 40 ? "§l" : "") + inv.translation.format("interface.villager.type." + entity.getVillagerType().name().toLowerCase()))).get();
+                        .lore(inv.translation.format("interface.villager.profession", (inv.villagerTick < 40 ? "§l" : "") + inv.translation.format("interface.villager.profession." + ClassChange.enumName(entity.getProfession()).toLowerCase())))
+                        .lore(inv.translation.format("generic.type_", (inv.villagerTick >= 40 ? "§l" : "") + inv.translation.format("interface.villager.type." + ClassChange.enumName(entity.getVillagerType()).toLowerCase()))).get();
             }
         }, (inv, event, entity) -> {
             if (Main.VERSION < 14) {
@@ -316,7 +315,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                     }
                 }
             } else
-                new VillagerSpecificationsInventory(inv.viewer, entity, (CustomInventoryView) event.getView()).getView().open();
+                new VillagerSpecificationsInventory(inv.viewer, entity, event.getView()).open();
         }));
 
         DATA_ITEMS.put(EntityType.WOLF, new DataItem<Wolf>((inv, entity) ->
@@ -351,12 +350,12 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             //<editor-fold desc="Data Items - 1.14+ versions" defaultstate="collapsed">
             DATA_ITEMS.put(EntityType.CAT, new DataItem<Cat>((inv, entity) ->
                     new ItemStackBuilder(Material.TROPICAL_FISH, inv.formatModify("generic.type"))
-                            .enumLore(inv.translation, Cat.Type.values(), entity.getCatType(), "interface.cat.type")
+                            .enumLore(inv.translation, ClassChange.enumValues(Cat.Type.class), entity.getCatType(), "interface.cat.type")
                             .lore("")
                             .lore(inv.translation.format("interface.wolf.collar", inv.translation.formatColor(entity.getCollarColor())))
                             .get(),
                     (inv, event, entity) ->
-                            ItemStackBuilder.enumLoreClick(event, Cat.Type.values(), entity.getCatType(), entity::setCatType)));
+                            ItemStackBuilder.enumLoreClick(event, ClassChange.enumValues(Cat.Type.class), entity.getCatType(), entity::setCatType)));
 
             DATA_ITEMS.put(EntityType.FOX, new DataItem<Fox>((inv, entity) ->
                     new ItemStackBuilder(entity.getFoxType() == Fox.Type.RED ? Material.SPRUCE_SAPLING : Material.SNOW_BLOCK, inv.formatToggle("generic.type"))

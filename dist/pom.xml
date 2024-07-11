@@ -113,6 +113,11 @@
             <artifactId>${project.artifactId}-v1_20_R4</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}-v1_21_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

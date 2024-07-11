@@ -6,9 +6,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import mc.dailycraft.advancedspyinventory.command.EnderChestCommand;
 import mc.dailycraft.advancedspyinventory.command.InventoryCommand;
+import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.inventory.entity.EntityInventory;
 import mc.dailycraft.advancedspyinventory.nms.NMSHandler;
-import mc.dailycraft.advancedspyinventory.utils.CustomInventoryView;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
 import org.bstats.bukkit.Metrics;
@@ -64,10 +64,13 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getView() instanceof CustomInventoryView) {
-            event.setCancelled(true);
-            ((CustomInventoryView) event.getView()).getContainer().onClick(event, event.getRawSlot());
-        } else if (event.getView().getClass().getName().equals(CustomInventoryView.class.getName())) {
+        try {
+            BaseInventory inventory = BaseInventory.fromView(event.getView());
+            if (inventory != null) {
+                event.setCancelled(true);
+                inventory.onClick(event, event.getRawSlot());
+            }
+        } catch (ClassCastException exception) {
             event.setCancelled(true);
             event.getWhoClicked().closeInventory();
             event.getWhoClicked().sendMessage(Translation.of((Player) event.getWhoClicked()).format("interface.reload"));
@@ -78,9 +81,10 @@ public class Main extends JavaPlugin implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         if (event.getEntity().getType() != EntityType.PLAYER) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.getOpenInventory() instanceof CustomInventoryView) {
-                    CustomInventoryView view = (CustomInventoryView) player.getOpenInventory();
-                    if (view.getContainer() instanceof EntityInventory && ((EntityInventory<?>) view.getContainer()).entity == event.getEntity()) {
+                BaseInventory inventory = BaseInventory.fromView(player.getOpenInventory());
+
+                if (inventory != null) {
+                    if (inventory instanceof EntityInventory && ((EntityInventory<?>) inventory).entity == event.getEntity()) {
                         player.closeInventory();
                         player.sendMessage(Translation.of(player).format("interface.dead"));
                     }
@@ -102,10 +106,13 @@ public class Main extends JavaPlugin implements Listener {
             String packageVersion;
 
             if (Bukkit.getServer().getClass().getName().equals("org.bukkit.craftbukkit.CraftServer")) {
+                System.out.println(Bukkit.getVersion());
                 // New paper server (>= 1.20.5)
-                if (VERSION >= 20.5 || VERSION < 21)
+                if (VERSION >= 20.5 && VERSION < 21)
                     packageVersion = "v1_20_R4";
-                else if (VERSION >= 21)
+                else if (VERSION >= 21 && VERSION < 22)
+                    packageVersion = "v1_21_R1";
+                else if (VERSION >= 22)
                     return false;
                 else
                     throw new IllegalStateException("Unexpected server version: 1." + Bukkit.getVersion() + " (" + Bukkit.getName() + ")");

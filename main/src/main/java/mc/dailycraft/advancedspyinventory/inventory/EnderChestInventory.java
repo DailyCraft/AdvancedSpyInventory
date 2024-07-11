@@ -46,12 +46,12 @@ public class EnderChestInventory extends BaseInventory {
 
     @Override
     public void onOpen(Player player) {
-        viewer.playSound(viewer.getLocation(), Sound.valueOf("BLOCK_ENDER" + (Main.VERSION > 12 ? "_" : "") + "CHEST_OPEN"), 2, 1);
+        viewer.playSound(viewer.getLocation(), Sound.valueOf("BLOCK_ENDER" + (Main.VERSION >= 13 ? "_" : "") + "CHEST_OPEN"), 2, 1);
     }
 
     @Override
     public void onClose(Player player) {
-        viewer.playSound(viewer.getLocation(), Sound.valueOf("BLOCK_ENDER" + (Main.VERSION > 12 ? "_" : "") + "CHEST_CLOSE"), 2, 1);
+        viewer.playSound(viewer.getLocation(), Sound.valueOf("BLOCK_ENDER" + (Main.VERSION >= 13 ? "_" : "") + "CHEST_CLOSE"), 2, 1);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class EnderChestInventory extends BaseInventory {
                 viewer.sendMessage(translation.format("permission.enderchest.modify"));
         } else if (rawSlot == getSize() - 9) {
             if (Permissions.PLAYER_VIEW.has(viewer))
-                new PlayerInventory(viewer, target).getView().open();
+                new PlayerInventory(viewer, target).open();
         } else if (rawSlot == getSize() - 5) {
             if ((target.equals(viewer) && Permissions.ENDER_MODIFY.has(viewer) || Permissions.ENDER_OTHERS_MODIFY.has(viewer)) && event.isShiftClick())
                 event.getInventory().clear();

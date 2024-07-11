@@ -92,7 +92,7 @@ public class PlayerData implements AnimalTamer {
             nms.putLong("WorldUUIDLeast", location.getWorld().getUID().getLeastSignificantBits());
             nms.putLong("WorldUUIDMost", location.getWorld().getUID().getMostSignificantBits());
 
-            if (Main.VERSION > 15)
+            if (Main.VERSION >= 16)
                 nms.putString("Dimension", Main.NMS.worldKey(location.getWorld()).toString());
         }
     }

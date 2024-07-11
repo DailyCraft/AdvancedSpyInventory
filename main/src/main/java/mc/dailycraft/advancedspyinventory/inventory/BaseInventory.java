@@ -10,18 +10,18 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class BaseInventory {
-    private static final Constructor<? extends CustomInventoryView> VIEW_CONSTRUCTOR;
-
+    private static Method FROM_VIEW;
     protected static final ItemStack VOID_ITEM = ItemStackBuilder.ofStainedGlassPane(DyeColor.GRAY, "").get();
 
     protected final Player viewer;
@@ -51,12 +51,12 @@ public abstract class BaseInventory {
 
     public abstract void onClick(InventoryClickEvent event, int rawSlot);
 
-    public CustomInventoryView getView() {
-        try {
-            return VIEW_CONSTRUCTOR.newInstance(viewer, this);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException exception) {
-            throw new RuntimeException(exception);
-        }
+    public InventoryView getView() {
+        return Main.NMS.createView(viewer, this);
+    }
+
+    public void open() {
+        Main.NMS.openInventory(viewer, getView());
     }
 
     public static ItemStack getNonNull(ItemStack privileged, ItemStack replacer) {
@@ -75,10 +75,10 @@ public abstract class BaseInventory {
 
     protected void shift(InventoryClickEvent event, int slot, EquipmentSlot equipmentSlot, Function<InformationItems, Function<Translation, ItemStack>> informationItem, String orEndsWith) {
         shift(event, slot, informationItem.apply(InformationItems.of(equipmentSlot)).apply(Translation.of((Player) event.getWhoClicked())), current -> {
-            if (Main.VERSION > 16)
+            if (Main.VERSION >= 17)
                 return current.getEquipmentSlot() == equipmentSlot;
             else
-                return (Main.VERSION > 12 ? current.getKey().getKey() : current.name().toLowerCase()).endsWith(orEndsWith);
+                return (Main.VERSION >= 13 ? current.getKey().getKey() : current.name().toLowerCase()).endsWith(orEndsWith);
         });
     }
 
@@ -110,14 +110,14 @@ public abstract class BaseInventory {
             event.setCurrentItem(null);
 
         if (event.getCursor().equals(informationItem))
-            event.getView().setCursor(null);
+            ClassChange.setCursor(event.getView(), null);
 
         Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
             if (event.getCurrentItem() != null && event.getCurrentItem().equals(informationItem))
                 event.setCurrentItem(null);
 
             if (event.getCursor().equals(informationItem))
-                event.getView().setCursor(null);
+                ClassChange.setCursor(event.getView(), null);
 
             viewer.updateInventory();
         });
@@ -129,9 +129,9 @@ public abstract class BaseInventory {
 
         viewer.closeInventory();
 
-        if (Main.VERSION > 13)
+        if (Main.VERSION >= 14)
             viewer.sendBlockChange(loc, Material.OAK_SIGN.createBlockData());
-        else if (Main.VERSION > 12)
+        else if (Main.VERSION >= 13)
             viewer.sendBlockChange(loc, Material.getMaterial("SIGN").createBlockData());
         else
             viewer.sendBlockChange(loc, Material.getMaterial("SIGN_POST"), (byte) 0);
@@ -161,7 +161,7 @@ public abstract class BaseInventory {
                         result = defaultValue;
                     }
 
-                    if (Main.VERSION > 12)
+                    if (Main.VERSION >= 13)
                         viewer.sendBlockChange(loc, loc.getBlock().getBlockData());
                     else
                         viewer.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
@@ -169,7 +169,7 @@ public abstract class BaseInventory {
                     final T finalResult = result;
                     Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
                         if (runAfter.test(finalResult))
-                            getView().open();
+                            open();
                     });
 
                     triplet.pipeline.channel().eventLoop().submit(() -> triplet.pipeline.remove(handlerId));
@@ -186,12 +186,24 @@ public abstract class BaseInventory {
         });
     }
 
-    static {
+    public static BaseInventory fromView(InventoryView view) {
+        if (!ClassChange.getClass(view).getName().startsWith("mc.dailycraft.advancedspyinventory.nms.") || !ClassChange.getClass(view).getName().endsWith(".CustomInventoryView"))
+            return null;
+
+        if (FROM_VIEW == null || FROM_VIEW.getReturnType() != BaseInventory.class) {
+            try {
+                FROM_VIEW = ClassChange.getClass(view).getMethod("getContainer");
+            } catch (NoSuchMethodException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
+
         try {
-            VIEW_CONSTRUCTOR = (Constructor<CustomInventoryView>) Class.forName("mc.dailycraft.advancedspyinventory.utils.CustomInventoryView" + (Main.VERSION <= 13 ? "Old" : "New"))
-                    .getConstructor(Player.class, BaseInventory.class);
-        } catch (NoSuchMethodException | ClassNotFoundException exception) {
+            return (BaseInventory) FROM_VIEW.invoke(view);
+        } catch (IllegalAccessException | InvocationTargetException exception) {
             throw new RuntimeException(exception);
+        } catch (IllegalArgumentException exception) {
+            return null;
         }
     }
 }

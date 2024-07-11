@@ -49,7 +49,7 @@ public class HorseInventory<T extends AbstractHorse> extends EntityInventory<T> 
     public void onClick(InventoryClickEvent event, int rawSlot) {
         if (rawSlot >= getSize() && Permissions.ENTITY_MODIFY.has(viewer)) {
             shift(event, getSize() - 24, InformationItems.SADDLE.get(translation), current -> current == Material.SADDLE);
-            shift(event, getSize() - 22, InformationItems.HORSE_ARMOR.get(translation), current -> Main.VERSION > 12 ? current.getKey().getKey().endsWith("_horse_armor") : current.name().endsWith("_BARDING"));
+            shift(event, getSize() - 22, InformationItems.HORSE_ARMOR.get(translation), current -> Main.VERSION >= 13 ? current.getKey().getKey().endsWith("_horse_armor") : current.name().endsWith("_BARDING"));
         }
 
         if (rawSlot == getSize() - 24) {
