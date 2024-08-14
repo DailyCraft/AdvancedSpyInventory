@@ -9,35 +9,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClassChange {
-    private static Method enumName;
+    private static final Map<Class<?>, Method> enumName = new HashMap<>();
     public static String enumName(Object oldEnum) {
-        if (enumName == null) {
+        if (!enumName.containsKey(oldEnum.getClass())) {
             try {
-                enumName = oldEnum.getClass().getMethod("name");
+                enumName.put(oldEnum.getClass(), oldEnum.getClass().getMethod("name"));
             } catch (NoSuchMethodException exception) {
                 throw new RuntimeException(exception);
             }
         }
 
         try {
-            return (String) enumName.invoke(oldEnum);
+            return (String) enumName.get(oldEnum.getClass()).invoke(oldEnum);
         } catch (IllegalAccessException | InvocationTargetException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    private static Method enumOrdinal;
+    private static final Map<Class<?>, Method> enumOrdinal = new HashMap<>();
     public static int enumOrdinal(Object oldEnum) {
-        if (enumOrdinal == null) {
+        if (!enumOrdinal.containsKey(oldEnum.getClass())) {
             try {
-                enumOrdinal = oldEnum.getClass().getMethod("ordinal");
+                enumOrdinal.put(oldEnum.getClass(), oldEnum.getClass().getMethod("ordinal"));
             } catch (NoSuchMethodException exception) {
                 throw new RuntimeException(exception);
             }
         }
 
         try {
-            return (int) enumOrdinal.invoke(oldEnum);
+            return (int) enumOrdinal.get(oldEnum.getClass()).invoke(oldEnum);
         } catch (IllegalAccessException | InvocationTargetException exception) {
             throw new RuntimeException(exception);
         }
