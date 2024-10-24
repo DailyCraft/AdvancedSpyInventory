@@ -1,8 +1,10 @@
 package mc.dailycraft.advancedspyinventory.inventory;
 
 import mc.dailycraft.advancedspyinventory.Main;
+import mc.dailycraft.advancedspyinventory.utils.InformationItems;
+import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
+import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.PlayerData;
-import mc.dailycraft.advancedspyinventory.utils.*;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;

@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
@@ -29,7 +28,6 @@ import java.util.function.Function;
 
 public class ItemStackBuilder {
     private static final Map<String, GameProfile> headProfiles = new HashMap<>();
-    private static Field headField;
 
     private final ItemStack stack;
     private final ItemMeta meta;
@@ -88,14 +86,9 @@ public class ItemStackBuilder {
                         Main.getInstance().getLogger().severe("Error when loading head '" + headOwner + "'! Message: " + exception.getMessage());
                     }
                 });
-            } else {
-                if (headField == null)
-                    (headField = meta.getClass().getDeclaredField("profile")).setAccessible(true);
-
-                headField.set(meta, profile);
-                Main.NMS.setHeadSerializedProfile((SkullMeta) meta, profile);
-            }
-        } catch (Exception exception) {
+            } else
+                Main.NMS.setHeadProfile((SkullMeta) meta, profile);
+        } catch (ReflectiveOperationException exception) {
             throw new RuntimeException(exception);
         }
     }

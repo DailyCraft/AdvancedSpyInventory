@@ -1,6 +1,5 @@
 package mc.dailycraft.advancedspyinventory.nms.v1_21_R1;
 
-import com.mojang.authlib.GameProfile;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
 import net.minecraft.core.Holder;
@@ -29,14 +28,13 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.UUID;
 
 public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHandler {
-    private static Field connectionField, profileField;
+    private static Field connectionField;
 
     @Override
     public NMSData getData(UUID playerUuid) {
@@ -92,22 +90,5 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
         }
 
         return Material.RED_BED;
-    }
-
-    @Override
-    public void setHeadSerializedProfile(SkullMeta meta, GameProfile profile) {
-        if (profileField == null) {
-            try {
-                (profileField = meta.getClass().getDeclaredField("profile")).setAccessible(true);
-            } catch (NoSuchFieldException exception) {
-                throw new RuntimeException(exception);
-            }
-        }
-
-        try {
-            profileField.set(meta, profile);
-        } catch (IllegalAccessException exception) {
-            throw new RuntimeException(exception);
-        }
     }
 }

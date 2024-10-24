@@ -1,11 +1,14 @@
 package mc.dailycraft.advancedspyinventory.inventory.entity;
 
 import mc.dailycraft.advancedspyinventory.Main;
-import mc.dailycraft.advancedspyinventory.inventory.entity.information.SheepColorInventory;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
+import mc.dailycraft.advancedspyinventory.inventory.entity.information.SheepColorInventory;
 import mc.dailycraft.advancedspyinventory.inventory.entity.information.VillagerSpecificationsInventory;
 import mc.dailycraft.advancedspyinventory.utils.*;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.entity.memory.MemoryKey;

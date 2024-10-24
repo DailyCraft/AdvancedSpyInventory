@@ -1,9 +1,12 @@
 package mc.dailycraft.advancedspyinventory.nms.v1_20_R2;
 
+import com.mojang.authlib.GameProfile;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
@@ -28,6 +31,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
@@ -36,7 +40,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHandler {
-    private static Field connectionField;
+    private static Field connectionField, serializedProfileField;
 
     @Override
     public NMSData getData(UUID playerUuid) {
@@ -75,10 +79,8 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     @Override
     public Material getVillagerProfessionMaterial(Villager.Profession profession) {
         return switch (profession) {
-            case NONE ->
-                    Material.BELL;
-            case NITWIT ->
-                    Material.OAK_DOOR;
+            case NONE -> Material.BELL;
+            case NITWIT -> Material.OAK_DOOR;
             default -> {
                 for (Holder.Reference<PoiType> holder : BuiltInRegistries.POINT_OF_INTEREST_TYPE.holders().toList()) {
                     if (CraftVillager.CraftProfession.bukkitToMinecraft(profession).acquirableJobSite().test(holder)) {
@@ -95,5 +97,15 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     @Override
     public void setBasePotionType(PotionMeta meta, PotionType potionType) {
         meta.setBasePotionData(new PotionData(potionType));
+    }
+
+    @Override
+    public void setHeadProfile(SkullMeta meta, GameProfile profile) throws ReflectiveOperationException {
+        Variables.setProfileField(meta, profile);
+
+        if (serializedProfileField == null)
+            (serializedProfileField = meta.getClass().getDeclaredField("serializedProfile")).setAccessible(true);
+
+        serializedProfileField.set(meta, NbtUtils.writeGameProfile(new CompoundTag(), profile));
     }
 }

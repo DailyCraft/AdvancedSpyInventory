@@ -1,7 +1,7 @@
 package mc.dailycraft.advancedspyinventory.command;
 
 import mc.dailycraft.advancedspyinventory.Main;
-import mc.dailycraft.advancedspyinventory.inventory.*;
+import mc.dailycraft.advancedspyinventory.inventory.PlayerInventory;
 import mc.dailycraft.advancedspyinventory.inventory.entity.*;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import mc.dailycraft.advancedspyinventory.utils.Translation;
@@ -40,8 +40,7 @@ public class InventoryCommand extends PlayerTabExecutor {
                             sender.sendMessage(translation.format("command.inventory.only_one"));
                             return true;
                         }
-                    } catch (IllegalArgumentException ignored) {
-                    }
+                    } catch (IllegalArgumentException ignored) {}
                 }
 
                 if (targetUuid == null) {

@@ -2,7 +2,10 @@ package mc.dailycraft.advancedspyinventory.nms.v1_13_R2;
 
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_13_R2.BlockPosition;
+import net.minecraft.server.v1_13_R2.PacketPlayInUpdateSign;
+import net.minecraft.server.v1_13_R2.PacketPlayOutOpenSignEditor;
+import net.minecraft.server.v1_13_R2.PlayerConnection;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.CraftEquipmentSlot;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;

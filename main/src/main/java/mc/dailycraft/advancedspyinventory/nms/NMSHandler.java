@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionType;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
@@ -40,7 +41,7 @@ public interface NMSHandler {
 
     Inventory createInventory(BaseInventory inventory);
 
-    // 1.21+ - Add NMS
+    // 1.21+ - Extends a CraftBukkit class
     default InventoryView createView(Player viewer, BaseInventory inventory) {
         if (Variables.VIEW_CONSTRUCTOR == null) {
             String version;
@@ -116,8 +117,11 @@ public interface NMSHandler {
         return Bukkit.getEntity(uuid);
     }
 
-    // 1.20.3+ - Unwanted warning message
-    default void setHeadSerializedProfile(SkullMeta meta, GameProfile profile) {}
+    // 1.20.1-1.20.4 - Unwanted warning message
+    // 1.21.2+ - The variable type is no longer a GameProfile.
+    default void setHeadProfile(SkullMeta meta, GameProfile profile) throws ReflectiveOperationException {
+        Variables.setProfileField(meta, profile);
+    }
 
     // 1.20.3+ - New API
     default void setBasePotionType(PotionMeta meta, PotionType potionType) {
@@ -126,5 +130,13 @@ public interface NMSHandler {
 
     class Variables {
         private static Constructor<? extends InventoryView> VIEW_CONSTRUCTOR;
+        private static Field PROFILE_FIELD;
+
+        public static void setProfileField(SkullMeta meta, Object profile) throws ReflectiveOperationException {
+            if (PROFILE_FIELD == null)
+                (PROFILE_FIELD = meta.getClass().getDeclaredField("profile")).setAccessible(true);
+
+            PROFILE_FIELD.set(meta, profile);
+        }
     }
 }

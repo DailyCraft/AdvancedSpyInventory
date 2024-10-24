@@ -1,34 +1,34 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_20_R3;
+package mc.dailycraft.advancedspyinventory.nms.v1_21_R2;
 
 import com.mojang.authlib.GameProfile;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R3.CraftEquipmentSlot;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftLocation;
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_21_R2.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_21_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_21_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R2.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_21_R2.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_21_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R2.util.CraftLocation;
+import org.bukkit.craftbukkit.v1_21_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHandler {
-    private static Field connectionField, serializedProfileField;
+    private static Field connectionField;
 
     @Override
     public NMSData getData(UUID playerUuid) {
@@ -55,10 +55,15 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
     }
 
     @Override
+    public InventoryView createView(Player viewer, BaseInventory inventory) {
+        return new CustomInventoryView(viewer, inventory);
+    }
+
+    @Override
     public Triplet<?> openSign(Player player, Location loc) {
         if (connectionField == null) {
             try {
-                (connectionField = ServerCommonPacketListenerImpl.class.getDeclaredField("c")).setAccessible(true);
+                (connectionField = ServerCommonPacketListenerImpl.class.getDeclaredField("e")).setAccessible(true);
             } catch (NoSuchFieldException exception) {
                 throw new RuntimeException(exception);
             }
@@ -75,29 +80,23 @@ public class NMSHandler implements mc.dailycraft.advancedspyinventory.nms.NMSHan
 
     @Override
     public Material getVillagerProfessionMaterial(Villager.Profession profession) {
-        return switch (profession) {
-            case NONE -> Material.BELL;
-            case NITWIT -> Material.OAK_DOOR;
-            default -> {
-                for (Holder.Reference<PoiType> holder : BuiltInRegistries.POINT_OF_INTEREST_TYPE.holders().toList()) {
-                    if (CraftVillager.CraftProfession.bukkitToMinecraft(profession).acquirableJobSite().test(holder)) {
-                        Iterator<BlockState> iterator = holder.value().matchingStates().iterator();
-                        yield iterator.hasNext() ? CraftMagicNumbers.getMaterial(iterator.next().getBlock().asItem()) : Material.RED_BED;
-                    }
-                }
+        if (profession == Villager.Profession.NONE)
+            return Material.BELL;
+        else if (profession == Villager.Profession.NITWIT)
+            return Material.OAK_DOOR;
 
-                yield Material.RED_BED;
+        for (Holder<PoiType> holder : BuiltInRegistries.POINT_OF_INTEREST_TYPE.asHolderIdMap()) {
+            if (CraftVillager.CraftProfession.bukkitToMinecraft(profession).acquirableJobSite().test(holder)) {
+                Iterator<BlockState> iterator = holder.value().matchingStates().iterator();
+                return iterator.hasNext() ? CraftMagicNumbers.getMaterial(iterator.next().getBlock().asItem()) : Material.RED_BED;
             }
-        };
+        }
+
+        return Material.RED_BED;
     }
 
     @Override
     public void setHeadProfile(SkullMeta meta, GameProfile profile) throws ReflectiveOperationException {
-        Variables.setProfileField(meta, profile);
-
-        if (serializedProfileField == null)
-            (serializedProfileField = meta.getClass().getDeclaredField("serializedProfile")).setAccessible(true);
-
-        serializedProfileField.set(meta, NbtUtils.writeGameProfile(new CompoundTag(), profile));
+        Variables.setProfileField(meta, new ResolvableProfile(profile));
     }
 }
