@@ -121,7 +121,7 @@
         "no": "No Beehive",
         "location": "Location: §a%d %d %d",
         "honey": "Honey Level: §a%d§7/§a%d",
-        "number": "Bees Number: §a%d§7/§a%d"
+        "count": "Bees Count: §a%d§7/§a%d"
       },
       "nectar": "Has Nectar: %s",
       "stinger": "Has its stinger: %s"
@@ -176,6 +176,11 @@
       "gold": "Gold",
       "salt_and_pepper": "Salt and Pepper",
       "the_killer_bunny": "The Killer Bunny"
+    },
+    "salmon.type": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
     },
     "sheep.title": "%s's wool color",
     "snow_golem.pumpkin": "Wears a pumpkin: %s",

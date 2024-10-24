@@ -24,12 +24,13 @@ public class BeeInventory extends EntityInventory<Bee> {
                     org.bukkit.block.data.type.Beehive data = (org.bukkit.block.data.type.Beehive) hive.getBlockData();
 
                     return new ItemStackBuilder(Material.BEEHIVE, translation.format("interface.bee.hive"))
+                            .hideAdditionalTooltip()
                             .lore(translation.format("interface.bee.hive.location", hive.getX(), hive.getY(), hive.getZ()))
                             .lore(translation.format("interface.bee.hive.honey", data.getHoneyLevel(), data.getMaximumHoneyLevel()))
-                            .lore(translation.format("interface.bee.hive.number", hive.getEntityCount(), hive.getMaxEntities()))
+                            .lore(translation.format("interface.bee.hive.count", hive.getEntityCount(), hive.getMaxEntities()))
                             .get();
                 } else {
-                    return new ItemStackBuilder(Material.BEE_NEST, translation.format("interface.bee.hive.no")).get();
+                    return new ItemStackBuilder(Material.BEE_NEST, translation.format("interface.bee.hive.no")).hideAdditionalTooltip().get();
                 }
             } else if (index == getSize() - 2) {
                 return new ItemStackBuilder(Material.HONEYCOMB, formatToggleYesNo(entity.hasNectar(), "interface.bee.nectar")).get();

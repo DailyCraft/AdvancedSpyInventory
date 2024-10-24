@@ -96,13 +96,18 @@ public class ItemStackBuilder {
     public ItemStackBuilder(PotionType potionType, String displayName) {
         this(Material.POTION, displayName);
         Main.NMS.setBasePotionType((PotionMeta) meta, potionType);
-        meta.addItemFlags(Main.VERSION >= 20.5 ? ItemFlag.HIDE_ADDITIONAL_TOOLTIP : ItemFlag.valueOf("HIDE_POTION_EFFECTS"));
+        hideAdditionalTooltip();
     }
 
     public ItemStackBuilder displayName(String displayName) {
         meta.setDisplayName(displayName != null ? ChatColor.RESET.toString() + ChatColor.WHITE + displayName : null);
         if (Main.VERSION >= 20.5 && (displayName == null || displayName.isEmpty()))
             meta.setHideTooltip(true);
+        return this;
+    }
+
+    public ItemStackBuilder hideAdditionalTooltip() {
+        meta.addItemFlags(Main.VERSION >= 20.5 ? ItemFlag.HIDE_ADDITIONAL_TOOLTIP : ItemFlag.valueOf("HIDE_POTION_EFFECTS"));
         return this;
     }
 

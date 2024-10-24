@@ -125,6 +125,8 @@ public enum Permissions {
         }
         if (Main.VERSION >= 19)
             types.add(EntityType.ALLAY);
+        if (Main.VERSION >= 21.2)
+            types.add(EntityType.SALMON);
 
         for (EntityType type : types) {
             String key = start + "." + (Main.VERSION >= 14 ? type.getKey().getKey() : type.getName());

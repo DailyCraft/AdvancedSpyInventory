@@ -121,7 +121,7 @@
         "no": "Aucune ruche",
         "location": "Localisation : §a%d %d %d",
         "honey": "Quantité de miel : §a%d§7/§a%d",
-        "number": "Nombre d'abeilles : §a%d§7/§a%d"
+        "count": "Nombre d'abeilles : §a%d§7/§a%d"
       },
       "nectar": "A du nectar : %s",
       "stinger": "A son dard : %s"
@@ -176,6 +176,11 @@
       "gold": "Or",
       "salt_and_pepper": "Sel et poivre",
       "the_killer_bunny": "Le lapin tueur"
+    },
+    "salmon.type": {
+      "small": "Petit",
+      "medium": "Moyen",
+      "large": "Grand"
     },
     "sheep.title": "Couleur de la laine de %s",
     "snow_golem.pumpkin": "Porte une citrouille : %s",

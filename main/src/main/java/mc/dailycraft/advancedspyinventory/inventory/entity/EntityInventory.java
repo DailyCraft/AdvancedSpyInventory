@@ -423,6 +423,17 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
             }, null));
             //</editor-fold>
         }
+
+        if (Main.VERSION >= 21.2) {
+            //<editor-fold desc="Data Items - 1.21.2+ versions" defaultstate="collapsed">
+            DATA_ITEMS.put(EntityType.SALMON, new DataItem<Salmon>((inv, entity) ->
+                    new ItemStackBuilder(Material.SALMON, inv.formatModify("generic.type"))
+                            .enumLore(inv.translation, Salmon.Variant.values(), entity.getVariant(), "interface.salmon.type")
+                            .get(),
+                    (inv, event, entity) ->
+                            ItemStackBuilder.enumLoreClick(event, Salmon.Variant.values(), entity.getVariant(), entity::setVariant)));
+            //</editor-fold>
+        }
     }
 
     private void setEquipmentItem(EquipmentSlot slot, ItemStack stack) {
