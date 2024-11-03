@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public class PlayerData implements AnimalTamer {
+    public static final Attribute MAX_HEALTH_ATTRIBUTE = Main.VERSION >= 21.3 ? Attribute.MAX_HEALTH : Attribute.valueOf("GENERIC_MAX_HEALTH");
+
     private final UUID playerUuid;
     private final NMSData nms;
 
@@ -58,13 +60,13 @@ public class PlayerData implements AnimalTamer {
 
     public float getMaxHealth() {
         return isOnline()
-                ? (float) getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()
+                ? (float) getPlayer().getAttribute(MAX_HEALTH_ATTRIBUTE).getValue()
                 : nms.getMaxHealth();
     }
 
     public void setMaxHealth(float maxHealth) {
         if (isOnline())
-            getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+            getPlayer().getAttribute(MAX_HEALTH_ATTRIBUTE).setBaseValue(maxHealth);
         else
             nms.setMaxHealth(maxHealth);
     }

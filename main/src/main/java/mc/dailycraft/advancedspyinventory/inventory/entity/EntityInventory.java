@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -60,7 +59,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
 
         else if (index == getSize() - 8) {
             if (Permissions.ENTITY_HEALTH.has(viewer)) {
-                return new ItemStackBuilder(Main.VERSION >= 20.5 ? PotionType.HEALING : PotionType.valueOf("INSTANT_HEAL"), translation.format("interface.entity.health", entity.getHealth(), entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()))
+                return new ItemStackBuilder(Main.VERSION >= 20.5 ? PotionType.HEALING : PotionType.valueOf("INSTANT_HEAL"), translation.format("interface.entity.health", entity.getHealth(), entity.getAttribute(PlayerData.MAX_HEALTH_ATTRIBUTE).getValue()))
                         .lore(Permissions.ENTITY_HEALTH_MODIFY.has(viewer) || Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer), "", translation.format("interface.entity.health.modify.0"))
                         .lore(Permissions.ENTITY_HEALTH_MODIFY.has(viewer), "   " + translation.format("interface.entity.health.modify.1"))
                         .lore(Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer), "   " + translation.format("interface.entity.health.modify.2")).get();
@@ -139,7 +138,7 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 replaceItem(event, InformationItems.values()[Math.abs(getSize() - rawSlot - 12)].warning(translation));
         } else if (rawSlot == getSize() - 8) {
             if (Permissions.ENTITY_HEALTH_MODIFY.has(viewer) && event.isLeftClick())
-                openSign("health", entity.getHealth(), 0d, entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), Double::parseDouble, health -> {
+                openSign("health", entity.getHealth(), 0d, entity.getAttribute(PlayerData.MAX_HEALTH_ATTRIBUTE).getValue(), Double::parseDouble, health -> {
                     entity.setHealth(health);
 
                     if (entity.isDead()) {
@@ -150,13 +149,13 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                         return true;
                 });
             else if (Permissions.ENTITY_HEALTH_MODIFY_MAX.has(viewer) && event.isRightClick())
-                openSign("health.max", entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), 0.1, Double.MAX_VALUE, Double::parseDouble, maxHealth -> {
+                openSign("health.max", entity.getAttribute(PlayerData.MAX_HEALTH_ATTRIBUTE).getValue(), 0.1, Double.MAX_VALUE, Double::parseDouble, maxHealth -> {
                     if (entity.isDead()) {
                         viewer.closeInventory();
                         viewer.sendMessage(translation.format("interface.dead"));
                         return false;
                     } else {
-                        entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+                        entity.getAttribute(PlayerData.MAX_HEALTH_ATTRIBUTE).setBaseValue(maxHealth);
                         return true;
                     }
                 });

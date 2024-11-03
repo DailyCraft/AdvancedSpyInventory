@@ -129,9 +129,9 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public float getMaxHealth() {
-        for (Tag tag : getData().getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND))
-            if (((CompoundTag) tag).getString("Name").equals("minecraft:generic.max_health"))
-                return ((CompoundTag) tag).getFloat("Base");
+        for (Tag tag : getData().getList("attributes", CraftMagicNumbers.NBT.TAG_COMPOUND))
+            if (((CompoundTag) tag).getString("id").equals("minecraft:max_health"))
+                return ((CompoundTag) tag).getFloat("base");
 
         return -1;
     }
@@ -139,18 +139,18 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     @Override
     public void setMaxHealth(float maxHealth) {
         CompoundTag data = getData();
-        ListTag list = data.getList("Attributes", CraftMagicNumbers.NBT.TAG_COMPOUND);
+        ListTag list = data.getList("attributes", CraftMagicNumbers.NBT.TAG_COMPOUND);
 
         for (Tag nbt : list) {
-            if (((CompoundTag) nbt).getString("Name").equals("minecraft:generic.max_health")) {
+            if (((CompoundTag) nbt).getString("id").equals("minecraft:max_health")) {
                 list.remove(nbt);
                 break;
             }
         }
 
         CompoundTag nbt = new CompoundTag();
-        nbt.putString("Name", "minecraft:generic.max_health");
-        nbt.putFloat("Base", maxHealth);
+        nbt.putString("id", "minecraft:max_health");
+        nbt.putFloat("base", maxHealth);
         list.add(nbt);
         saveData(data);
     }

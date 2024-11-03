@@ -106,15 +106,14 @@ public class Main extends JavaPlugin implements Listener {
             String packageVersion;
 
             if (Bukkit.getServer().getClass().getName().equals("org.bukkit.craftbukkit.CraftServer")) {
-                // New paper server (>= 1.20.5)
-                if (VERSION >= 20.5 && VERSION < 21)
-                    packageVersion = "v1_20_R4";
-                else if (VERSION >= 21 && VERSION < 22)
-                    packageVersion = "v1_21_R1";
-                else if (VERSION >= 22)
-                    return false;
-                else
+                if (VERSION < 20.5)
                     throw new IllegalStateException("Unexpected server version: 1." + Bukkit.getVersion() + " (" + Bukkit.getName() + ")");
+
+                try {
+                    packageVersion = (String) Class.forName("io.papermc.paper.util.MappingEnvironment").getField("LEGACY_CB_VERSION").get(null);
+                } catch (ReflectiveOperationException exception) {
+                    throw new IllegalStateException("Unexpected server version: 1." + Bukkit.getVersion() + " (" + Bukkit.getName() + ")");
+                }
             } else
                 packageVersion = getServer().getClass().getPackage().getName().substring(23);
 

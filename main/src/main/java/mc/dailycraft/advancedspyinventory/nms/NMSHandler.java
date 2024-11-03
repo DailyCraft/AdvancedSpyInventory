@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public interface NMSHandler {
-
     // 1.16-1.18 - Method not implemented in Bukkit.
     default ResourceKey worldKey(World world) {
         if (Main.VERSION >= 19) // 1.19+ - Method implemented
