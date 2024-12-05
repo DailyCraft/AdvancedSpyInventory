@@ -12,7 +12,7 @@
     <artifactId>advancedspyinventory-main</artifactId>
 
     <properties>
-        <minecraftVersion>1.21.3</minecraftVersion>
+        <minecraftVersion>1.21.4</minecraftVersion>
     </properties>
 
     <repositories>
@@ -31,22 +31,22 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>24.1.0</version>
+            <version>26.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
-            <version>6.0.55</version>
+            <version>6.0.57</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport</artifactId>
-            <version>4.1.97.Final</version>
+            <version>4.1.115.Final</version>
         </dependency>
     </dependencies>
 
@@ -62,7 +62,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.6.0</version>
                 <configuration>
                     <relocations>
                         <relocation>

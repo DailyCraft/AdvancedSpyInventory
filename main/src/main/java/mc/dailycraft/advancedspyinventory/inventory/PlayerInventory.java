@@ -142,17 +142,11 @@ public class PlayerInventory extends BaseInventory {
                 viewer.sendMessage(translation.format("interface.player.own"));
         } else if (rawSlot == 42) {
             if (Permissions.PLAYER_SLOT.has(viewer)) {
-                if (event.getClick() == ClickType.LEFT) {
-                    if (target.getSelectedSlot() > 0)
-                        target.setSelectedSlot(target.getSelectedSlot() - 1);
-                    else
-                        target.setSelectedSlot(8);
-                } else if (event.getClick() == ClickType.RIGHT) {
-                    if (target.getSelectedSlot() < 8)
-                        target.setSelectedSlot(target.getSelectedSlot() + 1);
-                    else
-                        target.setSelectedSlot(0);
-                } else if (event.getClick() == ClickType.NUMBER_KEY)
+                if (event.getClick() == ClickType.LEFT)
+                    target.setSelectedSlot((target.getSelectedSlot() + 8) % 9);
+                else if (event.getClick() == ClickType.RIGHT)
+                    target.setSelectedSlot((target.getSelectedSlot() + 1) % 9);
+                else if (event.getClick() == ClickType.NUMBER_KEY)
                     target.setSelectedSlot(event.getHotbarButton());
             }
 
