@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.v1_21_R4.CraftServer;
 import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 
 public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     public NMSData(UUID playerUuid) {
@@ -90,12 +91,12 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
-    public ItemStack[] getArray(String id, int size, Function<Integer, Integer> slotConversion) {
+    public ItemStack[] getArray(String id, int size, IntUnaryOperator slotConversion) {
         ItemStack[] array = new ItemStack[size];
         Arrays.fill(array, new ItemStack(Material.AIR));
 
         getData().getListOrEmpty(id).stream().map(tag -> (CompoundTag) tag)
-                .forEach(tag -> array[slotConversion.apply((int) tag.getByteOr("Slot", (byte) 0))] = CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.parse(registryAccess(), tag).orElse(net.minecraft.world.item.ItemStack.EMPTY)));
+                .forEach(tag -> array[slotConversion.applyAsInt(tag.getByteOr("Slot", (byte) 0))] = CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.parse(registryAccess(), tag).orElse(net.minecraft.world.item.ItemStack.EMPTY)));
 
         return array;
     }
@@ -151,6 +152,41 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
         nbt.putString("id", "minecraft:max_health");
         nbt.putFloat("base", maxHealth);
         list.add(nbt);
+        saveData(data);
+    }
+
+    @Override
+    public ItemStack getEquipment(EquipmentSlot slot) {
+        String name = switch (slot) {
+            case HEAD -> "head";
+            case CHEST -> "chest";
+            case LEGS -> "legs";
+            case FEET -> "feet";
+            case OFF_HAND -> "offhand";
+            default -> null;
+        };
+
+        return getData().getCompoundOrEmpty("equipment").getCompound(name)
+                .map(tag -> CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.parse(registryAccess(), tag).orElse(net.minecraft.world.item.ItemStack.EMPTY)))
+                .orElseGet(() -> new ItemStack(Material.AIR));
+    }
+
+    @Override
+    public void setEquipment(EquipmentSlot slot, ItemStack stack) {
+        String name = switch (slot) {
+            case HEAD -> "head";
+            case CHEST -> "chest";
+            case LEGS -> "legs";
+            case FEET -> "feet";
+            case OFF_HAND -> "offhand";
+            default -> null;
+        };
+
+        CompoundTag data = getData();
+        if (stack == null || stack.getType() == Material.AIR)
+            data.getCompoundOrEmpty("equipment").remove(name);
+        else
+            data.getCompoundOrEmpty("equipment").put(name, CraftItemStack.asNMSCopy(stack).save(registryAccess()));
         saveData(data);
     }
 

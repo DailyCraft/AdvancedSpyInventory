@@ -38,7 +38,7 @@ public class PlayerInventory extends BaseInventory {
         else if (index <= 35)
             return inventory[index - 27];
         else if (index >= 37 && index <= 40)
-            return getNonNull(inventory[-index + 76], InformationItems.values()[-index + 42].get(translation));
+            return getNonNull(target.getEquipment(EquipmentSlot.values()[-index + 42]), InformationItems.values()[-index + 42].get(translation));
 
         switch (index) {
             case 42:
@@ -49,7 +49,7 @@ public class PlayerInventory extends BaseInventory {
                         .get();
 
             case 43:
-                return getNonNull(inventory[40], InformationItems.OFF_HAND.get(translation));
+                return getNonNull(target.getEquipment(EquipmentSlot.OFF_HAND), InformationItems.OFF_HAND.get(translation));
 
             case 44:
                 if (target.isOnline() && target.getPlayer().getGameMode() != GameMode.CREATIVE)
@@ -108,9 +108,9 @@ public class PlayerInventory extends BaseInventory {
         else if (index <= 35)
             target.addInInventory(index - 27, stack);
         else if (index >= 37 && index <= 40 && !stack.equals(InformationItems.values()[-index + 42].get(translation)))
-            target.addInInventory(-index + 76, stack);
+            target.setEquipment(EquipmentSlot.values()[-index + 42], stack);
         else if (index == 43 && !stack.equals(InformationItems.OFF_HAND.get(translation)))
-            target.addInInventory(40, stack);
+            target.setEquipment(EquipmentSlot.OFF_HAND, stack);
         else if (index == 44 && !stack.equals(InformationItems.CURSOR.get(translation)) && target.isOnline() && target.getPlayer().getGameMode() != GameMode.CREATIVE)
             target.getPlayer().setItemOnCursor(stack);
     }

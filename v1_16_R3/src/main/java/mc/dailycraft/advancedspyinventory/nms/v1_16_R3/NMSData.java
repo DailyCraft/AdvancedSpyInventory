@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 
 public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     public NMSData(UUID playerUuid) {
@@ -86,12 +86,12 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     @Override
-    public ItemStack[] getArray(String id, int size, Function<Integer, Integer> slotConversion) {
+    public ItemStack[] getArray(String id, int size, IntUnaryOperator slotConversion) {
         ItemStack[] array = new ItemStack[size];
         Arrays.fill(array, new ItemStack(Material.AIR));
 
         getData().getList(id, CraftMagicNumbers.NBT.TAG_COMPOUND).stream().map(tag -> (NBTTagCompound) tag)
-                .forEach(tag -> array[slotConversion.apply((int) tag.getByte("Slot"))] = CraftItemStack.asBukkitCopy(net.minecraft.server.v1_16_R3.ItemStack.a(tag)));
+                .forEach(tag -> array[slotConversion.applyAsInt(tag.getByte("Slot"))] = CraftItemStack.asBukkitCopy(net.minecraft.server.v1_16_R3.ItemStack.a(tag)));
 
         return array;
     }

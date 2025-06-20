@@ -8,6 +8,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public class PlayerData implements AnimalTamer {
-    public static final Attribute MAX_HEALTH_ATTRIBUTE = Main.VERSION >= 21.3 ? Attribute.MAX_HEALTH : Attribute.valueOf("GENERIC_MAX_HEALTH");
+    public static final Attribute MAX_HEALTH_ATTRIBUTE = Main.VERSION >= 21.3 ? Attribute.MAX_HEALTH : ClassChange.enumValueOf(Attribute.class, "GENERIC_MAX_HEALTH");
 
     private final UUID playerUuid;
     private final NMSData nms;
@@ -113,22 +114,34 @@ public class PlayerData implements AnimalTamer {
     public ItemStack[] getInventory() {
         if (isOnline())
             return getPlayer().getInventory().getContents();
-
-        return nms.getArray("Inventory", 41, i -> {
-            if (i >= 100 && i <= 103)
-                i -= 64;
-            else if (i == -106)
-                i = 40;
-
-            return i;
-        });
+        return nms.getInventory();
     }
 
     public void addInInventory(int slot, ItemStack stack) {
         if (isOnline())
             getPlayer().getInventory().setItem(slot, stack);
         else
-            nms.setInArray("Inventory", slot <= 35 ? slot : slot <= 39 ? slot + 64 : slot == 40 ? -106 : -1, stack);
+            nms.setInInventory(slot, stack);
+    }
+
+    public ItemStack getEquipment(EquipmentSlot slot) {
+        if (isOnline()) {
+            if (Main.VERSION >= 15.2)
+                return getPlayer().getInventory().getItem(slot);
+            else
+                return getPlayer().getInventory().getItem(slot == EquipmentSlot.OFF_HAND ? 40 : slot.ordinal() + 34);
+        }
+        return nms.getEquipment(slot);
+    }
+
+    public void setEquipment(EquipmentSlot slot, ItemStack stack) {
+        if (isOnline()) {
+            if (Main.VERSION >= 15.2)
+                getPlayer().getInventory().setItem(slot, stack);
+            else
+                getPlayer().getInventory().setItem(slot == EquipmentSlot.OFF_HAND ? 40 : slot.ordinal() + 34, stack);
+        } else
+            nms.setEquipment(slot, stack);
     }
 
     public ItemStack[] getEnderChest() {
