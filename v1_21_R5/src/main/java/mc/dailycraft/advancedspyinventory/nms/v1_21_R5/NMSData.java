@@ -10,6 +10,7 @@ import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.entity.EntityEquipment;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import org.bukkit.Bukkit;
@@ -23,13 +24,19 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.IntUnaryOperator;
 
 public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
+    private Method paperLoadMethod;
+    private Field paperInputField;
+
     public NMSData(UUID playerUuid) {
         super(playerUuid);
     }
@@ -41,7 +48,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public void putInt(String id, int value) {
-        CompoundTag data = getData().input;
+        CompoundTag data = getDataInput();
         data.putInt(id, value);
         saveData(data);
     }
@@ -53,7 +60,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public void putLong(String id, long value) {
-        CompoundTag data = getData().input;
+        CompoundTag data = getDataInput();
         data.putLong(id, value);
         saveData(data);
     }
@@ -65,7 +72,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public void putFloat(String id, float value) {
-        CompoundTag data = getData().input;
+        CompoundTag data = getDataInput();
         data.putFloat(id, value);
         saveData(data);
     }
@@ -77,7 +84,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public void putString(String id, String value) {
-        CompoundTag data = getData().input;
+        CompoundTag data = getDataInput();
         data.putString(id, value);
         saveData(data);
     }
@@ -89,7 +96,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public void putList(String id, double[] value, boolean isFloat) {
-        CompoundTag data = getData().input;
+        CompoundTag data = getDataInput();
         ListTag list = new ListTag();
         for (double v : value)
             list.add(isFloat ? FloatTag.valueOf((float) v) : DoubleTag.valueOf(v));
@@ -110,7 +117,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public void setInArray(String id, int slot, ItemStack stack) {
-        CompoundTag data = getData().input;
+        CompoundTag data = getDataInput();
 
         ListTag list = data.getListOrEmpty(id);
 
@@ -144,7 +151,7 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public void setMaxHealth(float maxHealth) {
-        CompoundTag data = getData().input;
+        CompoundTag data = getDataInput();
         ListTag list = data.getListOrEmpty("attributes");
 
         for (Tag nbt : list) {
@@ -163,8 +170,9 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
 
     @Override
     public ItemStack getEquipment(EquipmentSlot slot) {
-        return CraftItemStack.asBukkitCopy(getData().read("equipment", EntityEquipment.CODEC).orElseThrow()
-                .get(CraftEquipmentSlot.getNMS(slot)));
+        return getData().read("equipment", EntityEquipment.CODEC)
+                .map(equipment -> CraftItemStack.asBukkitCopy(equipment.get(CraftEquipmentSlot.getNMS(slot))))
+                .orElseGet(() -> new ItemStack(Material.AIR));
     }
 
     @Override
@@ -178,7 +186,9 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
             default -> null;
         };
 
-        CompoundTag data = getData().input;
+        CompoundTag data = getDataInput();
+        if (!data.contains("equipment"))
+            data.put("equipment", new CompoundTag());
         if (stack == null || stack.getType() == Material.AIR)
             data.getCompoundOrEmpty("equipment").remove(name);
         else {
@@ -189,9 +199,36 @@ public class NMSData extends mc.dailycraft.advancedspyinventory.nms.NMSData {
     }
 
     private TagValueInput getData() {
-        return (TagValueInput) ((CraftServer) Bukkit.getServer()).getHandle().playerIo
-                .load(playerUuid.toString(), playerUuid.toString(), ProblemReporter.DISCARDING, registryAccess())
-                .orElseThrow();
+        PlayerDataStorage io = ((CraftServer) Bukkit.getServer()).getHandle().playerIo;
+
+        try {
+            return (TagValueInput) io
+                    .load(playerUuid.toString(), playerUuid.toString(), ProblemReporter.DISCARDING, registryAccess())
+                    .orElseThrow();
+        } catch (NoSuchMethodError error) { // Paper
+            try {
+                if (paperLoadMethod == null)
+                    paperLoadMethod = PlayerDataStorage.class.getMethod("load", String.class, String.class, ProblemReporter.class);
+                CompoundTag tag = ((Optional<CompoundTag>) paperLoadMethod.invoke(io, playerUuid.toString(), playerUuid.toString(), ProblemReporter.DISCARDING)).orElseThrow();
+                return (TagValueInput) TagValueInput.create(ProblemReporter.DISCARDING, registryAccess(), tag);
+            } catch (ReflectiveOperationException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
+    }
+
+    private CompoundTag getDataInput() {
+        try {
+            return getData().input;
+        } catch (IllegalAccessError error) { // Paper
+            try {
+                if (paperInputField == null)
+                    (paperInputField = TagValueInput.class.getDeclaredField("input")).setAccessible(true);
+                return (CompoundTag) paperInputField.get(getData());
+            } catch (ReflectiveOperationException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
     }
 
     private <T> CompoundTag saveWithCodec(Codec<T> codec, T element) {
