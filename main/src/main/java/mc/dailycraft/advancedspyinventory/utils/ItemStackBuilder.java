@@ -42,7 +42,7 @@ public class ItemStackBuilder {
     }
 
     public static ItemStackBuilder ofStainedGlassPane(DyeColor color, String displayName) {
-            return new ItemStackBuilder(Material.getMaterial(color.name() + "_STAINED_GLASS_PANE"), displayName);
+        return new ItemStackBuilder(Material.getMaterial(color.name() + "_STAINED_GLASS_PANE"), displayName);
     }
 
     public ItemStackBuilder(Material material, String displayName) {
@@ -94,8 +94,10 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder hideAdditionalTooltip() {
-        meta.addItemFlags(ItemFlag.HIDE_BEES);
-        meta.addItemFlags(ItemFlag.HIDE_BLOCK_STATE);
+        try {
+            meta.addItemFlags(ItemFlag.HIDE_BEES);
+            meta.addItemFlags(ItemFlag.HIDE_BLOCK_STATE);
+        } catch (NoSuchFieldError ignored) {} // Paper
         meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         return this;
     }
@@ -180,7 +182,7 @@ public class ItemStackBuilder {
             if (current == entry)
                 sb.append("§l");
 
-            lore(sb + translation.format(keyStart + "." + entry.getKeyOrThrow().getKey()));
+            lore(sb + translation.format(keyStart + "." + entry.getKey().getKey()));
         }
 
         return this;

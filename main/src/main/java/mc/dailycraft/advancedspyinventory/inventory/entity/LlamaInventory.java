@@ -73,7 +73,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
     public void onClick(InventoryClickEvent event, int rawSlot) {
         if (rawSlot >= getSize() && Permissions.ENTITY_MODIFY.has(viewer)) {
             shift(event, 30, InformationItems.SADDLE.warning(translation), current -> current == Material.SADDLE);
-            shift(event, 32, InformationItems.LLAMA_DECOR.get(translation), current -> current.getKeyOrThrow().getKey().endsWith("_carpet"));
+            shift(event, 32, InformationItems.LLAMA_DECOR.get(translation), current -> current.getKey().getKey().endsWith("_carpet"));
         }
 
         if (entity.isCarryingChest()) {

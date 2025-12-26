@@ -1,8 +1,8 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_21_R6;
+package mc.dailycraft.advancedspyinventory.nms.v1_21_R7;
 
 import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
-import org.bukkit.craftbukkit.v1_21_R6.inventory.CraftAbstractInventoryView;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftAbstractInventoryView;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;

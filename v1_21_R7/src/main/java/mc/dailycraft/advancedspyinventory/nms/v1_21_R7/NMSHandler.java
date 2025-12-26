@@ -1,4 +1,4 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_21_R6;
+package mc.dailycraft.advancedspyinventory.nms.v1_21_R7;
 
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import mc.dailycraft.advancedspyinventory.utils.Triplet;
@@ -13,14 +13,14 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_21_R6.CraftEquipmentSlot;
-import org.bukkit.craftbukkit.v1_21_R6.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_21_R6.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R6.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_21_R6.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_21_R6.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_21_R6.util.CraftLocation;
-import org.bukkit.craftbukkit.v1_21_R6.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_21_R7.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R7.util.CraftLocation;
+import org.bukkit.craftbukkit.v1_21_R7.util.CraftMagicNumbers;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;

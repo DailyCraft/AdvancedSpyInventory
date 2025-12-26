@@ -32,7 +32,7 @@ public class InventoryCommand extends PlayerTabExecutor {
                     List<Entity> entities = Bukkit.selectEntities(sender, args[0]);
 
                     if (entities.size() == 1)
-                        targetUuid = entities.get(0).getUniqueId();
+                        targetUuid = entities.getFirst().getUniqueId();
                     else if (entities.size() > 1) {
                         sender.sendMessage(translation.format("command.inventory.only_one"));
                         return true;

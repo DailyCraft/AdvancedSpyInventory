@@ -22,13 +22,13 @@ public class VillagerSpecificationsInventory extends InformationInventory<Villag
         }
 
         contents[4] = new ItemStackBuilder(Material.CRAFTING_TABLE, translation.format("interface.villager.specifications.profession"))
-                .lore(translation.format("interface.villager.profession", translation.format("interface.villager.profession." + entity.getProfession().getKeyOrThrow().getKey()))).get();
+                .lore(translation.format("interface.villager.profession", translation.format("interface.villager.profession." + entity.getProfession().getKey().getKey()))).get();
         contents[31] = new ItemStackBuilder(Material.OAK_LOG, translation.format("interface.villager.specifications.type"))
-                .lore(translation.format("generic.type_", translation.format("interface.villager.type." + entity.getVillagerType().getKeyOrThrow().getKey()))).get();
+                .lore(translation.format("generic.type_", translation.format("interface.villager.type." + entity.getVillagerType().getKey().getKey()))).get();
 
         int i = 9;
         for (Villager.Profession profession : Registry.VILLAGER_PROFESSION) {
-            contents[i] = new ItemStackBuilder(Main.NMS.getVillagerProfessionMaterial(profession), translation.format("interface.villager.profession." + profession.getKeyOrThrow().getKey()))
+            contents[i] = new ItemStackBuilder(Main.NMS.getVillagerProfessionMaterial(profession), translation.format("interface.villager.profession." + profession.getKey().getKey()))
                     .lore(translation.format("interface.information.select" + (entity.getProfession() == profession ? "ed" : "")))
                     .enchant(entity.getProfession() == profession).get();
             i++;
@@ -36,7 +36,7 @@ public class VillagerSpecificationsInventory extends InformationInventory<Villag
 
         i = 36;
         for (Villager.Type type : Registry.VILLAGER_TYPE) {
-            contents[i] = new ItemStackBuilder(getMaterialOfType(type), translation.format("interface.villager.type." + type.getKeyOrThrow().getKey()))
+            contents[i] = new ItemStackBuilder(getMaterialOfType(type), translation.format("interface.villager.type." + type.getKey().getKey()))
                     .lore(translation.format("interface.information.select" + (entity.getVillagerType() == type ? "ed" : "")))
                     .enchant(entity.getVillagerType() == type).get();
 

@@ -1,4 +1,4 @@
-package mc.dailycraft.advancedspyinventory.nms.v1_21_R6;
+package mc.dailycraft.advancedspyinventory.nms.v1_21_R7;
 
 import mc.dailycraft.advancedspyinventory.inventory.BaseInventory;
 import net.minecraft.core.NonNullList;
@@ -6,8 +6,8 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_21_R6.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_21_R6.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 

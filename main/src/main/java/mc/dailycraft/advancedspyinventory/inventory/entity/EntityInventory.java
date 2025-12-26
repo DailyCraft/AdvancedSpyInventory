@@ -278,8 +278,8 @@ public class EntityInventory<T extends LivingEntity> extends BaseInventory {
                 inv.villagerTick = 0;
 
             return new ItemStackBuilder(++inv.villagerTick < 40 ? Main.NMS.getVillagerProfessionMaterial(entity.getProfession()) : VillagerSpecificationsInventory.getMaterialOfType(entity.getVillagerType()), inv.formatModify("interface.villager.specifications"))
-                    .lore(inv.translation.format("interface.villager.profession", (inv.villagerTick < 40 ? "§l" : "") + inv.translation.format("interface.villager.profession." + entity.getProfession().getKeyOrThrow().getKey())))
-                    .lore(inv.translation.format("generic.type_", (inv.villagerTick >= 40 ? "§l" : "") + inv.translation.format("interface.villager.type." + entity.getVillagerType().getKeyOrThrow().getKey()))).get();
+                    .lore(inv.translation.format("interface.villager.profession", (inv.villagerTick < 40 ? "§l" : "") + inv.translation.format("interface.villager.profession." + entity.getProfession().getKey().getKey())))
+                    .lore(inv.translation.format("generic.type_", (inv.villagerTick >= 40 ? "§l" : "") + inv.translation.format("interface.villager.type." + entity.getVillagerType().getKey().getKey()))).get();
         }, (inv, event, entity) -> {
             new VillagerSpecificationsInventory(inv.viewer, entity, event.getView()).open();
         }));

@@ -15,7 +15,7 @@
 
     <modules>
         <module>main</module>
-        <module>v1_21_R6</module>
+        <module>v1_21_R7</module>
         <module>dist</module>
     </modules>
 
