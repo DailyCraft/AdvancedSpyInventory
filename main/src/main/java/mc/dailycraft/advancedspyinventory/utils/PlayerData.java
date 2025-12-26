@@ -16,8 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public class PlayerData implements AnimalTamer {
-    public static final Attribute MAX_HEALTH_ATTRIBUTE = Main.VERSION >= 21.3 ? Attribute.MAX_HEALTH : ClassChange.enumValueOf(Attribute.class, "GENERIC_MAX_HEALTH");
-
     private final UUID playerUuid;
     private final NMSData nms;
 
@@ -61,13 +59,13 @@ public class PlayerData implements AnimalTamer {
 
     public float getMaxHealth() {
         return isOnline()
-                ? (float) getPlayer().getAttribute(MAX_HEALTH_ATTRIBUTE).getValue()
+                ? (float) getPlayer().getAttribute(Attribute.MAX_HEALTH).getValue()
                 : nms.getMaxHealth();
     }
 
     public void setMaxHealth(float maxHealth) {
         if (isOnline())
-            getPlayer().getAttribute(MAX_HEALTH_ATTRIBUTE).setBaseValue(maxHealth);
+            getPlayer().getAttribute(Attribute.MAX_HEALTH).setBaseValue(maxHealth);
         else
             nms.setMaxHealth(maxHealth);
     }
@@ -94,9 +92,7 @@ public class PlayerData implements AnimalTamer {
             nms.putList("Rotation", new double[] {location.getYaw(), location.getPitch()}, true);
             nms.putLong("WorldUUIDLeast", location.getWorld().getUID().getLeastSignificantBits());
             nms.putLong("WorldUUIDMost", location.getWorld().getUID().getMostSignificantBits());
-
-            if (Main.VERSION >= 16)
-                nms.putString("Dimension", Main.NMS.worldKey(location.getWorld()).toString());
+            nms.putString("Dimension", location.getWorld().getKey().toString());
         }
     }
 
@@ -125,22 +121,15 @@ public class PlayerData implements AnimalTamer {
     }
 
     public ItemStack getEquipment(EquipmentSlot slot) {
-        if (isOnline()) {
-            if (Main.VERSION >= 15.2)
-                return getPlayer().getInventory().getItem(slot);
-            else
-                return getPlayer().getInventory().getItem(slot == EquipmentSlot.OFF_HAND ? 40 : slot.ordinal() + 34);
-        }
+        if (isOnline())
+            return getPlayer().getInventory().getItem(slot);
         return nms.getEquipment(slot);
     }
 
     public void setEquipment(EquipmentSlot slot, ItemStack stack) {
-        if (isOnline()) {
-            if (Main.VERSION >= 15.2)
-                getPlayer().getInventory().setItem(slot, stack);
-            else
-                getPlayer().getInventory().setItem(slot == EquipmentSlot.OFF_HAND ? 40 : slot.ordinal() + 34, stack);
-        } else
+        if (isOnline())
+            getPlayer().getInventory().setItem(slot, stack);
+        else
             nms.setEquipment(slot, stack);
     }
 

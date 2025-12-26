@@ -103,39 +103,30 @@ public enum Permissions {
         types.add(EntityType.RABBIT);
         types.add(EntityType.SHEEP);
         types.add(EntityType.SLIME);
-        types.add(Main.VERSION >= 20.5 ? EntityType.SNOW_GOLEM : EntityType.valueOf("SNOWMAN"));
+        types.add(EntityType.SNOW_GOLEM);
         types.add(EntityType.VILLAGER);
         types.add(EntityType.WOLF);
-        if (Main.VERSION >= 13)
-            types.add(EntityType.PHANTOM);
-        if (Main.VERSION >= 14) {
-            types.add(EntityType.CAT);
-            types.add(EntityType.FOX);
-            types.add(Main.VERSION >= 20.5 ? EntityType.MOOSHROOM : EntityType.valueOf("MUSHROOM_COW"));
-            types.add(EntityType.PANDA);
-            types.add(EntityType.TRADER_LLAMA);
-        }
-        if (Main.VERSION >= 15)
-            types.add(EntityType.BEE);
-        if (Main.VERSION >= 16)
-            types.add(EntityType.STRIDER);
-        if (Main.VERSION >= 17) {
-            types.add(EntityType.AXOLOTL);
-            types.add(EntityType.GOAT);
-        }
-        if (Main.VERSION >= 19)
-            types.add(EntityType.ALLAY);
-        if (Main.VERSION >= 21.2)
-            types.add(EntityType.SALMON);
+        types.add(EntityType.PHANTOM);
+        types.add(EntityType.CAT);
+        types.add(EntityType.FOX);
+        types.add(EntityType.MOOSHROOM);
+        types.add(EntityType.PANDA);
+        types.add(EntityType.TRADER_LLAMA);
+        types.add(EntityType.BEE);
+        types.add(EntityType.STRIDER);
+        types.add(EntityType.AXOLOTL);
+        types.add(EntityType.GOAT);
+        types.add(EntityType.ALLAY);
+        types.add(EntityType.SALMON);
 
         for (EntityType type : types) {
-            String key = start + "." + (Main.VERSION >= 14 ? type.getKey().getKey() : type.getName());
-            Permission perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific", Main.VERSION >= 14 ? type.getKey() : type.getName()), PermissionDefault.OP, valToMap(ENTITY_VIEW.get()));
+            String key = start + "." + type.getKeyOrThrow().getKey();
+            Permission perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific", type.getKeyOrThrow()), PermissionDefault.OP, valToMap(ENTITY_VIEW.get()));
             Bukkit.getPluginManager().addPermission(perm);
             ENTITY_INFORMATION.put(type, perm);
 
             key += ".modify";
-            perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific.modify", Main.VERSION >= 14 ? type.getKey().getKey() : type.getName()), PermissionDefault.OP, valToMap(perm));
+            perm = new Permission(key, Translation.of().format("permission.inventory.entity.information.specific.modify", type.getKeyOrThrow().getKey()), PermissionDefault.OP, valToMap(perm));
             Bukkit.getPluginManager().addPermission(perm);
             ENTITY_INFORMATION_MODIFY.put(type, perm);
         }

@@ -34,7 +34,7 @@ public class Translation {
     }
 
     public static Translation of(Player player) {
-        return of(Main.NMS.getPlayerLocale(player));
+        return of(player.getLocale());
     }
 
     public static Translation of() {
@@ -155,50 +155,11 @@ public class Translation {
     }
 
     public static String dyeColorToChat(DyeColor color) {
-        if (Main.VERSION >= 16) {
-            StringBuilder sb = new StringBuilder("§x");
+        StringBuilder sb = new StringBuilder("§x");
 
-            for (char c : Integer.toHexString(color.getColor().asRGB()).toCharArray())
-                sb.append('§').append(c);
+        for (char c : Integer.toHexString(color.getColor().asRGB()).toCharArray())
+            sb.append('§').append(c);
 
-            return sb.toString();
-        } else {
-            if (Main.VERSION < 13 && color == DyeColor.valueOf("SILVER"))
-                return ChatColor.GRAY.toString();
-
-            switch (color) {
-                case WHITE:
-                default:
-                    return ChatColor.WHITE.toString();
-                case ORANGE:
-                case BROWN:
-                    return ChatColor.GOLD.toString();
-                case MAGENTA:
-                case PINK:
-                    return ChatColor.LIGHT_PURPLE.toString();
-                case LIGHT_BLUE:
-                    return ChatColor.AQUA.toString();
-                case YELLOW:
-                    return ChatColor.YELLOW.toString();
-                case LIME:
-                    return ChatColor.GREEN.toString();
-                case GRAY:
-                    return ChatColor.DARK_GRAY.toString();
-                case LIGHT_GRAY:
-                    return ChatColor.GRAY.toString();
-                case CYAN:
-                    return ChatColor.DARK_AQUA.toString();
-                case PURPLE:
-                    return ChatColor.DARK_PURPLE.toString();
-                case BLUE:
-                    return ChatColor.BLUE.toString();
-                case GREEN:
-                    return ChatColor.DARK_GREEN.toString();
-                case RED:
-                    return ChatColor.RED.toString();
-                case BLACK:
-                    return ChatColor.BLACK.toString();
-            }
-        }
+        return sb.toString();
     }
 }

@@ -31,7 +31,6 @@ import java.net.URLConnection;
 
 public class Main extends JavaPlugin implements Listener {
     public static NMSHandler NMS;
-    public static float VERSION = Float.parseFloat(Bukkit.getBukkitVersion().split("-")[0].substring(2));
 
     private boolean updateAvailable = false;
 
@@ -106,9 +105,6 @@ public class Main extends JavaPlugin implements Listener {
             String packageVersion;
 
             if (Bukkit.getServer().getClass().getName().equals("org.bukkit.craftbukkit.CraftServer")) {
-                if (VERSION < 20.5)
-                    throw new IllegalStateException("Unexpected server version: 1." + Bukkit.getVersion() + " (" + Bukkit.getName() + ")");
-
                 try {
                     packageVersion = (String) Class.forName("io.papermc.paper.util.MappingEnvironment").getField("LEGACY_CB_VERSION").get(null);
                 } catch (ReflectiveOperationException exception) {
@@ -134,8 +130,7 @@ public class Main extends JavaPlugin implements Listener {
             try (InputStreamReader reader = new InputStreamReader(connection.getInputStream())) {
                 JsonArray json = new Gson().fromJson(reader, JsonArray.class);
 
-                // Don't use json.isEmpty() because old GSON versions (used in old Minecraft versions) don't implement this method
-                if (json.size() == 0 || json.get(0).getAsJsonObject().get("version_number").getAsString().equals(getDescription().getVersion()))
+                if (json.isEmpty() || json.get(0).getAsJsonObject().get("version_number").getAsString().equals(getDescription().getVersion()))
                     return;
 
                 String fileName = json.get(0).getAsJsonObject().getAsJsonArray("files").get(0).getAsJsonObject().get("filename").getAsString();

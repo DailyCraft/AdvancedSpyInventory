@@ -1,10 +1,6 @@
 package mc.dailycraft.advancedspyinventory.inventory;
 
-import mc.dailycraft.advancedspyinventory.Main;
-import mc.dailycraft.advancedspyinventory.utils.ClassChange;
-import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
-import mc.dailycraft.advancedspyinventory.utils.Permissions;
-import mc.dailycraft.advancedspyinventory.utils.PlayerData;
+import mc.dailycraft.advancedspyinventory.utils.*;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -47,12 +43,12 @@ public class EnderChestInventory extends BaseInventory {
 
     @Override
     public void onOpen(Player player) {
-        viewer.playSound(viewer.getLocation(), ClassChange.enumValueOf(Sound.class, "BLOCK_ENDER" + (Main.VERSION >= 13 ? "_" : "") + "CHEST_OPEN"), 2, 1);
+        viewer.playSound(viewer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 2, 1);
     }
 
     @Override
     public void onClose(Player player) {
-        viewer.playSound(viewer.getLocation(), ClassChange.enumValueOf(Sound.class, "BLOCK_ENDER" + (Main.VERSION >= 13 ? "_" : "") + "CHEST_CLOSE"), 2, 1);
+        viewer.playSound(viewer.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, 2, 1);
     }
 
     @Override

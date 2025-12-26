@@ -62,35 +62,22 @@ public abstract class NMSData {
         setInArray("Inventory", slot <= 35 ? slot : slot <= 39 ? slot + 64 : slot == 40 ? -106 : -1, stack);
     }
 
-    public ItemStack getEquipment(EquipmentSlot slot) {
-        int index = 0;
-        if (slot == EquipmentSlot.HEAD)
-            index = 39;
-        else if (slot == EquipmentSlot.CHEST)
-            index = 38;
-        else if (slot == EquipmentSlot.LEGS)
-            index = 37;
-        else if (slot == EquipmentSlot.FEET)
-            index = 36;
-        else if (slot == EquipmentSlot.OFF_HAND)
-            index = 40;
+    public int getEquipmentIndex(EquipmentSlot slot) {
+        return switch (slot) {
+            case HEAD -> 39;
+            case CHEST -> 38;
+            case LEGS -> 37;
+            case FEET -> 36;
+            case OFF_HAND -> 40;
+            default -> throw new IllegalArgumentException("Unexpected slot " + slot);
+        };
+    }
 
-        return getInventory()[index];
+    public ItemStack getEquipment(EquipmentSlot slot) {
+        return getInventory()[getEquipmentIndex(slot)];
     }
 
     public void setEquipment(EquipmentSlot slot, ItemStack stack) {
-        int index = 0;
-        if (slot == EquipmentSlot.HEAD)
-            index = 39;
-        else if (slot == EquipmentSlot.CHEST)
-            index = 38;
-        else if (slot == EquipmentSlot.LEGS)
-            index = 37;
-        else if (slot == EquipmentSlot.FEET)
-            index = 36;
-        else if (slot == EquipmentSlot.OFF_HAND)
-            index = 40;
-
-        setInInventory(index, stack);
+        setInInventory(getEquipmentIndex(slot), stack);
     }
 }

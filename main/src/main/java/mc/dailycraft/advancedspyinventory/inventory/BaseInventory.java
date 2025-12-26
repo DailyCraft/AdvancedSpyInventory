@@ -76,21 +76,15 @@ public abstract class BaseInventory {
         }
     }
 
-    protected void shift(InventoryClickEvent event, int slot, EquipmentSlot equipmentSlot, Function<InformationItems, Function<Translation, ItemStack>> informationItem, String orEndsWith) {
-        shift(event, slot, informationItem.apply(InformationItems.of(equipmentSlot)).apply(Translation.of((Player) event.getWhoClicked())), current -> {
-            if (Main.VERSION >= 17)
-                return current.getEquipmentSlot() == equipmentSlot;
-            else
-                return (Main.VERSION >= 13 ? current.getKey().getKey() : current.name().toLowerCase()).endsWith(orEndsWith);
-        });
+    protected void shift(InventoryClickEvent event, int slot, EquipmentSlot equipmentSlot, Function<InformationItems, Function<Translation, ItemStack>> informationItem) {
+        shift(event, slot, informationItem.apply(InformationItems.of(equipmentSlot)).apply(Translation.of((Player) event.getWhoClicked())), current -> current.getEquipmentSlot() == equipmentSlot);
     }
 
     protected ItemStack getLocationItemStack(Location location, boolean isPlayer) {
         String entityKey = "interface.entity.";
-        ResourceKey worldKey = Main.NMS.worldKey(location.getWorld());
 
         return new ItemStackBuilder(Material.ARROW, translation.format(entityKey + "location"))
-                .lore(translation.format(entityKey + "world", Main.VERSION < 16 ? worldKey.getKey() : worldKey, translation.format(entityKey + "world.environment." + location.getWorld().getEnvironment().name().toLowerCase())))
+                .lore(translation.format(entityKey + "world", location.getWorld().getKey(), translation.format(entityKey + "world.environment." + location.getWorld().getEnvironment().name().toLowerCase())))
                 .lore(translation.format(entityKey + "x", location.getX()))
                 .lore(translation.format(entityKey + "y", location.getY()))
                 .lore(translation.format(entityKey + "z", location.getZ()))
@@ -113,14 +107,14 @@ public abstract class BaseInventory {
             event.setCurrentItem(null);
 
         if (event.getCursor().equals(informationItem))
-            ClassChange.setCursor(event.getView(), null);
+            event.getView().setCursor(null);
 
         Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
             if (event.getCurrentItem() != null && event.getCurrentItem().equals(informationItem))
                 event.setCurrentItem(null);
 
             if (event.getCursor().equals(informationItem))
-                ClassChange.setCursor(event.getView(), null);
+                event.getView().setCursor(null);
 
             viewer.updateInventory();
         });
@@ -131,14 +125,7 @@ public abstract class BaseInventory {
         loc.setY(Math.max(0, loc.getY() - 5));
 
         viewer.closeInventory();
-
-        if (Main.VERSION >= 14)
-            viewer.sendBlockChange(loc, Material.OAK_SIGN.createBlockData());
-        else if (Main.VERSION >= 13)
-            viewer.sendBlockChange(loc, Material.getMaterial("SIGN").createBlockData());
-        else
-            viewer.sendBlockChange(loc, Material.getMaterial("SIGN_POST"), (byte) 0);
-
+        viewer.sendBlockChange(loc, Material.OAK_SIGN.createBlockData());
         viewer.sendSignChange(loc, new String[] {defaultValue.toString(), "^^^^^^^^^^^^^^^", translation.format("sign." + formatKey + ".0"), translation.format("sign." + formatKey + ".1")});
 
         Triplet<Object> triplet = (Triplet<Object>) Main.NMS.openSign(viewer, loc);
@@ -164,10 +151,7 @@ public abstract class BaseInventory {
                         result = defaultValue;
                     }
 
-                    if (Main.VERSION >= 13)
-                        viewer.sendBlockChange(loc, loc.getBlock().getBlockData());
-                    else
-                        viewer.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
+                    viewer.sendBlockChange(loc, loc.getBlock().getBlockData());
 
                     final T finalResult = result;
                     Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
@@ -190,12 +174,12 @@ public abstract class BaseInventory {
     }
 
     public static BaseInventory fromView(InventoryView view) {
-        if (!ClassChange.getClass(view).getName().startsWith("mc.dailycraft.advancedspyinventory.nms.") || !ClassChange.getClass(view).getName().endsWith(".CustomInventoryView"))
+        if (!view.getClass().getName().startsWith("mc.dailycraft.advancedspyinventory.nms.") || !view.getClass().getName().endsWith(".CustomInventoryView"))
             return null;
 
         if (FROM_VIEW == null || FROM_VIEW.getReturnType() != BaseInventory.class) {
             try {
-                FROM_VIEW = ClassChange.getClass(view).getMethod("getContainer");
+                FROM_VIEW = view.getClass().getMethod("getContainer");
             } catch (NoSuchMethodException exception) {
                 throw new RuntimeException(exception);
             }

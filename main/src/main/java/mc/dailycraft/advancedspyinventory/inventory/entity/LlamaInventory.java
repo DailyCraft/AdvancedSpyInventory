@@ -1,6 +1,5 @@
 package mc.dailycraft.advancedspyinventory.inventory.entity;
 
-import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.InformationItems;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
@@ -38,14 +37,10 @@ public class LlamaInventory extends HorseInventory<Llama> {
 
                 if (entity.getColor() == Llama.Color.CREAMY)
                     stack = new ItemStack(Material.MILK_BUCKET);
-                else if (Main.VERSION >= 13) {
-                    stack = new ItemStack(entity.getColor() == Llama.Color.GRAY ? Material.DIORITE : Material.getMaterial(entity.getColor().name() + "_WOOL"));
-                } else {
-                    if (entity.getColor() == Llama.Color.GRAY)
-                        stack = new ItemStack(Material.STONE, 1, (short) 3);
-                    else
-                        stack = new ItemStack(Material.getMaterial("WOOL"), 1, DyeColor.valueOf(entity.getColor().name()).getWoolData());
-                }
+                else if (entity.getColor() == Llama.Color.GRAY)
+                    stack = new ItemStack(Material.DIORITE);
+                else
+                    stack = new ItemStack(Material.getMaterial(entity.getColor().name() + "_WOOL"));
 
                 return new ItemStackBuilder(stack, formatModify("generic.color"))
                         .lore((entity.getColor() == Llama.Color.CREAMY ? "§2\u25ba " : "  ") + translation.format("generic.color.creamy"))
@@ -78,7 +73,7 @@ public class LlamaInventory extends HorseInventory<Llama> {
     public void onClick(InventoryClickEvent event, int rawSlot) {
         if (rawSlot >= getSize() && Permissions.ENTITY_MODIFY.has(viewer)) {
             shift(event, 30, InformationItems.SADDLE.warning(translation), current -> current == Material.SADDLE);
-            shift(event, 32, InformationItems.LLAMA_DECOR.get(translation), current -> Main.VERSION >= 13 ? current.getKey().getKey().endsWith("_carpet") : current == Material.getMaterial("CARPET"));
+            shift(event, 32, InformationItems.LLAMA_DECOR.get(translation), current -> current.getKeyOrThrow().getKey().endsWith("_carpet"));
         }
 
         if (entity.isCarryingChest()) {

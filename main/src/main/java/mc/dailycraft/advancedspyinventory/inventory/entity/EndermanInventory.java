@@ -1,6 +1,5 @@
 package mc.dailycraft.advancedspyinventory.inventory.entity;
 
-import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.InformationItems;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
 import org.bukkit.Material;
@@ -9,7 +8,6 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
 public class EndermanInventory extends EntityInventory<Enderman> {
     public EndermanInventory(Player viewer, Enderman entity) {
@@ -19,13 +17,8 @@ public class EndermanInventory extends EntityInventory<Enderman> {
     @Override
     public ItemStack getItem(int index) {
         if (index == 4) {
-            if (Main.VERSION >= 13) {
-                BlockData carried = entity.getCarriedBlock();
-                return getNonNull(carried != null ? new ItemStack(carried.getMaterial()) : null, InformationItems.ENDERMAN_CARRIED.get(translation));
-            } else {
-                MaterialData carried = entity.getCarriedMaterial();
-                return getNonNull(new ItemStack(carried.getItemType(), 1, carried.getData()), InformationItems.ENDERMAN_CARRIED.get(translation));
-            }
+            BlockData carried = entity.getCarriedBlock();
+            return getNonNull(carried != null ? new ItemStack(carried.getMaterial()) : null, InformationItems.ENDERMAN_CARRIED.get(translation));
         } else
             return super.getItem(index);
     }
@@ -33,10 +26,7 @@ public class EndermanInventory extends EntityInventory<Enderman> {
     @Override
     public void setItem(int index, ItemStack stack) {
         if (index == 4) {
-            if (Main.VERSION >= 13)
-                entity.setCarriedBlock(stack.getType().createBlockData());
-            else
-                entity.setCarriedMaterial(stack.getData());
+            entity.setCarriedBlock(stack.getType().createBlockData());
         } else
             super.setItem(index, stack);
     }

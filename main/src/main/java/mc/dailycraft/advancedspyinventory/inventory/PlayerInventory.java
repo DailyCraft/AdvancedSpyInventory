@@ -1,6 +1,5 @@
 package mc.dailycraft.advancedspyinventory.inventory;
 
-import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.InformationItems;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import mc.dailycraft.advancedspyinventory.utils.Permissions;
@@ -59,7 +58,7 @@ public class PlayerInventory extends BaseInventory {
 
             case 46:
                 if (Permissions.PLAYER_HEALTH.has(viewer)) {
-                    return new ItemStackBuilder(Main.VERSION >= 20.5 ? PotionType.HEALING : PotionType.valueOf("INSTANT_HEAL"), translation.format("interface.entity.health", target.getHealth(), target.getMaxHealth()))
+                    return new ItemStackBuilder(PotionType.HEALING, translation.format("interface.entity.health", target.getHealth(), target.getMaxHealth()))
                             .lore(Permissions.PLAYER_HEALTH_MODIFY.has(viewer) || Permissions.PLAYER_HEALTH_MODIFY.has(viewer), "", translation.format("interface.entity.health.modify.0"))
                             .lore(Permissions.PLAYER_HEALTH_MODIFY.has(viewer), "   " + translation.format("interface.entity.health.modify.1"))
                             .lore(Permissions.PLAYER_HEALTH_MODIFY_MAX.has(viewer), "   " + translation.format("interface.entity.health.modify.2")).get();
@@ -79,7 +78,7 @@ public class PlayerInventory extends BaseInventory {
 
             case 51:
                 if (Permissions.PLAYER_XP.has(viewer))
-                    return new ItemStackBuilder(Main.VERSION >= 13 ? Material.EXPERIENCE_BOTTLE : Material.getMaterial("EXP_BOTTLE"), translation.format("interface.player.experience", target.getExperience()) + (Permissions.PLAYER_XP_MODIFY.has(viewer) ? " " + translation.format("generic.modify") : "")).get();
+                    return new ItemStackBuilder(Material.EXPERIENCE_BOTTLE, translation.format("interface.player.experience", target.getExperience()) + (Permissions.PLAYER_XP_MODIFY.has(viewer) ? " " + translation.format("generic.modify") : "")).get();
 
                 break;
 
@@ -152,9 +151,9 @@ public class PlayerInventory extends BaseInventory {
 
             if (target.isOnline() && Permissions.PLAYER_DROP.has(viewer)) {
                 if (event.getClick() == ClickType.SHIFT_LEFT)
-                    Main.NMS.dropItem(target.getPlayer(), false);
+                    target.getPlayer().dropItem(false);
                 else if (event.getClick() == ClickType.SHIFT_RIGHT)
-                    Main.NMS.dropItem(target.getPlayer(), true);
+                    target.getPlayer().dropItem(true);
 
                 target.getPlayer().updateInventory();
             }
@@ -216,10 +215,10 @@ public class PlayerInventory extends BaseInventory {
                 if (Permissions.PLAYER_MODIFY.has(viewer)) {
                     event.setCancelled(false);
 
-                    shift(event, 37, EquipmentSlot.HEAD, item -> item::get, "_helmet");
-                    shift(event, 38, EquipmentSlot.CHEST, item -> item::get, "_chestplate");
-                    shift(event, 39, EquipmentSlot.LEGS, item -> item::get, "_leggings");
-                    shift(event, 40, EquipmentSlot.FEET, item -> item::get, "_boots");
+                    shift(event, 37, EquipmentSlot.HEAD, item -> item::get);
+                    shift(event, 38, EquipmentSlot.CHEST, item -> item::get);
+                    shift(event, 39, EquipmentSlot.LEGS, item -> item::get);
+                    shift(event, 40, EquipmentSlot.FEET, item -> item::get);
                 }
             }
         }

@@ -1,6 +1,5 @@
 package mc.dailycraft.advancedspyinventory.inventory.entity.information;
 
-import mc.dailycraft.advancedspyinventory.Main;
 import mc.dailycraft.advancedspyinventory.utils.ItemStackBuilder;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -15,7 +14,7 @@ public class SheepColorInventory extends InformationInventory<Sheep> {
         super(viewer, entity, oldView, 3);
 
         for (DyeColor color : DyeColor.values())
-            contents[color.ordinal()] = new ItemStackBuilder(Main.VERSION >= 13 ? new ItemStack(Material.getMaterial(color.name() + "_WOOL")) : new ItemStack(Material.getMaterial("WOOL"), 1, color.getWoolData()), translation.formatColor(color))
+            contents[color.ordinal()] = new ItemStackBuilder(new ItemStack(Material.getMaterial(color.name() + "_WOOL")), translation.formatColor(color))
                     .lore(translation.format("interface.information.select" + (entity.getColor() == color ? "ed" : "")))
                     .enchant(entity.getColor() == color).get();
     }

@@ -2,13 +2,8 @@ package mc.dailycraft.advancedspyinventory.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import mc.dailycraft.advancedspyinventory.Main;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -17,17 +12,21 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionType;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.registry.RegistryAware;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ItemStackBuilder {
-    private static final Map<String, GameProfile> headProfiles = new HashMap<>();
+    private static final Map<String, PlayerProfile> headProfiles = new HashMap<>();
 
     private final ItemStack stack;
     private final ItemMeta meta;
@@ -43,10 +42,7 @@ public class ItemStackBuilder {
     }
 
     public static ItemStackBuilder ofStainedGlassPane(DyeColor color, String displayName) {
-        if (Main.VERSION >= 13)
             return new ItemStackBuilder(Material.getMaterial(color.name() + "_STAINED_GLASS_PANE"), displayName);
-        else
-            return new ItemStackBuilder(new ItemStack(Material.getMaterial("STAINED_GLASS_PANE"), 1, color.getWoolData()), displayName);
     }
 
     public ItemStackBuilder(Material material, String displayName) {
@@ -54,60 +50,53 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder(String headOwner, String displayName) {
-        stack = Main.VERSION >= 13 ? new ItemStack(Material.PLAYER_HEAD) : new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 3);
+        stack = new ItemStack(Material.PLAYER_HEAD);
         meta = stack.getItemMeta();
         displayName(displayName);
 
-        try {
-            GameProfile profile = headProfiles.get(headOwner);
+        PlayerProfile profile = headProfiles.get(headOwner);
 
-            if (profile == null) {
-                Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
-                    try {
-                        UUID uuid;
+        if (profile == null) {
+            Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+                UUID uuid;
 
-                        if (Bukkit.getOnlineMode()) {
-                            uuid = Bukkit.getOfflinePlayer(headOwner).getUniqueId();
-                        } else {
-                            try (Reader reader = new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + headOwner).openStream())) {
-                                uuid = UUID.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString().replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
-                            }
-                        }
-
-                        try (Reader sessionReader = new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "")).openStream())) {
-                            JsonObject textureProperty = new Gson().fromJson(sessionReader, JsonObject.class).get("properties").getAsJsonArray().get(0).getAsJsonObject();
-                            String value = textureProperty.get("value").getAsString();
-
-                            GameProfile gameProfile = new GameProfile(uuid, headOwner);
-                            gameProfile.getProperties().put("textures", new Property("textures", value));
-                            headProfiles.put(headOwner, gameProfile);
-                        }
-                    } catch (Exception exception) {
-                        Main.getInstance().getLogger().severe("Error when loading head '" + headOwner + "'! Message: " + exception.getMessage());
+                if (Bukkit.getOnlineMode()) {
+                    uuid = Bukkit.getOfflinePlayer(headOwner).getUniqueId();
+                } else {
+                    try (Reader reader = new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + headOwner).openStream())) {
+                        uuid = UUID.fromString(new Gson().fromJson(reader, JsonObject.class).get("id").getAsString().replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
+                    } catch (IOException exception) {
+                        throw new RuntimeException(exception);
                     }
-                });
-            } else
-                Main.NMS.setHeadProfile((SkullMeta) meta, profile);
-        } catch (ReflectiveOperationException exception) {
-            throw new RuntimeException(exception);
-        }
+                }
+
+                try {
+                    headProfiles.put(headOwner, Bukkit.createPlayerProfile(uuid).update().get());
+                } catch (InterruptedException | ExecutionException exception) {
+                    throw new RuntimeException(exception);
+                }
+            });
+        } else
+            ((SkullMeta) meta).setOwnerProfile(profile);
     }
 
     public ItemStackBuilder(PotionType potionType, String displayName) {
         this(Material.POTION, displayName);
-        Main.NMS.setBasePotionType((PotionMeta) meta, potionType);
+        ((PotionMeta) meta).setBasePotionType(potionType);
         hideAdditionalTooltip();
     }
 
     public ItemStackBuilder displayName(String displayName) {
         meta.setDisplayName(displayName != null ? ChatColor.RESET.toString() + ChatColor.WHITE + displayName : null);
-        if (Main.VERSION >= 20.5 && (displayName == null || displayName.isEmpty()))
+        if (displayName == null || displayName.isEmpty())
             meta.setHideTooltip(true);
         return this;
     }
 
     public ItemStackBuilder hideAdditionalTooltip() {
-        meta.addItemFlags(Main.VERSION >= 20.5 ? ItemFlag.HIDE_ADDITIONAL_TOOLTIP : ItemFlag.valueOf("HIDE_POTION_EFFECTS"));
+        meta.addItemFlags(ItemFlag.HIDE_BEES);
+        meta.addItemFlags(ItemFlag.HIDE_BLOCK_STATE);
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         return this;
     }
 
@@ -153,8 +142,8 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public <T> ItemStackBuilder enumLore(Translation translation, T[] enumeration, T current, @Nullable Function<T, DyeColor> entryColor, String keyStart) {
-        Arrays.sort(enumeration, Comparator.comparingInt(ClassChange::enumOrdinal));
+    public <T extends Enum<?>> ItemStackBuilder enumLore(Translation translation, T[] enumeration, T current, @Nullable Function<T, DyeColor> entryColor, String keyStart) {
+        Arrays.sort(enumeration, Comparator.comparingInt(Enum::ordinal));
 
         for (T entry : enumeration) {
             StringBuilder sb = new StringBuilder(current == entry ? "§2\u25ba§a " : "  ");
@@ -163,19 +152,19 @@ public class ItemStackBuilder {
             if (current == entry)
                 sb.append("§l");
 
-            lore(sb + translation.format(keyStart + "." + ClassChange.enumName(entry).toLowerCase()));
+            lore(sb + translation.format(keyStart + "." + entry.name().toLowerCase()));
         }
 
         return this;
     }
 
-    public <T> ItemStackBuilder enumLore(Translation translation, T[] enumeration, T current, String keyStart) {
+    public <T extends Enum<?>> ItemStackBuilder enumLore(Translation translation, T[] enumeration, T current, String keyStart) {
         return enumLore(translation, enumeration, current, null, keyStart);
     }
 
-    public static <T> void enumLoreClick(InventoryClickEvent event, T[] enumeration, T currentValue, Consumer<T> setter) {
-        Arrays.sort(enumeration, Comparator.comparingInt(ClassChange::enumOrdinal));
-        int i = ClassChange.enumOrdinal(currentValue);
+    public static <T extends Enum<?>> void enumLoreClick(InventoryClickEvent event, T[] enumeration, T currentValue, Consumer<T> setter) {
+        Arrays.sort(enumeration, Comparator.comparingInt(Enum::ordinal));
+        int i = currentValue.ordinal();
 
         if (event.isLeftClick())
             setter.accept(enumeration[++i >= enumeration.length ? 0 : i]);
@@ -183,9 +172,38 @@ public class ItemStackBuilder {
             setter.accept(enumeration[--i < 0 ? enumeration.length - 1 : i]);
     }
 
+    public <T extends Keyed & RegistryAware> ItemStackBuilder registryLore(Translation translation, Registry<T> registry, T current, @Nullable Function<T, DyeColor> entryColor, String keyStart) {
+        for (T entry : registry) {
+            StringBuilder sb = new StringBuilder(current == entry ? "§2\u25ba§a " : "  ");
+            if (entryColor != null)
+                sb.append(Translation.dyeColorToChat(entryColor.apply(entry)));
+            if (current == entry)
+                sb.append("§l");
+
+            lore(sb + translation.format(keyStart + "." + entry.getKeyOrThrow().getKey()));
+        }
+
+        return this;
+    }
+
+    public <T extends Keyed & RegistryAware> ItemStackBuilder registryLore(Translation translation, Registry<T> registry, T current, String keyStart) {
+        return registryLore(translation, registry, current, null, keyStart);
+    }
+
+    public static <T extends Keyed & RegistryAware> void registryLoreClick(InventoryClickEvent event, Registry<T> registry, T currentValue, Consumer<T> setter) {
+        List<T> list = new ArrayList<>();
+        registry.iterator().forEachRemaining(list::add);
+        int i = list.indexOf(currentValue);
+
+        if (event.isLeftClick())
+            setter.accept(list.get(++i >= list.size() ? 0 : i));
+        else if (event.isRightClick())
+            setter.accept(list.get(--i < 0 ? list.size() - 1 : i));
+    }
+
     public ItemStackBuilder enchant(boolean condition) {
         if (condition) {
-            stack.addUnsafeEnchantment(Main.VERSION >= 20.5 ? Enchantment.PROTECTION : Enchantment.getByName("PROTECTION_ENVIRONMENTAL"), 1);
+            stack.addUnsafeEnchantment(Enchantment.PROTECTION, 1);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
